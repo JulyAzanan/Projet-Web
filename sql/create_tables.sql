@@ -1,7 +1,7 @@
-CREATE TABLE user (
+CREATE TABLE musician (
     name VARCHAR(42) NOT NULL,
-    email TEXT NOT NULL,
     passwordHash TEXT NOT NULL,
+    email VARCHAR(100),
     latestCommit TIMESTAMP(3),
     age INTEGER,
 
@@ -63,9 +63,9 @@ CREATE TABLE friend (
     PRIMARY KEY (followerName,followingName)
 );
 
-CREATE UNIQUE INDEX user.email_unique ON user(email);
+CREATE UNIQUE INDEX musician_email_unique ON musician(email);
 
-ALTER TABLE project ADD FOREIGN KEY (authorName) REFERENCES user(name) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE project ADD FOREIGN KEY (authorName) REFERENCES musician(name) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE branch ADD FOREIGN KEY (authorName, projectName) REFERENCES project(authorName, name) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -73,10 +73,12 @@ ALTER TABLE version ADD FOREIGN KEY (authorName, projectName, branchName) REFERE
 
 ALTER TABLE partition ADD FOREIGN KEY (authorName, projectName, branchName, versionID) REFERENCES version(authorName, projectName, branchName, id) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE contributor ADD FOREIGN KEY (contributorName) REFERENCES user(name) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE contributor ADD FOREIGN KEY (contributorName) REFERENCES musician(name) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE contributor ADD FOREIGN KEY (authorName, projectName) REFERENCES project(authorName, name) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE friend ADD FOREIGN KEY (followerName) REFERENCES user(name) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE friend ADD FOREIGN KEY (followerName) REFERENCES musician(name) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE friend ADD FOREIGN KEY (followingName) REFERENCES user(name) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE friend ADD FOREIGN KEY (followingName) REFERENCES musician(name) ON DELETE CASCADE ON UPDATE CASCADE;
+
+GRANT ALL ON ALL TABLES IN SCHEMA public TO "tpphp";
