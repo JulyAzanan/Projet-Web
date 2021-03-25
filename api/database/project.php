@@ -13,18 +13,32 @@ function remove($author, $project) {
 
 function fetchAll($first, $after, $loggedUser)
 {
+    if ($first == null || $after == null) {
+        arg_error();
+    }
     // Gérer cas projets privés et publics. Modifier ce qu'il faut pour un order by date de création ou de modif, asc ou desc
 }
 
 function fetchAllFromUser($first, $after, $user, $loggedUser)
 {
+    if ($first == null || $after == null) {
+        arg_error();
+    }
     // Gérer cas projets privés et publics. Modifier ce qu'il faut pour un order by date de création ou de modif, asc ou desc
 }
 
 function count($loggedUser) {
-    
+    //Gérer cas des projets privés et publics
 }
 
 function countFromUser($loggedUser) {
-    
+    //Gérer cas des projets privés et publics
+}
+
+function seekBranch($first, $after, $author, $project, $loggedUser) 
+{
+    if ($first == null || $after == null) {
+        arg_error();
+    }
+    // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$branch%
 }

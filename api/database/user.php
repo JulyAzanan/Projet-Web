@@ -2,20 +2,23 @@
 namespace User;
 
 include_once "config.php";
+include_once "../utils/error.php";
+include_once "../utils/args.php";
 
 /**
  * Permet de créer un nouvel utilisateur
  */
-function add($name, $password, $email, $age)
+function add($user, $password, $email, $age)
 {
-    if ($name == null || $password == null || strlen($name) <= 0 || strlen($password) <= 0) {
-        return false;
+    check_not_null($user, $password);
+    if (strlen($name) <= 0 || strlen($password) <= 0) {
+        arg_error();
     }
     $passwordHash = hash("sha256", $password);
     $bd = connect();
     $sql = "INSERT INTO musician VALUES (:name, :passwordHash, :email, NULL, :age)";
     $stmt = $bd->prepare($sql);
-    $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
+    $stmt->bindValue(':name', $user, \PDO::PARAM_STR);
     $stmt->bindValue(':passwordHash', $passwordHash, \PDO::PARAM_STR);
     $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
     $stmt->bindValue(':age', $age, \PDO::PARAM_INT);
@@ -25,14 +28,56 @@ function add($name, $password, $email, $age)
 /**
  * Permet de retirer l'utilisateur dont le nom est entré en argument de la base de données
  */
-function remove($name)
+function remove($user, $loggedUser)
 {
+    check_not_null($user, $loggedUser);
+    check_owner($user, $loggedUser);
     $bd = connect();
     $sql = "DELETE FROM musician WHERE name = :name";
 
     $stmt = $bd->prepare($sql);
-    $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
+    $stmt->bindValue(':name', $user, \PDO::PARAM_STR);
     return $stmt->execute();
+}
+
+function update($user, $password, $email, $age, $loggedUser)
+{
+    check_not_null($user, $loggedUser);
+    check_owner($user, $loggedUser);
+    $bd = connect();
+    if ($age != null) {
+        $sql = "UPDATE musician SET age = :age WHERE name = :user";
+        $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
+        $stmt->bindValue(':age', $age, \PDO::PARAM_INT);
+        $stmt = $bd->prepare($sql);
+        if (!$stmt->execute()) {
+            return false;
+        }
+    }
+    if ($password != null) {
+        $passwordHash = hash("sha256", $password);
+        $sql = "UPDATE musician SET passwordHash = :passwordHash WHERE name = :user";
+        $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
+        $stmt->bindValue(':passwordHash', $passwordHash, \PDO::PARAM_STR);
+        $stmt = $bd->prepare($sql);
+        if (!$stmt->execute()) {
+            return false;
+        }
+    }
+    if ($email != null) {
+        if (findByEmail($email) != null) {
+            return false;
+        }
+
+        $sql = "UPDATE musician SET email = :email WHERE name = :user";
+        $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
+        $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
+        $stmt = $bd->prepare($sql);
+        if (!$stmt->execute()) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
@@ -40,6 +85,7 @@ function remove($name)
  */
 function fetchAll($first, $after)
 {
+    check_not_null($first, $after);
     $bd = connect();
     $stmt = $bd->prepare("SELECT name, email, latestCommit, age FROM musician LIMIT :first OFFSET :after");
     $stmt->bindValue(':first', $first, \PDO::PARAM_INT);
@@ -57,17 +103,6 @@ function fetchAll($first, $after)
     return $users;
 }
 
-function auth($name, $password)
-{
-    $hash = hash("sha256", $password);
-    $bd = connect();
-    $stmt = $bd->prepare("SELECT passwordHash FROM musician WHERE name = :name");
-    $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
-    $stmt->execute();
-    $passwordHash = $stmt->fetch()[0];
-    return hash_equals($passwordHash, $hash);
-}
-
 function count()
 {
     $bd = connect();
@@ -75,4 +110,51 @@ function count()
     $stmt->execute();
     $res = $stmt->fetch();
     return $res[0];
+}
+
+function findByEmail($email)
+{
+    $bd = connect();
+    $stmt = $bd->prepare("SELECT * FROM musician WHERE email = :email");
+    $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
+    $stmt->execute();
+    $user = null;
+    foreach ($stmt->fetchAll() as $res) {
+        $user = (object) [
+            'name' => $res['name'],
+            'email' => $res['email'],
+            'latestCommit' => $res['latestCommit'],
+            'age' => $res['age'],
+        ];
+    }
+    return $user;
+}
+
+function find($user)
+{
+    $bd = connect();
+    $stmt = $bd->prepare("SELECT * FROM musician WHERE name = :name");
+    $stmt->bindValue(':name', $user, \PDO::PARAM_STR);
+    $stmt->execute();
+    $user = null;
+    foreach ($stmt->fetchAll() as $res) {
+        $user = (object) [
+            'name' => $res['name'],
+            'email' => $res['email'],
+            'latestCommit' => $res['latestCommit'],
+            'age' => $res['age'],
+        ];
+    }
+    return $user;
+}
+
+function auth($user, $password)
+{
+    $hash = hash("sha256", $password);
+    $bd = connect();
+    $stmt = $bd->prepare("SELECT passwordHash FROM musician WHERE name = :name");
+    $stmt->bindValue(':name', $user, \PDO::PARAM_STR);
+    $stmt->execute();
+    $passwordHash = $stmt->fetch()[0];
+    return hash_equals($passwordHash, $hash);
 }
