@@ -1,5 +1,25 @@
 # Muse Git
 
+## Configuration du projet
+```
+yarn install
+```
+
+### Compilation et rechargement à chaud pour le développement
+```
+yarn dev
+```
+
+### Compilation et minification pour la production
+```
+yarn build
+```
+
+### Formatage et correction des fichiers
+```
+yarn lint
+```
+
 ## Cahier des charges
 
 | Fonctions                   | Critère                       | Solution technique                             | Flexibilité | Niveau  |
