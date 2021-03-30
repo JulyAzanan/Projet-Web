@@ -69,7 +69,7 @@ CREATE UNIQUE INDEX musician_email_unique ON musician(email);
 
 ALTER TABLE project ADD FOREIGN KEY (authorName) REFERENCES musician(name) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE project ADD FOREIGN KEY (mainBranchName) REFERENCES branch(name) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE project ADD FOREIGN KEY (authorName, name, mainBranchName) REFERENCES branch(authorName, projectName, name) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE branch ADD FOREIGN KEY (authorName, projectName) REFERENCES project(authorName, name) ON DELETE CASCADE ON UPDATE CASCADE;
 
