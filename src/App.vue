@@ -3,7 +3,7 @@
     <div class="uk-navbar-left test-overlay">
       <div class="uk-navbar-item">
         <router-link to="/">
-          <img src="https://picsum.photos/200" width="50" alt="" />
+          <img src="@/assets/logo_simple.png" width="50" alt="" />
         </router-link>
       </div>
     </div>
