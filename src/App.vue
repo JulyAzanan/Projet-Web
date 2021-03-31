@@ -4,6 +4,7 @@
       <div class="uk-navbar-item">
         <router-link to="/">
           <img src="@/assets/logo_simple.png" width="50" alt="" />
+          <img src="@/assets/logo_text.png" width="100" alt="" />
         </router-link>
       </div>
     </div>
