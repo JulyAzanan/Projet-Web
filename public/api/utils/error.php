@@ -27,6 +27,13 @@ function request_error()
     die;
 }
 
+function project_error()
+{
+    http_response_code(400);
+    echo "<h1> 400 Unknown project </h1>";
+    die;
+}
+
 function forbidden_error()
 {
     http_response_code(403);

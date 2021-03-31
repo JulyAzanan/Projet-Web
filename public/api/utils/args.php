@@ -36,7 +36,7 @@ function check_contributor($User_to_check,$Project,$Project_Author_Name)
     $stmt->execute(); //Execute the request 
     //We select all contributors
     foreach ($stmt->fetchAll() as $res) {
-        if (strcmp($res['contributorname'],$User_to_check) == 0 )//Check if 
+        if (strcmp($res['contributorname'],$User_to_check) == 0 )//Check if $User_to_check is a contributor of the selected project
         {
             return true;
         }
@@ -58,4 +58,15 @@ function admin_or_contributor($author, $project, $loggedUser){
         }
     }
     return true ;
+}
+
+function check_project_exist($Project_Author_Name, $project){
+    $bd = connect();
+    //Select all contributor from project $Project 
+    $stmt = $bd->prepare("SELECT name FROM Project WHERE name = :pname AND authorname = :pauthorname");
+    //Binding args
+    $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':pauthorname', $Project_Author_Name, \PDO::PARAM_STR);
+    $stmt->execute(); //Execute the request 
+    return ($stmt->rowCount() == 1 ) ; //Check if we found the requested project
 }
