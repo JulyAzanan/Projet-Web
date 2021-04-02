@@ -15,9 +15,11 @@
         <li :class="{ 'uk-active': $route.path === '/users' }">
           <router-link to="/users">utilisateurs</router-link>
         </li>
+
         <li :class="{ 'uk-active': $route.path === '/projects' }">
           <router-link to="/projects">projets</router-link>
         </li>
+
         <li :class="{ 'uk-active': $route.path === '/about' }">
           <router-link to="/about">à propos</router-link>
         </li>
@@ -43,11 +45,13 @@
               uk-tooltip="title: Nouveau projet; pos: bottom; delay: 200"
             ></a>
           </li>
+
           <li>
             <a uk-icon="icon: thumbnails"></a>
             <div uk-dropdown="pos: bottom-justify">
               <ul class="uk-nav uk-dropdown-nav">
                 <li class="uk-nav-header">Projets récents</li>
+
                 <li>
                   <a href="#">
                     <span
@@ -57,6 +61,7 @@
                     Projet 3615
                   </a>
                 </li>
+
                 <li>
                   <a href="#">
                     <span
@@ -66,6 +71,7 @@
                     Nier: Automata
                   </a>
                 </li>
+
                 <li>
                   <a href="#">
                     <span
@@ -75,7 +81,9 @@
                     Daft Punk
                   </a>
                 </li>
+
                 <li class="uk-nav-divider"></li>
+
                 <li>
                   <a href="#">
                     <span
@@ -85,6 +93,7 @@
                     Foo
                   </a>
                 </li>
+
                 <li>
                   <a href="#">
                     <span
@@ -122,6 +131,7 @@
                   Mon profil
                 </a>
               </li>
+
               <li>
                 <a href="#">
                   <span
@@ -131,6 +141,7 @@
                   Mes projets
                 </a>
               </li>
+
               <li>
                 <a href="#">
                   <span
@@ -140,7 +151,9 @@
                   Mes amis
                 </a>
               </li>
+
               <li class="uk-nav-divider"></li>
+
               <li>
                 <a href="#">
                   <span
@@ -150,6 +163,7 @@
                   Paramètres
                 </a>
               </li>
+
               <li>
                 <a href="#">
                   <span

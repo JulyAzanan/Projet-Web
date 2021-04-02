@@ -6,12 +6,15 @@
         <div>
           <p>Some bullshit</p>
         </div>
+
         <div>
           <p>More bullshit</p>
         </div>
+
         <div>
           <ul class="uk-nav uk-nav-default">
             <li class="uk-nav-header">Liens</li>
+
             <li>
               <a href="https://github.com/JulyAzanan/Projet-Web">
                 <span
@@ -21,6 +24,7 @@
                 Github
               </a>
             </li>
+
             <li>
               <a href="mailto:foo@example.com">
                 <span class="uk-margin-small-right" uk-icon="icon: mail"></span>
