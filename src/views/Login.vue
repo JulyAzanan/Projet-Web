@@ -52,7 +52,7 @@ export default defineComponent({});
 <style lang="scss" scoped>
 .background {
   background-image: url("../assets/login.jpg");
-  background-color: #68463b;
+  background-color: #685d5a;
   height: 80vh;
   background-position: center;
   background-repeat: no-repeat;
