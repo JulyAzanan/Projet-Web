@@ -1,6 +1,6 @@
 <template>
   <Navbar/>
-  <div id="main" class="uk-container">
+  <div id="main">
     <router-view />
   </div>
   <Footer/>

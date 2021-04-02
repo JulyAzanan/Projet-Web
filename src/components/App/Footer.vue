@@ -37,9 +37,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
-export default defineComponent({
-  name: "Footer"
-});
+export default defineComponent({});
 </script>
 
 <style lang="scss" scoped>
