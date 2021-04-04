@@ -123,13 +123,13 @@
           <div class="uk-navbar-dropdown">
             <ul class="uk-nav uk-navbar-dropdown-nav">
               <li>
-                <a href="#">
+                <router-link :to="{path: '/-/' + username}">
                   <span
                     class="uk-margin-small-right"
                     uk-icon="icon: user"
                   ></span>
                   Mon profil
-                </a>
+                </router-link>
               </li>
 
               <li>
@@ -210,7 +210,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   setup() {
-    const logged = false;
+    const logged = true;
     const username = "Steel";
     return {
       logged,
