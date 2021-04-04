@@ -9,24 +9,21 @@
         </router-link>
       </div>
     </div>
-    <div class="uk-navbar-center search-overlay">
+    <div class="uk-navbar-center search-overlay uk-visible@s">
       <!-- Routes principales -->
       <ul class="uk-navbar-nav">
-        <li :class="{ 'uk-active': $route.path === '/users' }">
-          <router-link to="/users">utilisateurs</router-link>
-        </li>
-
-        <li :class="{ 'uk-active': $route.path === '/projects' }">
-          <router-link to="/projects">projets</router-link>
-        </li>
-
-        <li :class="{ 'uk-active': $route.path === '/about' }">
-          <router-link to="/about">à propos</router-link>
-        </li>
+        <Links />
       </ul>
     </div>
     <div class="uk-navbar-right search-overlay">
-      <ul class="uk-navbar-nav">
+      <!-- Hamburger -->
+      <a
+        class="uk-navbar-toggle uk-hidden@s"
+        uk-toggle="target: #sidenav"
+        uk-navbar-toggle-icon
+      ></a>
+      <!-- Recherche -->
+      <ul class="uk-navbar-nav uk-visible@s">
         <li class="uk-active">
           <a
             class="uk-navbar-toggle"
@@ -36,165 +33,45 @@
         </li>
       </ul>
       <!-- Actions rapide -->
-      <div v-if="logged" class="uk-navbar-item">
+      <div v-if="logged" class="uk-navbar-item uk-visible@s">
         <ul class="uk-iconnav">
           <li>
             <a
               href="#"
-              uk-icon="icon: plus"
               uk-tooltip="title: Nouveau projet; pos: bottom; delay: 200"
-            ></a>
+              ><span uk-icon="icon: plus"></span>
+            </a>
           </li>
 
           <li>
-            <a uk-icon="icon: thumbnails"></a>
+            <a><span uk-icon="icon: thumbnails"></span></a>
             <div uk-dropdown="pos: bottom-justify">
               <ul class="uk-nav uk-dropdown-nav">
                 <li class="uk-nav-header">Projets récents</li>
-
-                <li>
-                  <a href="#">
-                    <span
-                      class="uk-margin-small-right"
-                      uk-icon="icon: folder"
-                    ></span>
-                    Projet 3615
-                  </a>
-                </li>
-
-                <li>
-                  <a href="#">
-                    <span
-                      class="uk-margin-small-right"
-                      uk-icon="icon: folder"
-                    ></span>
-                    Nier: Automata
-                  </a>
-                </li>
-
-                <li>
-                  <a href="#">
-                    <span
-                      class="uk-margin-small-right"
-                      uk-icon="icon: folder"
-                    ></span>
-                    Daft Punk
-                  </a>
-                </li>
-
-                <li class="uk-nav-divider"></li>
-
-                <li>
-                  <a href="#">
-                    <span
-                      class="uk-margin-small-right"
-                      uk-icon="icon: lock"
-                    ></span>
-                    Foo
-                  </a>
-                </li>
-
-                <li>
-                  <a href="#">
-                    <span
-                      class="uk-margin-small-right"
-                      uk-icon="icon: lock"
-                    ></span>
-                    Bar
-                  </a>
-                </li>
+                <RecentProjects />
               </ul>
             </div>
           </li>
-          <li>
-            <a
-              href="#"
-              uk-icon="icon: bell"
-              uk-tooltip="title: Notifications; pos: bottom; delay: 200"
-              ><span class="uk-badge">2</span></a
-            >
-          </li>
+          <Notifications />
         </ul>
       </div>
-      <ul class="uk-navbar-nav">
+      <ul class="uk-navbar-nav uk-visible@s">
         <!-- Profil utilisateur -->
         <li v-if="logged" class="uk-active">
           <a class="username">{{ username }} </a>
           <div class="uk-navbar-dropdown">
             <ul class="uk-nav uk-navbar-dropdown-nav">
-              <li>
-                <a href="#">
-                  <span
-                    class="uk-margin-small-right"
-                    uk-icon="icon: user"
-                  ></span>
-                  Mon profil
-                </a>
-              </li>
-
-              <li>
-                <a href="#">
-                  <span
-                    class="uk-margin-small-right"
-                    uk-icon="icon: album"
-                  ></span>
-                  Mes projets
-                </a>
-              </li>
-
-              <li>
-                <a href="#">
-                  <span
-                    class="uk-margin-small-right"
-                    uk-icon="icon: users"
-                  ></span>
-                  Mes amis
-                </a>
-              </li>
-
-              <li class="uk-nav-divider"></li>
-
-              <li>
-                <a href="#">
-                  <span
-                    class="uk-margin-small-right"
-                    uk-icon="icon: settings"
-                  ></span>
-                  Paramètres
-                </a>
-              </li>
-
-              <li>
-                <a href="#">
-                  <span
-                    class="uk-margin-small-right"
-                    uk-icon="icon: sign-out"
-                  ></span>
-                  Déconnexion
-                </a>
-              </li>
+              <Usernav />
             </ul>
           </div>
         </li>
-        <li v-else>
-          <router-link to="/login">
-            <span class="uk-margin-small-right" uk-icon="icon: sign-in"></span>
-            Se connecter
-          </router-link>
-        </li>
+        <Login v-else />
       </ul>
     </div>
     <!-- Overlay de recherche -->
     <div class="uk-navbar-left uk-flex-1 search-overlay" hidden>
       <div class="uk-navbar-item uk-width-expand">
-        <form class="uk-search uk-search-navbar uk-width-1-1">
-          <input
-            class="uk-search-input"
-            type="search"
-            placeholder="Rechercher..."
-            autofocus
-          />
-        </form>
+        <Search/>
       </div>
       <a
         class="uk-navbar-toggle"
@@ -203,14 +80,31 @@
       ></a>
     </div>
   </nav>
+  <Sidenav />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import Sidenav from "./Sidenav.vue";
+import Links from "./Links.vue";
+import Usernav from "./Usernav.vue";
+import Login from "./Login.vue";
+import RecentProjects from "./Recent-Projects.vue";
+import Notifications from "./Notifications.vue";
+import Search from "./Search.vue"
 
 export default defineComponent({
+  components: {
+    Sidenav,
+    Links,
+    Usernav,
+    Login,
+    RecentProjects,
+    Notifications,
+    Search,
+  },
   setup() {
-    const logged = false;
+    const logged = true;
     const username = "Steel";
     return {
       logged,
@@ -220,9 +114,9 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .username {
-  text-transform: none;
+  text-transform: none !important;
   font-weight: bold;
 }
 </style>
