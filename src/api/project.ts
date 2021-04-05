@@ -3,20 +3,15 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function exists(username?: string, project?: string) {
-  if (username == undefined || project == undefined) return false;
+export async function find(user?: string, project?: string) {
+  if (user == undefined || project == undefined) throw null;
   await sleep(500);
-  return true;
-}
-
-export async function metadata(username?: string, project?: string) {
-  if (username == undefined || project == undefined) throw new Error("metadata: undefined props");
-  await sleep(500);
+  const foo = false;
+  if (foo) return null;
   return {
-    username,
-    project,
-    meta: {
-      mainBranch: "main"
-    }
-  };
+    contributors: ["Steel", "July", "Michel"],
+    mainBranch: "main",
+    updatedAt: new Date(),
+    createdAt: new Date(),
+  }
 }
