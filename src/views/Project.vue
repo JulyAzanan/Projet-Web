@@ -52,7 +52,7 @@ export default defineComponent({
     project: String,
   },
   setup(props) {
-    const ready = ref(false);
+    const ready = ref(true);
     Project.exists(props.username, props.project).then((exists) => {
       if (exists) ready.value = true;
       else notFound();

@@ -63,7 +63,7 @@ export default defineComponent({
     branch: String,
   },
   setup(props) {
-    const ready = ref(false);
+    const ready = ref(true);
     if (props.branch === null) {
       Project.metadata(props.username, props.project).then(
         ({ meta, username, project }) => {
@@ -78,6 +78,7 @@ export default defineComponent({
         (exists) => {
           if (exists) ready.value = true;
           else notFound();
+          console.log("exists")
         }
       );
     }
