@@ -1,5 +1,5 @@
 <template>
-  The branch is {{ username }} / {{ project }} / {{ branch }} / {{ commit }}
+  Commit: {{ username }} / {{ project }} / {{ branch }} / {{ commit }}
 </template>
 
 <script lang="ts">

@@ -1,23 +1,23 @@
 <template>
   <div class="uk-section uk-section-default uk-section-small">
     <div class="uk-container">
-      <h3>
+      <h3 v-if="ready">
         <router-link :to="{ name: 'User', params: { username } }">
           {{ username }}
         </router-link>
         /
-        <router-link :to="{ name: 'Project', params: { username, project } }">
+        <router-link
+          :to="{ name: 'Branch-default', params: { username, project } }"
+        >
           {{ project }}
         </router-link>
       </h3>
+      <div v-else uk-spinner></div>
       <div>
         <ul class="uk-tab" uk-switcher="animation: uk-animation-fade">
           <li>
             <router-link
-              :to="{
-                name: 'Branch',
-                params: { username, project, branch: null },
-              }"
+              :to="{ name: 'Branch-default', params: { username, project } }"
               >Partitions</router-link
             >
           </li>
@@ -32,27 +32,32 @@
               >Discussions
             </router-link>
           </li>
-          <li class="uk-disabled"><a>Disabled</a></li>
         </ul>
 
-        <router-view></router-view>
-      </div>
-    </div>
-    <div class="uk-container">
-      <div uk-grid>
-        <div class="uk-width-2-3@m"></div>
+        <router-view v-if="ready"></router-view>
+        <div v-else uk-spinner></div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import { notFound } from "@/routes";
+import * as Project from "@/api/project";
 
 export default defineComponent({
   props: {
     username: String,
     project: String,
+  },
+  setup(props) {
+    const ready = ref(false);
+    Project.exists(props.username, props.project).then((exists) => {
+      if (exists) ready.value = true;
+      else notFound();
+    });
+    return { ready };
   },
 });
 </script>

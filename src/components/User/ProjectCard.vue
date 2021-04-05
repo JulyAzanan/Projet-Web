@@ -20,7 +20,7 @@
           <p></p>
           <h3 class="uk-card-title">{{project}}</h3>
           <router-link
-            :to="{ name: 'Project', params: { username, project } }"
+            :to="{ name: 'Branch-default', params: { username, project } }"
             uk-margin
             class="uk-button uk-button-default"
           >

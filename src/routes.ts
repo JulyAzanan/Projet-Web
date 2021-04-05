@@ -122,4 +122,8 @@ const router = createRouter({
   routes
 })
 
+export function notFound() {
+  router.push({ name: "NotFound", params: { catchAll: "404" } })
+}
+
 export default router
