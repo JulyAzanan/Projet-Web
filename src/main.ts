@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
+import router from './routes'
 import uk from 'uikit';
 // @ts-ignore
 import Icons from 'uikit/dist/js/uikit-icons';

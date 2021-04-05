@@ -7,7 +7,7 @@
   </li>
 
   <li>
-    <router-link :to="{ name: 'User', params: { user: username } }">
+    <router-link :to="{ name: 'User', params: { username } }">
       <span class="uk-margin-small-right" uk-icon="icon: album"></span>
       Mes projets
     </router-link>

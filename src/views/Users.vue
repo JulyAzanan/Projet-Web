@@ -1,21 +1,17 @@
 <template>
-  The project is {{ user }} / {{ project }}
-
-  Breadcrumb
-  Index
-  Switcher
-  Tab
-  Table
-  Upload
+  Users page {{ page }}
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 
 export default defineComponent({
+
   props: {
-    user: String,
-    project: String,
+    page: String,
   },
 });
 </script>
+
+<style lang="scss" scoped>
+</style>

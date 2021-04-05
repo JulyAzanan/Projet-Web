@@ -1,176 +1,123 @@
 <template>
   <div class="uk-container">
     <div uk-grid>
-      <div class="uk-width-1-3@s" uk-first-column>
-        <h2>Bienvenue {{ user }} !</h2>
+      <div class="uk-width-1-3@s uk-margin-large-top" uk-first-column>
+        <h2>Profil de {{ username }}</h2>
         <button class="uk-button uk-button-text buttonNormalText">
-          <span class="uk-margin-small-right" uk-icon="icon: user"></span>
+          <span class="uk-margin-small-right" uk-icon="icon: star"></span>
           {{ friendAmount }} amis
         </button>
         <!-- TODO : afficher une liste des amis quand on clique sur le bouton -->
-        <div>
-          <div class="uk-inline">
-            <button
-              class="uk-form-icon"
-              uk-icon="icon: pencil"
-              v-on:click="changeMail()"
-            ></button>
-            <input
-              class="uk-input"
-              type="email"
-              :placeholder="email"
-              id="cMail"
-            />
-            <!-- TODO : modifier l'email quand on clique sur le petit icon crayon -->
-          </div>
+        <div v-if="email">
+          <span class="uk-margin-small-right" uk-icon="icon: mail"> </span>
+          {{ email }}
         </div>
-        <hr class="uk-divider-icon" />
-        <div>
-          <button
-            v-if="age > 0"
-            class="uk-button uk-button-text buttonNormalText"
-            v-on:click="modifyAge = !modifyAge"
-          >
-            <span class="uk-margin-small-right" uk-icon="icon: calendar"></span>
-            {{ age }} ans
-          </button>
-          <div v-else class="uk-inline">
-            <button
-              class="uk-form-icon"
-              href="#"
-              uk-icon="icon: pencil"
-            ></button>
-            <input
-              class="uk-input"
-              type="text"
-              placeholder="Entrez votre âge."
-            />
-            <!-- TODO : modifier l'âge quand on clique sur le petit icon crayon -->
-          </div>
-          <div v-show="modifyAge" class="uk-inline">
-            <button
-              class="uk-form-icon"
-              href="#"
-              uk-icon="icon: pencil"
-            ></button>
-            <input
-              class="uk-input"
-              type="text"
-              placeholder="Entrez votre âge."
-            />
-            <!-- TODO : modifier l'âge quand on clique sur le petit icon crayon -->
-          </div>
-        </div>
-        <button
-          v-if="age > 0"
-          class="uk-button uk-button-text buttonNormalText"
-          v-on:click="modifyPassword = !modifyPassword"
-        >
-          Modifier le mot de passe
-        </button>
-        <div v-show="modifyPassword">
-          <input
-            class="uk-input"
-            type="password"
-            placeholder="Ancien mot de passe."
-            required
-          />
-          <input
-            class="uk-input"
-            type="password"
-            placeholder="Nouveau mot de passe."
-            required
-          />
-          <button class="uk-button uk-button-default buttonNormalText">
-            Confirmer
-          </button>
+        <hr class="uk-divider-icon uk-margin-large-right" />
+        <div v-if="age">
+          <span class="uk-margin-small-right" uk-icon="icon: calendar"></span>
+          {{ age }} ans
         </div>
       </div>
-      <div class="uk-width-2-3@s uk-container" uk-grid>
+      <div class="uk-width-2-3@s uk-container uk-margin-small-top" uk-grid>
         <h2>Projets récents</h2>
         <div
           class="uk-grid-column-small uk-grid-row-small uk-child-width-1-3@s uk-text-center"
           uk-grid
         >
           <ProjectCard
-            v-bind:priv="true"
-            v-bind:project="'Nier: Automata'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'04/04/2021'"
-            v-bind:branch="'main'"
+            :priv="true"
+            :project="'Nier: Automata'"
+            :username="username"
+            :author="username"
+            :updatedAt="'04/04/2021'"
+            :branch="'main'"
           />
           <ProjectCard
-            v-bind:priv="true"
-            v-bind:project="'Daft Punk'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'04/04/2021'"
-            v-bind:branch="'master'"
+            :priv="true"
+            :project="'Daft Punk'"
+            :username="username"
+            :author="username"
+            :updatedAt="'04/04/2021'"
+            :branch="'master'"
           />
           <ProjectCard
-            v-bind:priv="false"
-            v-bind:project="'Tu'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'04/04/2021'"
-            v-bind:branch="'branch1'"
+            :priv="false"
+            :project="'Tu'"
+            :username="username"
+            :author="username"
+            :updatedAt="'04/04/2021'"
+            :branch="'branch1'"
           />
           <ProjectCard
-            v-bind:priv="false"
-            v-bind:project="'Tournes'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'04/04/2021'"
-            v-bind:branch="'main'"
+            :priv="false"
+            :project="'Tournes'"
+            :username="username"
+            :author="username"
+            :updatedAt="'04/04/2021'"
+            :branch="'main'"
           />
           <ProjectCard
-            v-bind:priv="false"
-            v-bind:project="'Joyeuses'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'04/04/2021'"
-            v-bind:branch="'ahahah'"
+            :priv="false"
+            :project="'Joyeuses'"
+            :username="username"
+            :author="username"
+            :updatedAt="'04/04/2021'"
+            :branch="'ahahah'"
           />
           <ProjectCard
-            v-bind:priv="false"
-            v-bind:project="'Pâques'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'02/04/2021'"
-            v-bind:branch="'Liora'"
+            :priv="false"
+            :project="'Pâques'"
+            :username="username"
+            :author="username"
+            :updatedAt="'02/04/2021'"
+            :branch="'Liora'"
           />
           <ProjectCard
-            v-bind:priv="false"
-            v-bind:project="'foo'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'05/04/2021'"
-            v-bind:branch="'vitalité'"
+            :priv="false"
+            :project="'foo'"
+            :username="username"
+            :author="username"
+            :updatedAt="'05/04/2021'"
+            :branch="'vitalité'"
           />
           <ProjectCard
-            v-bind:priv="false"
-            v-bind:project="'bar'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'01/04/2021'"
-            v-bind:branch="'main'"
+            :priv="false"
+            :project="'bar'"
+            :username="username"
+            :author="username"
+            :updatedAt="'01/04/2021'"
+            :branch="'main'"
           />
           <ProjectCard
-            v-bind:priv="false"
-            v-bind:project="'nya'"
-            v-bind:username="user"
-            v-bind:author="user"
-            v-bind:updatedAt="'02/04/2021'"
-            v-bind:branch="'main'"
+            :priv="false"
+            :project="'nya'"
+            :username="username"
+            :author="username"
+            :updatedAt="'02/04/2021'"
+            :branch="'main'"
           />
         </div>
-        <h2>Activités de mes amis</h2>
+        <ul class="uk-pagination uk-margin-medium-bottom uk-margin-medium-left" uk-margin>
+                <li class="uk-disabled"><a><span uk-pagination-previous></span></a></li>
+                <li class="uk-active"><span>1</span></li>
+                <li class="uk-disabled"><span>...</span></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><a href="#">6</a></li>
+                <li><a href="#">7</a></li>
+                <li><a href="#">8</a></li>
+                <li><a href="#">9</a></li>
+                <li><a href="#">10</a></li>
+                <li class="uk-disabled"><span>...</span></li>
+                <li><a href="#">20</a></li>
+                <li><a href="#"><span uk-pagination-next></span></a></li>
+            </ul>
+        <!-- <h2>Activités de mes amis</h2>
         <div
           class="uk-grid-column-small uk-grid-row-small uk-child-width-1-3@s uk-text-center"
           uk-grid
         >
-          <!-- Générer quelques cartes de manière random, selon les projets récents des amis. Adapter si pas d'amis -->
+          Générer quelques cartes de manière random, selon les projets récents des amis. Adapter si pas d'amis
           <ProjectCard />
           <ProjectCard />
           <ProjectCard />
@@ -181,19 +128,20 @@
           <ProjectCard />
           <ProjectCard />
         </div>
-        <p></p>
+        <p></p> -->
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import ProjectCard from "@/components/App/ProjectCard.vue";
+import { defineComponent, ref } from "vue";
+import ProjectCard from "@/components/User/ProjectCard.vue";
 
 export default defineComponent({
   props: {
-    user: String,
+    username: String,
+    page: String,
     // friendAmount: Number,
     // age: Number,
   },
@@ -204,22 +152,21 @@ export default defineComponent({
     const friendAmount = 3615;
     const email = "maël@tutournes.troll";
     const age = 69;
+    const modifyAge = ref(false);
+    const modifyPassword = ref(false);
+
+    function changeMail() {
+      /* let mail = document.getElementById("cMail");
+      this.email = mail; */
+    }
+
     return {
       friendAmount,
       email,
       age,
-    };
-  },
-  methods: {
-    changeMail: function () {
-      /* let mail = document.getElementById("cMail");
-      this.email = mail; */
-    },
-  },
-  data() {
-    return {
-      modifyAge: false,
-      modifyPassword: false,
+      changeMail,
+      modifyAge,
+      modifyPassword,
     };
   },
 });
@@ -232,5 +179,9 @@ export default defineComponent({
 
 .cardHolder {
   display: flex;
+}
+
+.userInfo {
+  margin-top: 10em;
 }
 </style>

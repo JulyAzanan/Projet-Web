@@ -1,6 +1,6 @@
 <template>
   <Navbar/>
-  <div id="main">
+  <div uk-height-viewport="expand: true">
     <router-view />
   </div>
   <Footer/>
@@ -21,13 +21,4 @@ export default defineComponent({
 
 <style lang="scss">
 @import "@/styles/variables.scss";
-
-#app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  #main {
-    flex-grow: 1;
-  }
-}
 </style>

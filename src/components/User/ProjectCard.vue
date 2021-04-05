@@ -19,20 +19,15 @@
         <div class="uk-card-body">
           <p></p>
           <h3 class="uk-card-title">{{project}}</h3>
-          <p>Dernière mise à jour le : {{ updatedAt }}</p>
-          <p>Créé par : {{ author }}</p>
           <router-link
-            :to="{ path: '/-/' + username + '/' + project + '/blob/' + branch }"
-          >
-            Branche principale : {{ branch }}
-          </router-link>
-          <router-link
-            :to="{ path: '/-/' + username + '/' + project }"
+            :to="{ name: 'Project', params: { username, project } }"
             uk-margin
             class="uk-button uk-button-default"
           >
             Voir le projet
           </router-link>
+          <p>Dernière mise à jour le : {{ updatedAt }}</p>
+          <p v-if="username != author">Créé par : {{ author }}</p>
         </div>
       </div>
     </div>
