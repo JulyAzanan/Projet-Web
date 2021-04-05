@@ -1,53 +1,81 @@
 <template>
-  <div class="uk-container">
-    <div class="uk-grid-divider" uk-grid>
-      <div class="uk-width-2-3@s">
-        <select class="uk-select uk-form-width-small">
-          <option>Option 01</option>
-          <option>Option 02</option>
-        </select>
-      </div>
-      <div class="uk-width-1-3@s">
-        <div v-if="ready">
-          <h4>
-            <span class="uk-margin-small-right" uk-icon="icon: info"></span>
-            À propos
-          </h4>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
-            pellentesque turpis eu libero elementum, mattis egestas nisi
-            scelerisque. Nulla facilisi. Pellentesque lacinia felis non leo
-            scelerisque tristique. Suspendisse bibendum quam quis ullamcorper
-            lacinia. Ut nec semper enim, vitae efficitur felis. Curabitur
-            scelerisque dignissim metus, at sagittis tortor scelerisque sit
-            amet. Donec eu tincidunt justo.
-          </p>
-
-          <hr class="uk-divider-small" />
-
-          <h4>
-            <span class="uk-margin-small-right" uk-icon="icon: users"></span>
-            Contributeurs
-          </h4>
-          <ul class="uk-grid-small uk-flex-middle" uk-grid>
-            <li v-for="name in contributors" :key="name">
-              <router-link :to="{ name: 'User', params: { username: name } }">
-                <img
-                  :src="`https://picsum.photos/seed/${name}/200/300`"
-                  :alt="name"
-                  :uk-tooltip="`title: ${name}; pos: bottom`"
-                  class="rounded"
-                />
-              </router-link>
-            </li>
-          </ul>
+  <div>
+    <div class="uk-container">
+      <div class="uk-grid-divider" uk-grid>
+        <div class="uk-width-2-3@s">
+          <div class="uk-child-width-auto" uk-grid>
+            <div class="uk-width-expand">
+              <select
+                class="uk-select uk-form-width-small uk-margin-small-right"
+              >
+                <option>main</option>
+                <option>dev</option>
+              </select>
+              <span>
+                <span class="uk-margin-small-right" uk-icon="icon: git-branch">
+                </span>
+                <strong>2</strong> branches
+              </span>
+              <span class="uk-margin-small-left">
+                <span class="uk-margin-small-right" uk-icon="icon: history">
+                </span>
+                <strong>56</strong> modifications
+              </span>
+            </div>
+            <div>
+              <button class="uk-button uk-button-primary">
+                Télécharger<span
+                  class="uk-margin-small-left"
+                  uk-icon="icon: download"
+                ></span>
+              </button>
+            </div>
+          </div>
+          <div class="uk-margin">
+            <router-view></router-view>
+          </div>
         </div>
-        <div v-else uk-spinner></div>
+        <div class="uk-width-1-3@s">
+          <div v-if="ready">
+            <h4>
+              <span class="uk-margin-small-right" uk-icon="icon: info"></span>
+              À propos
+            </h4>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
+              pellentesque turpis eu libero elementum, mattis egestas nisi
+              scelerisque. Nulla facilisi. Pellentesque lacinia felis non leo
+              scelerisque tristique. Suspendisse bibendum quam quis ullamcorper
+              lacinia. Ut nec semper enim, vitae efficitur felis. Curabitur
+              scelerisque dignissim metus, at sagittis tortor scelerisque sit
+              amet. Donec eu tincidunt justo.
+            </p>
+
+            <hr class="uk-divider-small" />
+
+            <h4>
+              <span class="uk-margin-small-right" uk-icon="icon: users"></span>
+              Contributeurs
+            </h4>
+            <ul class="uk-grid-small uk-flex-middle" uk-grid>
+              <li v-for="name in contributors" :key="name">
+                <router-link :to="{ name: 'User', params: { username: name } }">
+                  <img
+                    :src="`https://picsum.photos/seed/${name}/200/300`"
+                    :alt="name"
+                    :uk-tooltip="`title: ${name}; pos: bottom`"
+                    class="rounded"
+                  />
+                </router-link>
+              </li>
+            </ul>
+          </div>
+          <div v-else uk-spinner></div>
+        </div>
       </div>
     </div>
+    <br />
   </div>
-  <br />
-  <router-view :branch="branch"></router-view>
 </template>
 
 <script lang="ts">
@@ -63,6 +91,7 @@ export default defineComponent({
     branch: String,
   },
   setup(props) {
+    console.log("branch");
     const ready = ref(true);
     if (props.branch === null) {
       Project.metadata(props.username, props.project).then(
@@ -78,7 +107,6 @@ export default defineComponent({
         (exists) => {
           if (exists) ready.value = true;
           else notFound();
-          console.log("exists")
         }
       );
     }

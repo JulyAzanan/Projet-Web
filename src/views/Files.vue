@@ -1,5 +1,27 @@
 <template>
-  The branch is {{ username }} / {{ project }} / {{ branch }} / {{ commit }} / files
+  <table class="uk-table uk-table-divider uk-table-hover">
+    <tbody>
+      <tr v-for="i in [1,2,3,4,5]" :key="i">
+        <td><input class="uk-checkbox" type="checkbox" /></td>
+        <td class="uk-table-link">
+          <router-link
+            :to="{
+              name: 'File',
+              params: {
+                username,
+                project,
+                branch,
+                commit,
+                filepath: 'fichier_3615',
+              },
+            }"
+          >fichier_3615</router-link>
+        </td>
+        <td>Description random</td>
+        <td class="uk-text-nowrap">Il y a 5 mois</td>
+      </tr>
+    </tbody>
+  </table>
 </template>
 
 <script lang="ts">
@@ -12,5 +34,8 @@ export default defineComponent({
     branch: String,
     commit: String,
   },
+  setup() {
+    console.log("files")
+  }
 });
 </script>

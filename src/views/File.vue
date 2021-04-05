@@ -1,5 +1,8 @@
 <template>
-  The branch is {{ username }} / {{ project }} / {{ branch }} / {{ commit }} / {{ filepath }}
+  <div>
+    <h3>{{ filepath }}</h3>
+    <p><mark>TODO: affichage partition</mark></p>
+  </div>
 </template>
 
 <script lang="ts">
@@ -12,6 +15,9 @@ export default defineComponent({
     branch: String,
     commit: String,
     filepath: String,
+  },
+  setup() {
+    console.log("file");
   },
 });
 </script>
