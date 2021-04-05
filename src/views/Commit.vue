@@ -1,5 +1,5 @@
 <template>
-  The branch is {{ user }} / {{ project }} / {{ branch }} / {{ commit }}
+  The branch is {{ username }} / {{ project }} / {{ branch }} / {{ commit }}
 </template>
 
 <script lang="ts">
@@ -7,7 +7,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    user: String,
+    username: String,
     project: String,
     branch: String,
     commit: String,

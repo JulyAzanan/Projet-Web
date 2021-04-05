@@ -1,5 +1,5 @@
 <template>
-  The branch is {{ username }} / {{ project }} / {{ branch }}
+  The branch is {{ username }} / {{ project }} / {{ branch }} / {{ commit }} / files
 </template>
 
 <script lang="ts">
@@ -10,6 +10,7 @@ export default defineComponent({
     username: String,
     project: String,
     branch: String,
+    commit: String,
   },
 });
 </script>

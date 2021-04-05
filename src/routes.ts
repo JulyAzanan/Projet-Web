@@ -1,8 +1,8 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 
-function load(name: string) {
+function load(name: string, prefix?: string) {
   return {
-    name,
+    name: name + (prefix ? `-${prefix}` : ""),
     component: () => import(/* webpackChunkName: "[request]" */ `@/views/${name}.vue`),
   }
 }
@@ -29,33 +29,50 @@ const routes: Array<RouteRecordRaw> = [
   {
     ...load("User"),
     path: "/-/:username", // liste des projets d'un utilisateur
-    props: route => ({ page: route.query.page ?? "1", username: route.params.username }),
+    props: route => ({ page: route.query.page ?? "1", ...route.params }),
   },
   {
     ...load("Project"),
-    path: "/-/:username/:project", // affiche la branche main par défaut
+    path: "/-/:username/:project", // page d'un projet
     props: true,
     children: [
       {
+        ...load("Branch", "default"),
+        path: "", // affiche la branche main par défaut
+        props: route => ({ branch: null, ...route.params }),
+      },
+      {
         ...load("Branch"),
-        path: "blob/:branch", // affiche le commit le plus récent par défaut
+        path: "blob/:branch", // affiche les partitions d'une branche
         props: true,
         children: [
           {
-            ...load("Commit"),
-            path: ":commit", // affiche l'ensemble des partitions ainsi que des détails sur le projet
-            props: true,
+            ...load("Commit", "default"),
+            path: "", // affiche le dernier commit par défaut
+            props: route => ({ commit: null, ...route.params }),
           },
           {
-            ...load("File"),
-            path: ":filepath", // affiche la partition en question
+            ...load("Commit"),
+            path: ":commit", // affiche le commit en question
             props: true,
+            children: [
+              {
+                ...load("Files"),
+                path: "", // affiche l'ensemble des partitions
+              },
+              {
+                ...load("File"),
+                path: ":filepath", // affiche la partition en question
+                props: true,
+              },
+            ]
           },
         ]
       },
       {
         ...load("Pulls"),
         path: "pulls", // pull request
+        props: true,
       },
       {
         ...load("Pull"),
@@ -65,6 +82,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         ...load("Discussions"),
         path: "discussions", // discussions sur le projet
+        props: true,
       },
       {
         ...load("Discussion"),
