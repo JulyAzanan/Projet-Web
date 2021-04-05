@@ -45,17 +45,17 @@ export default defineComponent({
     commit: String,
   },
   setup(props) {
-    console.log("commit");
+    console.log("commit", props);
     if (props.commit == null) {
       router.push({
-      name: "Commit",
-      params: {
-        username: props.username ?? "Steel",
-        project: props.project ?? "daft_punk",
-        branch: props.branch ?? "main",
-        commit: "8f5e91",
-      },
-    });
+        name: "Commit",
+        params: {
+          username: props.username ?? "Steel",
+          project: props.project ?? "daft_punk",
+          branch: props.branch ?? "main",
+          commit: "8f5e91",
+        },
+      });
     }
   },
 });

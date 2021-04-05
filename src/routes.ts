@@ -43,7 +43,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         ...load("Branch"),
-        path: "blob/:branch", // affiche les partitions d'une branche
+        path: "-/:branch", // affiche les partitions d'une branche
         props: true,
         children: [
           {
@@ -113,7 +113,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     ...load("NotFound"),
-    path: "/:catchAll(.*)",
+    path: "/:catchAll(.*)*",
   },
 ]
 
@@ -122,8 +122,14 @@ const router = createRouter({
   routes
 })
 
-export function notFound() {
-  router.push({ name: "NotFound", params: { catchAll: "404" } })
+export async function notFound(): Promise<void> {
+  const route = router.currentRoute.value
+  await router.push({
+    name: "NotFound",
+    params: { catchAll: route.path.substring(1).split('/') },
+    query: route.query,
+    hash: route.hash,
+  })
 }
 
 export default router

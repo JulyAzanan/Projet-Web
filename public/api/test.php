@@ -8,6 +8,10 @@ include_once "./database/user.php";
 // echo "|";
 // var_dump($_POST['q']);
 
+echo json_encode(\User\find("jenexistepas"));
+
+die;
+
 function foo(...$vars)
 {
     var_dump($vars);

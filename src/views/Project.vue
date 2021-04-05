@@ -34,7 +34,53 @@
           </li>
         </ul>
 
-        <router-view v-if="ready"></router-view>
+        <router-view
+          v-if="ready"
+          :mainBranch="mainBranch"
+          v-slot="{ Component }"
+        >
+          <component :is="Component">
+            <template v-slot:sidebar>
+              <h4>
+                <span class="uk-margin-small-right" uk-icon="icon: info"></span>
+                À propos
+              </h4>
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
+                pellentesque turpis eu libero elementum, mattis egestas nisi
+                scelerisque. Nulla facilisi. Pellentesque lacinia felis non leo
+                scelerisque tristique. Suspendisse bibendum quam quis
+                ullamcorper lacinia. Ut nec semper enim, vitae efficitur felis.
+                Curabitur scelerisque dignissim metus, at sagittis tortor
+                scelerisque sit amet. Donec eu tincidunt justo.
+              </p>
+
+              <hr class="uk-divider-small" />
+
+              <h4>
+                <span
+                  class="uk-margin-small-right"
+                  uk-icon="icon: users"
+                ></span>
+                Contributeurs
+              </h4>
+              <ul class="uk-grid-small uk-flex-middle" uk-grid>
+                <li v-for="name in contributors" :key="name">
+                  <router-link
+                    :to="{ name: 'User', params: { username: name } }"
+                  >
+                    <img
+                      :src="`https://picsum.photos/seed/${name}/200/300`"
+                      :alt="name"
+                      :uk-tooltip="`title: ${name}; pos: bottom`"
+                      class="rounded"
+                    />
+                  </router-link>
+                </li>
+              </ul>
+            </template>
+          </component>
+        </router-view>
         <div v-else uk-spinner></div>
       </div>
     </div>
@@ -52,12 +98,31 @@ export default defineComponent({
     project: String,
   },
   setup(props) {
-    const ready = ref(true);
-    Project.exists(props.username, props.project).then((exists) => {
-      if (exists) ready.value = true;
-      else notFound();
-    });
-    return { ready };
+    const ready = ref(false);
+    const mainBranch = ref("");
+    const contributors = ref<string[]>([]);
+
+    async function init() {
+      const project = await Project.find(props.username, props.project);
+      if (project === null) return notFound();
+      mainBranch.value = project.mainBranch;
+      contributors.value = project.contributors;
+      ready.value = true;
+    }
+
+    init();
+    return { ready, mainBranch, contributors };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+img {
+  &.rounded {
+    object-fit: cover;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+  }
+}
+</style>

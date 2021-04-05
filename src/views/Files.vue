@@ -34,8 +34,8 @@ export default defineComponent({
     branch: String,
     commit: String,
   },
-  setup() {
-    console.log("files")
+  setup(props) {
+    console.log("files", props)
   }
 });
 </script>
