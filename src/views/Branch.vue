@@ -80,7 +80,7 @@ export default defineComponent({
           branch = props.mainBranch!;
         }
         await router.replace({
-          name: "Branch",
+          name: "Commit-default",
           params: {
             username: props.username!,
             project: props.project!,

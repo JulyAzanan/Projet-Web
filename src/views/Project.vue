@@ -14,7 +14,7 @@
       </h3>
       <div v-else uk-spinner></div>
       <div>
-        <ul class="uk-tab" uk-switcher="animation: uk-animation-fade">
+        <ul class="uk-tab">
           <li>
             <router-link
               :to="{ name: 'Branch-default', params: { username, project } }"

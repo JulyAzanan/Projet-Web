@@ -7,7 +7,34 @@ function load(name: string, prefix?: string) {
   }
 }
 
-const routes: Array<RouteRecordRaw> = [
+const fileRoutes: RouteRecordRaw[] = [
+  {
+    ...load("Files"),
+    path: "", // affiche l'ensemble des partitions
+  },
+  {
+    ...load("File"),
+    path: ":filepath", // affiche la partition en question
+    props: true,
+  },
+]
+
+const commitRoutes: RouteRecordRaw[] = [
+  {
+    ...load("Commit", "default"),
+    path: "", // affiche le dernier commit par défaut
+    props: route => ({ commit: null, ...route.params }),
+    children: fileRoutes,
+  },
+  {
+    ...load("Commit"),
+    path: ":commit", // affiche le commit en question
+    props: true,
+    children: fileRoutes,
+  },
+]
+
+const routes: RouteRecordRaw[] = [
   {
     ...load("Home"),
     path: "/", // page d'accueil
@@ -37,37 +64,20 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
     children: [
       {
+        path: "-",
+        redirect: to => ({ name: "Project", params: { username: to.params.username, project: to.params.project } })
+      },
+      {
         ...load("Branch", "default"),
         path: "", // affiche la branche main par défaut
         props: route => ({ branch: null, ...route.params }),
+        children: commitRoutes,
       },
       {
         ...load("Branch"),
         path: "-/:branch", // affiche les partitions d'une branche
         props: true,
-        children: [
-          {
-            ...load("Commit", "default"),
-            path: "", // affiche le dernier commit par défaut
-            props: route => ({ commit: null, ...route.params }),
-          },
-          {
-            ...load("Commit"),
-            path: ":commit", // affiche le commit en question
-            props: true,
-            children: [
-              {
-                ...load("Files"),
-                path: "", // affiche l'ensemble des partitions
-              },
-              {
-                ...load("File"),
-                path: ":filepath", // affiche la partition en question
-                props: true,
-              },
-            ]
-          },
-        ]
+        children: commitRoutes,
       },
       {
         ...load("Pulls"),
@@ -124,7 +134,7 @@ const router = createRouter({
 
 export async function notFound(): Promise<void> {
   const route = router.currentRoute.value
-  await router.push({
+  await router.replace({
     name: "NotFound",
     params: { catchAll: route.path.substring(1).split('/') },
     query: route.query,
