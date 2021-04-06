@@ -1,6 +1,6 @@
 <template>
   <li>
-    <router-link to="/profile">
+    <router-link :to="{ name: 'Profile', params: { username } }">
       <span class="uk-margin-small-right" uk-icon="icon: user"></span>
       Mon profil
     </router-link>
