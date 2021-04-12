@@ -5,7 +5,7 @@ require_once "./error.php";
 function check_not_null(...$args)
 {
     foreach ($args as $arg) {
-        if (arg == null) {
+        if ($arg == null) {
             arg_error();
         }
     }
