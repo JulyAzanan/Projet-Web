@@ -12,7 +12,7 @@ include_once "config.php";
 
 function add($author, $project, $branch, $loggedUser)
 {
-    check_not_null($author, $project, $branch, $private, $loggedUser);
+    check_not_null($author, $project, $branch, $loggedUser);
     if (check_project_exist($author, $project)) {
         arg_error();
     }
@@ -23,6 +23,7 @@ function add($author, $project, $branch, $loggedUser)
 
     //Always executed
     $sql = $sql = "INSERT INTO branch VALUES (:name, updatedat, :authorname, :projectname)";
+    $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':name', $branch, \PDO::PARAM_STR);
     $stmt->bindValue(':apdatedat', "CURRENT_TIMESTAMP", \PDO::PARAM_STR); //Let see !
@@ -53,6 +54,7 @@ function remove($author, $project, $branch, $loggedUser)
     //Checking the name of the main branch. If we are trying to delete it, throw an request_error
     $sql = "SELECT mainbranchname FROM Project WHERE name = :pname AND authorname = :pauthorname";
     //getting the main branch name of our project
+    $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
@@ -110,6 +112,7 @@ function rename($author, $project, $branch, $loggedUser, $new_branch_name)
      */
     $sql = "SELECT name FROM branch WHERE projectname = :pname AND authorname = :pauthorname";
     //getting the main branch name of our project
+    $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
@@ -179,6 +182,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
         arg_error();
     }
 
+    $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
@@ -190,7 +194,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
             'name' => $branch['name'],
         ];
     }
-    return $users;
+    return $branchs;
 
     //Gérer cas projets privés et publics --> Should be done
 }
@@ -216,8 +220,7 @@ function countFromProject($author, $project, $loggedUser)
         FROM branch b
         JOIN Projet p ON
         b.projectname = p.name and b.authorname = p.name
-        WHERE b.projectname = :pname AND b.authorname = :pauthorname
-        LIMIT :number_to_show OFFSET :offset ";
+        WHERE b.projectname = :pname AND b.authorname = :pauthorname";
     } else {
         /**
          * We are not an admin and we are not a contributor
@@ -227,14 +230,12 @@ function countFromProject($author, $project, $loggedUser)
         FROM branch b
         JOIN Projet p
         ON b.projectname = p.name and b.authorname = p.name
-        WHERE b.projectname = :pname AND b.authorname = :pauthorname AND p.private = 'f'
-        LIMIT :number_to_show OFFSET :offset ";
+        WHERE b.projectname = :pname AND b.authorname = :pauthorname AND p.private = 'f' ";
     }
+    $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
-    $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
-    $stmt->bindValue(':number_to_show', $first, \PDO::PARAM_INT);
     if ($stmt->execute()) {
         foreach ($stmt->fetchAll() as $res) { //Should be only one result, but anyway i'm looping for safety reasons
             return $res[0];
