@@ -70,3 +70,29 @@ function check_project_exist($Project_Author_Name, $project){
     $stmt->execute(); //Execute the request 
     return ($stmt->rowCount() == 1 ) ; //Check if we found the requested project
 }
+/**
+ * Return true if the project of name $project made
+ * by $Project_Author_Name contain the branch $branch
+ * throw PDO_error if request cannot be executed
+ */
+function check_branch_exist($Project_Author_Name, $project,$branch){
+    check_not_null($Project_Author_Name, $project,$branch) ;
+    $bd = connect();
+    //Selecting all project corresponding to our args
+    $sql = "SELECT name
+        FROM branch
+        WHERE authorname = :aname 
+        AND projectName = :pname 
+        AND name = :bname ";
+    $stmt = $bd->prepare($sql);
+    //Binding args
+    $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':pauthorname', $Project_Author_Name, \PDO::PARAM_STR);
+    $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
+    if (! $stmt->execute()){//Execute the request 
+        //Something went wrong
+        PDO_error();
+    } 
+    //Ensure that we have one and only one branch of project that has the requested name
+    return ($stmt->rowCount() == 1 ) ; //Check if we found the requested project
+}
