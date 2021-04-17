@@ -13,7 +13,7 @@ include_once "config.php";
 function add($author, $project, $branch, $loggedUser)
 {
     check_not_null($author, $project, $branch, $loggedUser);
-    if (check_project_exist($author, $project)) {
+    if (! check_project_exist($author, $project)) {
         arg_error();
     }
     if (!admin_or_contributor($author, $project, $loggedUser)) {
@@ -44,7 +44,7 @@ function add($author, $project, $branch, $loggedUser)
 function remove($author, $project, $branch, $loggedUser)
 {
     // ne pas supprimer la branche principale
-    if (check_project_exist($author, $project)) {
+    if (! check_project_exist($author, $project)) {
         project_error();
     }
 
@@ -101,7 +101,7 @@ function remove($author, $project, $branch, $loggedUser)
  */
 function rename($author, $project, $branch, $loggedUser, $new_branch_name)
 {
-    if (check_project_exist($author, $project)) {
+    if (! check_project_exist($author, $project)) {
         project_error();
     }
     if (!admin_or_contributor($author, $project, $loggedUser)) {
@@ -150,7 +150,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
 {
     check_not_null($first, $after, $author, $project, $loggedUser);
 
-    if (check_project_exist($author, $project)) {
+    if (! check_project_exist($author, $project)) {
         project_error();
     }
     if (admin_or_contributor($author, $project, $loggedUser)) {
@@ -209,7 +209,7 @@ function countFromProject($author, $project, $loggedUser)
 {
     check_not_null($author, $project, $loggedUser);
 
-    if (check_project_exist($author, $project)) {
+    if (! check_project_exist($author, $project)) {
         project_error();
     }
     if (admin_or_contributor($author, $project, $loggedUser)) {
@@ -250,7 +250,7 @@ function countFromProject($author, $project, $loggedUser)
 function seekVersion($first, $after, $author, $project, $branch, $version, $loggedUser)
 {
     check_not_null($first, $after, $author, $project, $branch, $version, $loggedUser);
-    if (check_project_exist($author, $project)) {
+    if (! check_project_exist($author, $project)) {
         project_error();
     }
     if (!admin_or_contributor($author, $project, $loggedUser)) {
