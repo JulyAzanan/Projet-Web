@@ -22,7 +22,7 @@ function add($author, $project, $branch, $loggedUser)
     //We are an either an admin, the creator or a contributor. We can add a branch
 
     //Always executed
-    $sql = $sql = "INSERT INTO branch VALUES (:name, updatedat, :authorname, :projectname)";
+    $sql = "INSERT INTO branch VALUES (:name, updatedat, :authorname, :projectname)";
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':name', $branch, \PDO::PARAM_STR);
