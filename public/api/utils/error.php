@@ -34,6 +34,12 @@ function project_error()
     die;
 }
 
+function branch_error()
+{
+    http_response_code(400);
+    echo "<h1> 400 Unknown branch </h1>";
+    die;
+}
 function forbidden_error()
 {
     http_response_code(403);
