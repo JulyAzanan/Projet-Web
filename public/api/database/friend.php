@@ -61,7 +61,7 @@ function fetchAllFromUser($first, $after, $user)
     }
     $sql = "SELECT followingName
         FROM friend
-        WHERE followerName = :fname AND
+        WHERE followerName = :fname 
         LIMIT :number_to_show OFFSET :offset " ;
     $bd = connect();
     $stmt = $bd->prepare($sql);
