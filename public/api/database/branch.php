@@ -187,7 +187,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
-    $stmt->bindValue(':number_to_show', $first, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
     $stmt->execute();
     foreach ($stmt->fetchAll() as $branch) {
         $branchs[] = (object) [
