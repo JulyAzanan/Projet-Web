@@ -7,7 +7,7 @@ include_once "config.php";
 function add($contributor, $authorName, $project, $loggedUser)
 {
     check_not_null($contributor, $authorName, $project, $loggedUser);
-    if (check_project_exist($authorName, $project)) {
+    if (! check_project_exist($authorName, $project)) {
         project_error();
     }
 
@@ -35,7 +35,7 @@ function remove($contributor, $authorName, $project, $loggedUser)
     //Gérer le cas de se retirer soi-même si on veut quitter, mais si on n'est pas l'auteur, 
     //alors on ne peut pas kick les autres --> Should be done 
     check_not_null($contributor, $authorName, $project, $loggedUser);
-    if (check_project_exist($authorName, $project)) {
+    if (! check_project_exist($authorName, $project)) {
         project_error();
     }
 
@@ -82,7 +82,7 @@ function fetchAllFromProject($first, $after, /*$contributor, Not needed right ?*
     // Gérer cas projets privés et publics
     check_not_null($first, $after, $authorName, $project, $loggedUser);
 
-    if (check_project_exist($authorName, $project)) {
+    if (! check_project_exist($authorName, $project)) {
         project_error();
     }
     if (admin_or_contributor($authorName, $project, $loggedUser)) {
@@ -127,7 +127,7 @@ function countFromProject(/*$contributor -> Not needed ?!?,*/ $authorName, $proj
     // Gérer cas projets privés et publics
     check_not_null($authorName, $project, $loggedUser);
 
-    if (check_project_exist($authorName, $project)) {
+    if (! check_project_exist($authorName, $project)) {
         project_error();
     }
     if (admin_or_contributor($authorName, $project, $loggedUser)) {
