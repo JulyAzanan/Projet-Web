@@ -129,16 +129,11 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
          * We are an admin and/or a contributor -> W
          */
         $sql = "COUNT(*)
-        FROM version v
-        JOIN project p 
-        ON
-        v.projectName = p.name AND v.authorName = p.name
-        JOIN branch b
-        ON v.projectName = b.projectName AND v.authorName = b.authorName AND v.branchName = b.name
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
-        AND v.branchName = :bname
-        AND v.id = :branchid
+        FROM partition pa
+        WHERE pa.projectname = :pname 
+        AND pa.authorname = :pauthorname
+        AND pa.branchName = :bname
+        AND pa.versionId = :branchid
         LIMIT :number_to_show OFFSET :offset ";
 
         //Fuck off @July for putting so long SQL Requests 
@@ -148,17 +143,12 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
          * So we
          */
         $sql = "COUNT(*)
-        FROM version v
-        JOIN project p 
-        ON
-        v.projectName = p.name AND v.authorName = p.name
-        JOIN branch b
-        ON v.projectName = b.projectName AND v.authorName = b.authorName AND v.branchName = b.name
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
-        AND v.branchName = :bname
-        AND v.id = :branchid
-        AND p.private = 'f' 
+        FROM partition pa
+        WHERE pa.projectname = :pname 
+        AND pa.authorname = :pauthorname
+        AND pa.branchName = :bname
+        AND pa.versionId = :branchid
+        AND p.private = 'f'
         LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
 
     }
