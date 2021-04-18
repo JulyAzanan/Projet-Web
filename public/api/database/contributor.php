@@ -66,12 +66,12 @@ function remove($contributor, $authorName, $project, $loggedUser)
 
 
     $sql = "DELETE FROM contributor
-    WHERE contributor = :contributoname 
-    AND pojectname = :projectname 
-    AND authorname = :authorname";
+    WHERE contributorName = :contributorname 
+    AND pojectName = :projectname 
+    AND authorName = :authorname";
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    $stmt->bindValue(':contributoname', $contributor, \PDO::PARAM_STR);
+    $stmt->bindValue(':contributorname', $contributor, \PDO::PARAM_STR);
     $stmt->bindValue(':authorname', $authorName, \PDO::PARAM_STR);
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_INT);
     return $stmt->execute();
@@ -91,9 +91,7 @@ function fetchAllFromProject($first, $after, /*$contributor, Not needed right ?*
          */
         $sql = "SELECT contributorName
         FROM contributor c
-        JOIN Projet p ON
-        c.projectName = p.name and c.authorName = p.name
-        WHERE b.projectName = :pname AND b.authorname = :pauthorname
+        WHERE c.projectName = :pname AND c.authorname = :pauthorname
         LIMIT :number_to_show OFFSET :offset ";
     } else {
         /**
@@ -103,8 +101,11 @@ function fetchAllFromProject($first, $after, /*$contributor, Not needed right ?*
         $sql = "SELECT contributorName
         FROM contributor c
         JOIN Projet p ON
-        c.projectName = p.name and c.authorName = p.authorName
-        WHERE b.projectname = :pname AND b.authorname = :pauthorname AND p.private = 'f'
+        c.projectName = p.name 
+        AND c.authorName = p.authorName
+        WHERE c.projectName = :pname 
+        AND c.authorName = :pauthorname 
+        AND p.private = 'f'
         LIMIT :number_to_show OFFSET :offset ";
     }
     $bd = connect();
@@ -136,9 +137,8 @@ function countFromProject(/*$contributor -> Not needed ?!?,*/ $authorName, $proj
          */
         $sql = "COUNT(*)
         FROM contributor c
-        JOIN Projet p ON
-        c.projectName = p.name and c.authorName = p.name
-        WHERE b.projectName = :pname AND b.authorname = :pauthorname ";
+        WHERE c.projectName = :pname 
+        AND c.authorName = :pauthorname ";
     } else {
         /**
          * We are not an admin and we are not a contributor
@@ -147,8 +147,11 @@ function countFromProject(/*$contributor -> Not needed ?!?,*/ $authorName, $proj
         $sql = "COUNT(*)
         FROM contributor c
         JOIN Projet p ON
-        c.projectName = p.name and c.authorName = p.authorName
-        WHERE b.projectname = :pname AND b.authorname = :pauthorname AND p.private = 'f' ";
+        c.projectName = p.name 
+        AND c.authorName = p.authorName
+        WHERE c.projectName = :pname 
+        AND b.authorName = :pauthorname 
+        AND p.private = 'f' ";
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);

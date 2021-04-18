@@ -57,10 +57,10 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
          */
         $sql = "SELECT name,content
         FROM partition pa
-        WHERE pa.projectname = :pname 
-        AND pa.authorname = :pauthorname
+        WHERE pa.projectName = :pname 
+        AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
-        AND pa.id = :branchid
+        AND pa.versionID = :branchid
         LIMIT :number_to_show OFFSET :offset ";
 
 
@@ -75,9 +75,9 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
         ON
         pa.projectName = p.name AND pa.authorName = p.name
         WHERE pa.projectname = :pname 
-        AND pa.authorname = :pauthorname
+        AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
-        AND pa.id = :branchid
+        AND pa.versionID = :branchid
         AND p.private = 'f' 
         LIMIT :number_to_show OFFSET :offset ";
 
@@ -119,8 +119,8 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
          */
         $sql = "COUNT(*)
         FROM partition pa
-        WHERE pa.projectname = :pname 
-        AND pa.authorname = :pauthorname
+        WHERE pa.projectName = :pname 
+        AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
         AND pa.versionId = :branchid
         LIMIT :number_to_show OFFSET :offset ";
@@ -133,8 +133,8 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
          */
         $sql = "COUNT(*)
         FROM partition pa
-        WHERE pa.projectname = :pname 
-        AND pa.authorname = :pauthorname
+        WHERE pa.projectName = :pname 
+        AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
         AND pa.versionId = :branchid
         AND p.private = 'f'
@@ -170,8 +170,8 @@ function seekPartition($first, $after, $author, $project, $branch, $version, $pa
          */
         $sql = "SELECT name
         FROM partition pa
-        WHERE pa.projectname = :pname 
-        AND pa.authorname = :pauthorname
+        WHERE pa.projectName = :pname 
+        AND pa.authorName = :pauthorname
         AND pa.branchName = bname
         AND pa.versionID = :versionID
         AND pa.name LIKE %:partitionname%
@@ -186,8 +186,8 @@ function seekPartition($first, $after, $author, $project, $branch, $version, $pa
          */
         $sql = "SELECT name
         FROM partition pa
-        WHERE pa.projectname = :pname 
-        AND pa.authorname = :pauthorname
+        WHERE pa.projectName = :pname 
+        AND pa.authorName = :pauthorname
         AND pa.branchName = bname
         AND pa.versionID = :versionID
         AND pa.name LIKE %:partitionName%

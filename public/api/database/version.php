@@ -2,7 +2,8 @@
 namespace Version;
 
 include_once "config.php";
-include_once "partition.php";
+include_once "partition.php"; //Useless or not ? 
+
 /**
  * Ajoute les partitons contenues dans l'argument $partitions à la table partition
  * S'occupe de creer une nouvelle version, avec un identifiant aléatoire de 10 charactères
@@ -34,7 +35,7 @@ function add($author, $project, $branch, $partitions, $loggedUser)
 
     //testing if we are not trying to create an empty version ($partitions being empty)
     $counter = 0;
-    foreach($partitions as $partition){
+    foreach($partitions as $partition){ //Absolutely disgusting but should work :/ 
         $counter += 1 ;
     }
     if ($counter <= 0){
@@ -55,7 +56,7 @@ function add($author, $project, $branch, $partitions, $loggedUser)
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':id', $version, \PDO::PARAM_STR);
-    $stmt->bindValue(':createdAt', "CURRENT_TIMESTAMP", \PDO::PARAM_STR);
+    $stmt->bindValue(':createdAt', "CURRENT_TIMESTAMP", \PDO::PARAM_STR); 
     $stmt->bindValue(':authorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':branchname', $branch, \PDO::PARAM_STR);
@@ -93,12 +94,12 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
          */
         $sql = "SELECT id,branchName
         FROM version v
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
         ORDER BY branchName :order
         LIMIT :number_to_show OFFSET :offset ";
 
-        //Fuck off @July for putting so long SQL Requests 
+
     } else {
         /**
          * We are not an admin and we are not a contributor
@@ -109,8 +110,8 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
         JOIN project p 
         ON
         v.projectName = p.name AND v.authorName = p.name
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
         AND p.private = 'f'
         ORDER BY branchName :order 
         LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
@@ -220,8 +221,8 @@ function countFromProject($author, $project, $loggedUser)
          */
         $sql = "COUNT(*)
         FROM version v
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
         ORDER BY branchName :order
         LIMIT :number_to_show OFFSET :offset ";
 
@@ -236,8 +237,8 @@ function countFromProject($author, $project, $loggedUser)
         JOIN project p 
         ON
         pa.projectName = p.name AND pa.authorName = p.name
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
         AND p.private = 'f'
         ORDER BY branchName :order 
         LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
@@ -275,8 +276,8 @@ function countFromBranch($author, $project, $branch, $loggedUser)
          */
         $sql = "COUNT(*)
         FROM version v
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
         AND v.branchName = bname
         ORDER BY branchName :order
         LIMIT :number_to_show OFFSET :offset ";
@@ -291,7 +292,7 @@ function countFromBranch($author, $project, $branch, $loggedUser)
         FROM version v
         JOIN project p
         ON v.projectName = p.name 
-        AND v.authorname = p.authorName
+        AND v.authorName = p.authorName
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = bname
