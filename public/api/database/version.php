@@ -98,7 +98,6 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
         v.projectName = p.name AND v.authorName = p.name
         WHERE v.projectname = :pname 
         AND v.authorname = :pauthorname
-        AND v.id = :branchid
         ORDER BY branchName :order
         LIMIT :number_to_show OFFSET :offset ";
 
@@ -115,7 +114,6 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
         v.projectName = p.name AND v.authorName = p.name
         WHERE v.projectname = :pname 
         AND v.authorname = :pauthorname
-        AND v.id = :branchid
         AND p.private = 'f'
         ORDER BY branchName :order 
         LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
@@ -128,7 +126,7 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
-    $stmt->bindValue(':order', $realOrder, \PDO::PARAM_INT);
+    $stmt->bindValue(':order', $realOrder, \PDO::PARAM_STR);
     if (! $stmt->execute()){
         //Request encoutered an error, aborting
         PDO_error();
@@ -143,28 +141,171 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
     
 }
 
-function fetchAllFromBranch($first, $after, $author, $project, $branch, $loggedUser)
+function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $loggedUser)
 {
-    if ($first == null || $after == null) {
-        arg_error();
+    check_not_null($first, $after, $author, $project,$branch,$order, $loggedUser);
+    if (! check_branch_exist($author, $project,$branch)){
+        branch_error();
     }
+    if ($order){
+        $realOrder = "ASC" ;
+    } else {
+        $realOrder = "DESC";
+    } 
+
+    if (admin_or_contributor($author, $project, $loggedUser)) {
+        /**
+         * We are an admin and/or a contributor -> W
+         */
+        $sql = "SELECT id,branchName
+        FROM version v
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
+        AND v.branchName = :bname
+        ORDER BY branchName :order
+        LIMIT :number_to_show OFFSET :offset ";
+
+        //Fuck off @July for putting so long SQL Requests 
+    } else {
+        /**
+         * We are not an admin and we are not a contributor
+         * So we
+         */
+        $sql = "SELECT id,branchName
+        FROM version v
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
+        AND v.branchName = :bname
+        AND p.private = 'f'
+        ORDER BY branchName :order
+        LIMIT :number_to_show OFFSET :offset ";//Here, only public project are listed
+
+    }
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    // ($first, $after, $author, $project, $version, $loggedUser)
+    $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
+    $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
+    $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
+    $stmt->bindValue(':order', $realOrder, \PDO::PARAM_STR);
+    if (! $stmt->execute()){
+        //Request encoutered an error, aborting
+        PDO_error();
+    }
+    foreach ($stmt->fetchAll() as $version) {
+        $versions[] = (object) [
+            'name' => $version['name'],
+            'content' => $version['branchName'],
+        ];
+    }
+    return $versions;
     // Gérer cas projets privés et publics. Modifier ce qu'il faut pour order by createdAt asc ou desc
 }
 
 function countFromProject($author, $project, $loggedUser)
 {
     // Gérer cas projets privés et publics
+    check_not_null($author, $project, $loggedUser);
+    if (! check_project_exist($author, $project)){
+        project_error();
+    }
+
+
+
+    if (admin_or_contributor($author, $project, $loggedUser)) {
+        /**
+         * We are an admin and/or a contributor -> W
+         */
+        $sql = "COUNT(*)
+        FROM version v
+        WHERE v.projectname = :pname 
+        AND v.authorname = :pauthorname
+        ORDER BY branchName :order
+        LIMIT :number_to_show OFFSET :offset ";
+
+        //Fuck off @July for putting so long SQL Requests 
+    } else {
+        /**
+         * We are not an admin and we are not a contributor
+         * So we
+         */
+        $sql = "COUNT (*)
+        FROM version v
+        WHERE v.projectname = :pname 
+        AND v.authorname = :pauthorname
+        AND p.private = 'f'
+        ORDER BY branchName :order 
+        LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
+
+    }
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    // ($first, $after, $author, $project, $version, $loggedUser)
+    $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
+    
+    if (! $stmt->execute()){
+        //Request encoutered an error, aborting
+        PDO_error();
+    }
+    foreach ($stmt->fetchAll() as $res) {
+        return $res[0]; //The count requested
+    }
+    
 }
 
 function countFromBranch($author, $project, $branch, $loggedUser)
 {
     // Gérer cas projets privés et publics
+    check_not_null($author, $project, $loggedUser);
+    if (! check_project_exist($author, $project)){
+        project_error();
+    }
+
+
+
+    if (admin_or_contributor($author, $project, $loggedUser)) {
+        /**
+         * We are an admin and/or a contributor -> W
+         */
+        $sql = "COUNT(*)
+        FROM version v
+        WHERE v.projectname = :pname 
+        AND v.authorname = :pauthorname
+        AND v.branchName = bname
+        ORDER BY branchName :order
+        LIMIT :number_to_show OFFSET :offset ";
+
+        //Fuck off @July for putting so long SQL Requests 
+    } else {
+        /**
+         * We are not an admin and we are not a contributor
+         * So we
+         */
+        $sql = "COUNT (*)
+        FROM version v
+        WHERE v.projectname = :pname 
+        AND v.authorname = :pauthorname
+        AND v.branchName = bname
+        AND p.private = 'f'
+        ORDER BY branchName :order 
+        LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
+
+    }
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    // ($first, $after, $author, $project, $version, $loggedUser)
+    $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
+    $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
+    if (! $stmt->execute()){
+        //Request encoutered an error, aborting
+        PDO_error();
+    }
+    foreach ($stmt->fetchAll() as $res) {
+        return $res[0]; //The count requested
+    }
 }
 
-function seekPartition($first, $after, $author, $project, $branch, $version, $partition, $loggedUser)
-{
-    if ($first == null || $after == null) {
-        arg_error();
-    }
-    // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$partition%
-}

@@ -170,3 +170,12 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
     }
     
 }
+
+function seekPartition($first, $after, $author, $project, $branch, $version, $partition, $loggedUser)
+{
+    if ($first == null || $after == null) {
+        arg_error();
+    }
+    // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$partition%
+}
+
