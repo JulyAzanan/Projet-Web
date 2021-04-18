@@ -1,4 +1,5 @@
 <?php
+
 namespace Branch;
 
 include_once "config.php";
@@ -13,7 +14,7 @@ include_once "config.php";
 function add($author, $project, $branch, $loggedUser)
 {
     check_not_null($author, $project, $branch, $loggedUser);
-    if (! check_project_exist($author, $project)) {
+    if (!check_project_exist($author, $project)) {
         arg_error();
     }
     if (!admin_or_contributor($author, $project, $loggedUser)) {
@@ -30,6 +31,7 @@ function add($author, $project, $branch, $loggedUser)
     $stmt->bindValue(':authorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_INT);
     return $stmt->execute();
+    //Will return true on succes and false on failure
 
 }
 /**
@@ -44,7 +46,7 @@ function add($author, $project, $branch, $loggedUser)
 function remove($author, $project, $branch, $loggedUser)
 {
     // ne pas supprimer la branche principale
-    if (! check_project_exist($author, $project)) {
+    if (!check_project_exist($author, $project)) {
         project_error();
     }
 
@@ -54,23 +56,28 @@ function remove($author, $project, $branch, $loggedUser)
     //Checking the name of the main branch. If we are trying to delete it, throw an request_error
     $sql = "SELECT mainbranchname FROM Project WHERE name = :pname AND authorname = :pauthorname";
     //getting the main branch name of our project
+
+    /**
+     * Binding values
+     */
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
-    $i_got_a_result = $stmt->execute();
+    //Executing request
+    $i_got_a_result = $stmt->execute(); //Does the request was executed succesfully
     if (!$i_got_a_result) {
         /**
          * Something went wrong, but idk what to do
          */
-
+        PDO_error();
     }
     $i = 0;
     foreach ($stmt->fetchAll() as $res) { //Should be only one result, but anyway i'm looping for safety reasons
         $i = $i + 1; //Counter
         if (strcmp($res['mainbranchname'], $branch) == 0) //Check if strings are equal
         {
-            //Yes ? We are trying to delete the main branch
+            //Yes ? We are trying to delete the main branch. We should really not do taht
             request_error();
         }
     }
@@ -84,11 +91,13 @@ function remove($author, $project, $branch, $loggedUser)
     /**
      * If we are here, we should be able to remove the branch
      */
+    //So creating the request and executing it
     $sql = "DELETE FROM branch WHERE name = :bname AND pojectname = :pname AND authorname = :pauthorname";
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     return $stmt->execute();
+    //Will return true on succes and false on failure
 
 }
 
@@ -101,7 +110,7 @@ function remove($author, $project, $branch, $loggedUser)
  */
 function rename($author, $project, $branch, $loggedUser, $new_branch_name)
 {
-    if (! check_project_exist($author, $project)) {
+    if (!check_project_exist($author, $project)) {
         project_error();
     }
     if (!admin_or_contributor($author, $project, $loggedUser)) {
@@ -110,37 +119,27 @@ function rename($author, $project, $branch, $loggedUser, $new_branch_name)
     /**
      * Checking if a branch with name $branch exist in the project $project made by $author
      */
-    $sql = "SELECT name FROM branch WHERE projectname = :pname AND authorname = :pauthorname";
-    //getting the main branch name of our project
-    $bd = connect();
-    $stmt = $bd->prepare($sql);
-    $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
-    $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
-    $stmt->execute();
-    $i_found_the_branch = false;
-    foreach ($stmt->fetchAll() as $res) {
-        if (strcmp($res['name'], $branch) == 0) //Check if strings are equal
-        {
-            //Yes ? We found the branch we are trying to rename
-            $i_found_the_branch = true;
-        }
-    }
-    if (!$i_found_the_branch) {
+
+    if (!check_branch_exist($author, $project, $branch)) {
         //No match (Like me in Tinder) for the requested branch -> Throw an arg_error
         arg_error();
     }
-
-    $sql = "UPDATE branch SET name = :new_branch_name WHERE name = :bname AND projectname = :pname AND authorname = :pauthorname ";
+    //If we are here, the branch exist. Let's rename it now
+    //Creating the request
+    $bd = connect();
+    $sql = "UPDATE branch 
+    SET name = :new_branch_name 
+    WHERE name = :bname AND projectName = :pname 
+    AND authorName = :pauthorname ";
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
     $stmt->bindValue(':new_branch_name', $new_branch_name, \PDO::PARAM_STR);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     return $stmt->execute();
-
 }
 /**
- *  gather all branches from a defined project
+ *  Gather all branches from a defined project
  *  If you request a project that does not exist, throw a project_error
  *  If you dont have the rights, show only public projects
  *  If you have the rights, show private projects
@@ -150,7 +149,8 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
 {
     check_not_null($first, $after, $author, $project, $loggedUser);
 
-    if (! check_project_exist($author, $project)) {
+    if (!check_project_exist($author, $project)) {
+        //Project does not exist. Aborting
         project_error();
     }
     if (admin_or_contributor($author, $project, $loggedUser)) {
@@ -159,9 +159,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
          */
         $sql = "SELECT name
         FROM branch b
-        JOIN Projet p ON
-        b.projectname = p.name and b.authorname = p.name
-        WHERE b.projectname = :pname AND b.authorname = :pauthorname
+        WHERE b.projectName = :pname AND b.authorName = :pauthorname
         LIMIT :number_to_show OFFSET :offset ";
     } else {
         /**
@@ -170,15 +168,16 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
          */
         $sql = "SELECT name
         FROM branch b
-        JOIN Projet p
-        ON b.projectname = p.name and b.authorname = p.name
-        WHERE b.projectname = :pname AND b.authorname = :pauthorname AND p.private = 'f'
+        JOIN projet p
+        ON b.projectName = p.name and b.authorName = p.name
+        WHERE b.projectName = :pname AND b.authorName = :pauthorname AND p.private = 'f'
         LIMIT :number_to_show OFFSET :offset ";
     }
     //first is the first we want to see
-    //after is the last we want to see
+    //after is how many we want to see
 
     if ($first < 0 || $after < 0) {
+        //Cannot use negative values
         arg_error();
     }
 
@@ -188,7 +187,11 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
-    $stmt->execute();
+    if (! $stmt->execute()){
+        //failed to execute query
+        PDO_error();
+
+    }
     foreach ($stmt->fetchAll() as $branch) {
         $branchs[] = (object) [
             'name' => $branch['name'],
@@ -209,7 +212,7 @@ function countFromProject($author, $project, $loggedUser)
 {
     check_not_null($author, $project, $loggedUser);
 
-    if (! check_project_exist($author, $project)) {
+    if (!check_project_exist($author, $project)) {
         project_error();
     }
     if (admin_or_contributor($author, $project, $loggedUser)) {
@@ -218,9 +221,8 @@ function countFromProject($author, $project, $loggedUser)
          */
         $sql = "COUNT(*)
         FROM branch b
-        JOIN Projet p ON
-        b.projectname = p.name and b.authorname = p.name
-        WHERE b.projectname = :pname AND b.authorname = :pauthorname";
+        WHERE b.projectName = :pname 
+        AND b.authorName = :pauthorname";
     } else {
         /**
          * We are not an admin and we are not a contributor
@@ -228,35 +230,25 @@ function countFromProject($author, $project, $loggedUser)
          */
         $sql = "COUNT(*)
         FROM branch b
-        JOIN Projet p
-        ON b.projectname = p.name and b.authorname = p.name
-        WHERE b.projectname = :pname AND b.authorname = :pauthorname AND p.private = 'f' ";
+        JOIN projet p
+        ON b.projectName = p.name 
+        AND b.authorName = p.name
+        WHERE b.projectName = :pname 
+        AND b.authorName = :pauthorname 
+        AND p.private = 'f' ";
     }
+    //Binding and executing
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     if ($stmt->execute()) {
+        //succesfully executed request.
         foreach ($stmt->fetchAll() as $res) { //Should be only one result, but anyway i'm looping for safety reasons
             return $res[0];
         }
-    } else return -1 ;
-    // Gérer cas projets privés et publics
+    } else return -1; //Failed to execute, returning -1 as expected
+    // Gérer cas projets privés et publics --> Done
 }
-/**
- * Cherche toutes les versions d'un certain projet qui ressemblent à $version
- * 
- */
-function seekVersion($first, $after, $author, $project, $branch, $version, $loggedUser)
-{
-    check_not_null($first, $after, $author, $project, $branch, $version, $loggedUser);
-    if (! check_project_exist($author, $project)) {
-        project_error();
-    }
-    if (!admin_or_contributor($author, $project, $loggedUser)) {
-        forbidden_error(); //We do not have the right to seek for Version a branch --> FORBIDDEN
-    }
 
 
-    // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$version%
-}

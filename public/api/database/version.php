@@ -316,3 +316,29 @@ function countFromBranch($author, $project, $branch, $loggedUser)
     }
 }
 
+/**
+ * Search for all Version that look like $version
+ * On succes, return an a object array-like taht contains all requestedversions
+ * It handle:
+ * Permission. If we are an admin of the selected project, then we can seek all versions
+ * regardless if the project is public or private
+ * If we are not, we can only seek if the project is public
+ * It throw:
+ * branch_error if the request branch does not exist
+ * PDO_error if the request cannot be executed
+ * 
+ */
+function seekVersion($first, $after, $author, $project, $branch, $version, $loggedUser)
+{
+    check_not_null($first, $after, $author, $project, $branch, $version, $loggedUser);
+    if (!check_project_exist($author, $project)) {
+        project_error();
+    }
+    if (!admin_or_contributor($author, $project, $loggedUser)) {
+        forbidden_error(); //We do not have the right to seek for Version a branch --> FORBIDDEN
+    }
+
+
+    // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$version%
+}
+
