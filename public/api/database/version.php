@@ -93,9 +93,6 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
          */
         $sql = "SELECT id,branchName
         FROM version v
-        JOIN project p 
-        ON
-        v.projectName = p.name AND v.authorName = p.name
         WHERE v.projectname = :pname 
         AND v.authorname = :pauthorname
         ORDER BY branchName :order
@@ -173,6 +170,9 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
          */
         $sql = "SELECT id,branchName
         FROM version v
+        JOIN project p 
+        ON
+        pa.projectName = p.name AND pa.authorName = p.name
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname
@@ -233,6 +233,9 @@ function countFromProject($author, $project, $loggedUser)
          */
         $sql = "COUNT (*)
         FROM version v
+        JOIN project p 
+        ON
+        pa.projectName = p.name AND pa.authorName = p.name
         WHERE v.projectname = :pname 
         AND v.authorname = :pauthorname
         AND p.private = 'f'
@@ -286,8 +289,11 @@ function countFromBranch($author, $project, $branch, $loggedUser)
          */
         $sql = "COUNT (*)
         FROM version v
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
+        JOIN project p
+        ON v.projectName = p.name 
+        AND v.authorname = p.authorName
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
         AND v.branchName = bname
         AND p.private = 'f'
         ORDER BY branchName :order 
