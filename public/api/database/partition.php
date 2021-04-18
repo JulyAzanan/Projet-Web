@@ -3,6 +3,7 @@ namespace Partition;
 
 include_once "config.php";
 
+
 function add($author, $project, $branch, $partition, $version ,$content, $loggedUser,)
 {
     check_not_null($author, $project, $branch, $partition,$version, $content, $loggedUser);
@@ -55,16 +56,18 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
          * We are an admin and/or a contributor -> W
          */
         $sql = "SELECT name,content
-        FROM version v
+        FROM partition pa
+        JOIN version v
+        ON pa.versionID = v.id AND pa.projectName = v.projectName AND pa.authorName = v.authorName AND pa.branchName = v.branchName
         JOIN project p 
         ON
-        v.projectName = p.name AND v.authorName = p.name
+        pa.projectName = p.name AND pa.authorName = p.name
         JOIN branch b
-        ON v.projectName = b.projectName AND v.authorName = b.authorName AND v.branchName = b.name
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
-        AND v.branchName = :bname
-        AND v.id = :branchid
+        ON pa.projectName = b.projectName AND pa.authorName = b.authorName AND pa.branchName = b.name
+        WHERE pa.projectname = :pname 
+        AND pa.authorname = :pauthorname
+        AND pa.branchName = :bname
+        AND pa.id = :branchid
         LIMIT :number_to_show OFFSET :offset ";
 
         //Fuck off @July for putting so long SQL Requests 
@@ -74,18 +77,20 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
          * So we
          */
         $sql = "SELECT name,content
-        FROM version v
+        FROM partition pa
+        JOIN version v
+        ON pa.versionID = v.id AND pa.projectName = v.projectName AND pa.authorName = v.authorName AND pa.branchName = v.branchName
         JOIN project p 
         ON
-        v.projectName = p.name AND v.authorName = p.name
+        pa.projectName = p.name AND pa.authorName = p.name
         JOIN branch b
-        ON v.projectName = b.projectName AND v.authorName = b.authorName AND v.branchName = b.name
-        WHERE v.projectname = :pname 
-        AND v.authorname = :pauthorname
-        AND v.branchName = :bname
-        AND v.id = :branchid
+        ON pa.projectName = b.projectName AND pa.authorName = b.authorName AND pa.branchName = b.name
+        WHERE pa.projectname = :pname 
+        AND pa.authorname = :pauthorname
+        AND pa.branchName = :bname
+        AND pa.id = :branchid
         AND p.private = 'f' 
-        LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
+        LIMIT :number_to_show OFFSET :offset ";
 
     }
     $bd = connect();
