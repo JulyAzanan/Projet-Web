@@ -3,9 +3,9 @@ namespace Partition;
 
 include_once "config.php";
 
-function add($author, $project, $branch, $partition, $content, $loggedUser)
+function add($author, $project, $branch, $partition, $version ,$content, $loggedUser,)
 {
-    check_not_null($author, $project, $branch, $partition, $content, $loggedUser);
+    check_not_null($author, $project, $branch, $partition,$version, $content, $loggedUser);
     if (! check_branch_exist($author,$project,$branch)){
         //Requested branch does not exist, aborting 
         arg_error();
@@ -17,13 +17,7 @@ function add($author, $project, $branch, $partition, $content, $loggedUser)
     /** 
      * Creating a pseudo random versionID that relate to github's commit ID
     */
-    $length = 10;    
-    $commit_id = substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),1,$length); //Should be enough
-
-    /**
-     * Else we can use this:
-     * $commit_id = md5(microtime())
-     */
+    
     $sql = "INSERT INTO partition
     VALUES (:partname , :content , :authorname, :projectname, :branchname, :versionID)";
     $bd = connect();
@@ -33,7 +27,7 @@ function add($author, $project, $branch, $partition, $content, $loggedUser)
     $stmt->bindValue(':authorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':branchname', $branch, \PDO::PARAM_STR);
-    $stmt->bindValue(':versionID', $commit_id, \PDO::PARAM_STR);
+    $stmt->bindValue(':versionID', $version, \PDO::PARAM_STR);
     return($stmt->execute());
 }
 
