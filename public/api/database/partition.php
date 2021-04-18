@@ -57,20 +57,13 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
          */
         $sql = "SELECT name,content
         FROM partition pa
-        JOIN version v
-        ON pa.versionID = v.id AND pa.projectName = v.projectName AND pa.authorName = v.authorName AND pa.branchName = v.branchName
-        JOIN project p 
-        ON
-        pa.projectName = p.name AND pa.authorName = p.name
-        JOIN branch b
-        ON pa.projectName = b.projectName AND pa.authorName = b.authorName AND pa.branchName = b.name
         WHERE pa.projectname = :pname 
         AND pa.authorname = :pauthorname
         AND pa.branchName = :bname
         AND pa.id = :branchid
         LIMIT :number_to_show OFFSET :offset ";
 
-        //Fuck off @July for putting so long SQL Requests 
+
     } else {
         /**
          * We are not an admin and we are not a contributor
@@ -78,13 +71,9 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
          */
         $sql = "SELECT name,content
         FROM partition pa
-        JOIN version v
-        ON pa.versionID = v.id AND pa.projectName = v.projectName AND pa.authorName = v.authorName AND pa.branchName = v.branchName
         JOIN project p 
         ON
         pa.projectName = p.name AND pa.authorName = p.name
-        JOIN branch b
-        ON pa.projectName = b.projectName AND pa.authorName = b.authorName AND pa.branchName = b.name
         WHERE pa.projectname = :pname 
         AND pa.authorname = :pauthorname
         AND pa.branchName = :bname
@@ -136,7 +125,7 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
         AND pa.versionId = :branchid
         LIMIT :number_to_show OFFSET :offset ";
 
-        //Fuck off @July for putting so long SQL Requests 
+
     } else {
         /**
          * We are not an admin and we are not a contributor
@@ -173,9 +162,56 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
 
 function seekPartition($first, $after, $author, $project, $branch, $version, $partition, $loggedUser)
 {
-    if ($first == null || $after == null) {
-        arg_error();
-    }
     // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$partition%
+    check_not_null($first, $after, $author, $project, $branch, $version, $partition, $loggedUser);
+    if (admin_or_contributor($author, $project, $loggedUser)) {
+        /**
+         * We are an admin and/or a contributor -> W
+         */
+        $sql = "SELECT name
+        FROM partition pa
+        WHERE pa.projectname = :pname 
+        AND pa.authorname = :pauthorname
+        AND pa.branchName = bname
+        AND pa.versionID = :versionID
+        AND pa.name LIKE %:partitionname%
+        LIMIT :number_to_show OFFSET :offset ";
+        //Let see if it works
+
+
+    } else {
+        /**
+         * We are not an admin and we are not a contributor
+         * So we select only public projects
+         */
+        $sql = "SELECT name
+        FROM partition pa
+        WHERE pa.projectname = :pname 
+        AND pa.authorname = :pauthorname
+        AND pa.branchName = bname
+        AND pa.versionID = :versionID
+        AND pa.name LIKE %:partitionName%
+        AND p.private = 'f'
+        LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
+
+    }
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    // ($first, $after, $author, $project, $version, $loggedUser)
+    $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
+    $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
+    $stmt->bindValue(':versionID', $version, \PDO::PARAM_STR);
+    $stmt->bindValue(':partitionName', $partition, \PDO::PARAM_STR);
+    if (! $stmt->execute()){
+        //Request encoutered an error, aborting
+        PDO_error();
+    }
+    foreach ($stmt->fetchAll() as $res) { //Ading them all into one object
+        $resVersions[] = (object) [
+            'name' => $res['name'],
+        ];
+    }
+    return $resVersions;
 }
 
