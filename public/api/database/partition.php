@@ -53,7 +53,7 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
     // Gérer cas projets privés et publics --Should be done
     check_not_null($first, $after, $author, $project,$branch, $version, $loggedUser);
     if (! check_branch_exist($author, $project,$branch)){
-
+        branch_error();
     }
 
     if (admin_or_contributor($author, $project, $loggedUser)) {
@@ -122,7 +122,7 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
     // Gérer cas projets privés et publics --Should be done
     check_not_null($first, $after, $author, $project,$branch, $version, $loggedUser);
     if (! check_branch_exist($author, $project,$branch)){
-
+        branch_error();
     }
 
     if (admin_or_contributor($author, $project, $loggedUser)) {
