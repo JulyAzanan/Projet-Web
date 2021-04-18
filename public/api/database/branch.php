@@ -5,9 +5,13 @@ namespace Branch;
 include_once "config.php";
 /**
  * Add a branch for a selected project
+ * 
  * If the project does not exist, throw an project_error
+ * 
  * If the $loggedUser does not have the right, throw a forbidden_error
+ * 
  * If succesfully added, return true
+ * 
  * If not, return false
  */
 
@@ -36,11 +40,17 @@ function add($author, $project, $branch, $loggedUser)
 }
 /**
  * Remove a branch from a project
+ * 
  * If the project does not exist, throw project_error()
+ * 
  * If we do not have the rights, we throw an forbidden_error
+ * 
  * If we are trying to remove the main branch, we throw a request_error
+ * 
  * If project is not found, return a
+ * 
  * If succesfully removed, return true
+ * 
  * If faild to remove, return false
  */
 function remove($author, $project, $branch, $loggedUser)
@@ -103,9 +113,13 @@ function remove($author, $project, $branch, $loggedUser)
 
 /**
  * Rename a branch from a project
+ * 
  * If project does not exist, throw project_error
+ * 
  * If you do not have the rights to do so -> throw a forbidden error
+ * 
  * If the branch you are trying to rename does not exist -> Throw an arg_error
+ * 
  * Return true if succesfully removed, false if not
  */
 function rename($author, $project, $branch, $loggedUser, $new_branch_name)
@@ -140,9 +154,13 @@ function rename($author, $project, $branch, $loggedUser, $new_branch_name)
 }
 /**
  *  Gather all branches from a defined project
+ * 
  *  If you request a project that does not exist, throw a project_error
+ * 
  *  If you dont have the rights, show only public projects
+ * 
  *  If you have the rights, show private projects
+ * 
  *  if argument are not valid, throw
  */
 function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
@@ -203,9 +221,15 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
 }
 /**
  * Count the number of branches for a given project
+ * 
  * Throw project_error if the specified project does not exist
- * If you have the rights for a given project(eg: you are an admin or you are a contributor of this project), count even if project is private
- * If you do not have them however, should return 0 if private and the actual number of branches if public (= !private)
+ * 
+ * If you have the rights for a given project(eg: you are an admin or 
+ * you are a contributor of this project), count even if project is private
+ * 
+ * If you do not have them however, should return 0 if private and the actual 
+ * number of branches if public (= !private)
+ * 
  * Return -1 if not able to count
  */
 function countFromProject($author, $project, $loggedUser)
