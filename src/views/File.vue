@@ -17,7 +17,7 @@ export default defineComponent({
     filePath: String,
   },
   setup() {
-    console.log("file");
+    // 
   },
 });
 </script>

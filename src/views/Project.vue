@@ -41,6 +41,7 @@
         <router-view
           v-if="page.ready"
           :mainBranch="project.mainBranch"
+          :branches="branches"
           v-slot="{ Component }"
         >
           <component :is="Component">
@@ -96,6 +97,7 @@ import { defineComponent, ref, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import { notFound } from "@/routes";
 import * as Project from "@/api/project";
+import * as Branch from "@/api/branch";
 
 export default defineComponent({
   props: {
@@ -115,6 +117,7 @@ export default defineComponent({
       updatedAt: new Date(),
       createdAt: new Date(),
     });
+    const branches = ref<string[]>([]);
 
     async function init() {
       const result = await Project.find(props.userName, props.projectName);
@@ -122,6 +125,7 @@ export default defineComponent({
       project.value = result;
       page.valid = true;
       page.ready = true;
+      branches.value = await Branch.all(props.userName, props.projectName)
     }
 
     onBeforeRouteUpdate((to) => {
@@ -132,7 +136,7 @@ export default defineComponent({
     });
 
     init();
-    return { page, project };
+    return { page, project, branches };
   },
 });
 </script>

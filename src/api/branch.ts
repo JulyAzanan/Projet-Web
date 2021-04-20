@@ -39,8 +39,6 @@ export interface FetchAllFromResult extends BaseResult {
 }
 
 export async function fetchAllFrom(first: number, after: number, author?: string, project?: string): Promise<FetchAllFromResult[]> {
-  if (after < 0) throw new Error("Negative index (after)");
-  if (first <= 0) throw new Error("Negative index (first)");
   if (author == null || project == null) return [];
   await sleep(500); // TODO
   return [{
@@ -58,6 +56,16 @@ export async function fetchAllFrom(first: number, after: number, author?: string
     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
     branch: "prod",
   }];
+}
+
+export async function all(author?: string, project?: string): Promise<string[]> {
+  if (author == null || project == null) return [];
+  await sleep(500); // TODO
+  return [
+    "main",
+    "dev",
+    "prod",
+  ]
 }
 
 export async function countFrom(author?: string, project?: string): Promise<number> {

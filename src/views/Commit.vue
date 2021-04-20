@@ -45,7 +45,6 @@ export default defineComponent({
     commitID: String,
   },
   setup(props) {
-    console.log("commit", props);
     if (props.commitID == null) {
       router.push({
         name: "Files",

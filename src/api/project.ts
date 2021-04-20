@@ -41,8 +41,6 @@ export interface FetchAllResult extends BaseResult {
 }
 
 export async function fetchAll(first: number, after: number): Promise<FetchAllResult[]> {
-  if (after < 0) throw new Error("Negative index (after)");
-  if (first <= 0) throw new Error("Negative index (first)");
   await sleep(500); // TODO
   return [{
     private: true,
@@ -88,8 +86,6 @@ export interface FetchAllFromResult extends BaseResult {
 }
 
 export async function fetchAllFrom(first: number, after: number, user?: string): Promise<FetchAllFromResult[]> {
-  if (after < 0) throw new Error("Negative index (after)");
-  if (first <= 0) throw new Error("Negative index (first)");
   if (user == null) return [];
   await sleep(500); // TODO
   return [{

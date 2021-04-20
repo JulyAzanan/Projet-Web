@@ -34,8 +34,8 @@ export default defineComponent({
     branchName: String,
     commitID: String,
   },
-  setup(props) {
-    console.log("files", props)
+  setup() {
+    // 
   }
 });
 </script>
