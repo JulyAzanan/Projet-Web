@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>{{ filepath }}</h3>
+    <h3>{{ filePath }}</h3>
     <p><mark>TODO: affichage partition</mark></p>
   </div>
 </template>
@@ -10,11 +10,11 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    username: String,
-    project: String,
-    branch: String,
-    commit: String,
-    filepath: String,
+    userName: String,
+    projectName: String,
+    branchName: String,
+    commitID: String,
+    filePath: String,
   },
   setup() {
     console.log("file");

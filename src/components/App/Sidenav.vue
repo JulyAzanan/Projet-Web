@@ -26,7 +26,7 @@
           </ul>
         </li>
         <Notifications v-if="logged"> Notifications </Notifications>
-        <li v-if="logged" class="uk-nav-header username">{{ username }}</li>
+        <li v-if="logged" class="uk-nav-header username">{{ userName }}</li>
         <Usernav v-if="logged" />
         <Login v-else />
       </ul>
@@ -54,9 +54,9 @@ export default defineComponent({
   },
   setup() {
     const logged = true;
-    const username = "Steel";
+    const userName = "Steel";
     return {
-      username,
+      userName,
       logged,
     };
   },

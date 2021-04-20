@@ -1,5 +1,5 @@
 <template>
-  The project is {{ username }} / {{ project }} / {{ pull }}
+  The project is {{ userName }} / {{ projectName }} / {{ pull }}
 </template>
 
 <script lang="ts">
@@ -7,8 +7,8 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    username: String,
-    project: String,
+    userName: String,
+    projectName: String,
     pull: String
   },
 });

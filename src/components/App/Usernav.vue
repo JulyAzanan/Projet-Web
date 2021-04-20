@@ -1,13 +1,13 @@
 <template>
   <li>
-    <router-link :to="{ name: 'Profile', params: { username } }">
+    <router-link :to="{ name: 'Profile', params: { userName } }">
       <span class="uk-margin-small-right" uk-icon="icon: user"></span>
       Mon profil
     </router-link>
   </li>
 
   <li>
-    <router-link :to="{ name: 'User', params: { username } }">
+    <router-link :to="{ name: 'User', params: { userName } }">
       <span class="uk-margin-small-right" uk-icon="icon: album"></span>
       Mes projets
     </router-link>
@@ -43,7 +43,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   setup() {
     return {
-      username: "Steel",
+      userName: "Steel",
     };
   },
 });

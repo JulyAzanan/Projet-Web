@@ -11,12 +11,12 @@
 
         <div class="uk-card-body">
           <router-link
-            :to="{ name: 'User', params: { username } }"
+            :to="{ name: 'User', params: { userName } }"
             uk-margin
             class="uk-button uk-button-default"
             uk-tooltip="Voir le profil"
           >
-            {{username}}
+            {{userName}}
           </router-link>
         </div>
       </div>
@@ -29,7 +29,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    username: String,
+    userName: String,
     followers: Number,
   },
 });

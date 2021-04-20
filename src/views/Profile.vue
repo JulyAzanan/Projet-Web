@@ -8,7 +8,7 @@
           </h2>
           <button class="uk-button uk-button-text">
             <img
-              :src="`https://picsum.photos/seed/${username}/500/500`"
+              :src="`https://picsum.photos/seed/${userName}/500/500`"
               :alt="name"
               uk-tooltip="title: Modifier ma photo de profil; pos: top'"
               class="rounded"
@@ -16,7 +16,7 @@
           </button>
           <div>
               <span class="uk-margin-small-right" uk-icon="icon: user"></span>
-              {{username}}
+              {{userName}}
           </div>
           <!-- TODO : afficher une liste des amis quand on clique sur le bouton -->
           <div>
@@ -107,15 +107,15 @@
             class="uk-grid-column-small uk-grid-row-small uk-child-width-1-4@s uk-text-center uk-margin-medium-bottom"
             uk-grid
           >
-            <FriendCard :username="'July'" :followers="3615"/>
-            <FriendCard :username="'foo'" :followers="2"/>
-            <FriendCard :username="'bar'" :followers="1"/>
-            <FriendCard :username="'Annie'" :followers="42"/>
-            <FriendCard :username="'Elaim'" :followers="37"/>
-            <FriendCard :username="'gperdu'" :followers="354"/>
-            <FriendCard :username="'salut'" :followers="5"/>
-            <FriendCard :username="'toi'" :followers="225"/>
-            <FriendCard :username="'keur'" :followers="22326"/>
+            <FriendCard :userName="'July'" :followers="3615"/>
+            <FriendCard :userName="'foo'" :followers="2"/>
+            <FriendCard :userName="'bar'" :followers="1"/>
+            <FriendCard :userName="'Annie'" :followers="42"/>
+            <FriendCard :userName="'Elaim'" :followers="37"/>
+            <FriendCard :userName="'gperdu'" :followers="354"/>
+            <FriendCard :userName="'salut'" :followers="5"/>
+            <FriendCard :userName="'toi'" :followers="225"/>
+            <FriendCard :userName="'keur'" :followers="22326"/>
           </div>
           <ul class="uk-pagination uk-position-bottom-center" uk-margin>
             <li class="uk-disabled">
@@ -148,7 +148,7 @@ import FriendCard from "@/components/User/FriendCard.vue";
 
 export default defineComponent({
   props: {
-    username: String,
+    userName: String,
     // email: String,
   },
   components: {

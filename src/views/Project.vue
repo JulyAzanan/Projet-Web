@@ -1,15 +1,15 @@
 <template>
   <div class="uk-section uk-section-default uk-section-small">
     <div class="uk-container">
-      <h3 v-if="projectExists">
-        <router-link :to="{ name: 'User', params: { username } }">
-          {{ username }}
+      <h3 v-if="page.valid">
+        <router-link :to="{ name: 'User', params: { userName } }">
+          {{ userName }}
         </router-link>
         /
         <router-link
-          :to="{ name: 'Branch-default', params: { username, project } }"
+          :to="{ name: 'Branch-default', params: { userName, projectName } }"
         >
-          {{ project }}
+          {{ projectName }}
         </router-link>
       </h3>
       <div v-else uk-spinner></div>
@@ -17,26 +17,26 @@
         <ul class="uk-tab">
           <li>
             <router-link
-              :to="{ name: 'Branch-default', params: { username, project } }"
+              :to="{ name: 'Branch-default', params: { userName, projectName } }"
               >Partitions</router-link
             >
           </li>
           <li>
-            <router-link :to="{ name: 'Pulls', params: { username, project } }"
+            <router-link :to="{ name: 'Pulls', params: { userName, projectName } }"
               >Changements
             </router-link>
           </li>
           <li>
             <router-link
-              :to="{ name: 'Discussions', params: { username, project } }"
+              :to="{ name: 'Discussions', params: { userName, projectName } }"
               >Discussions
             </router-link>
           </li>
         </ul>
 
         <router-view
-          v-if="ready"
-          :mainBranch="mainBranch"
+          v-if="page.ready"
+          :mainBranch="project.mainBranch"
           v-slot="{ Component }"
         >
           <component :is="Component">
@@ -67,7 +67,7 @@
               <ul class="uk-grid-small uk-flex-middle" uk-grid>
                 <li v-for="name in contributors" :key="name">
                   <router-link
-                    :to="{ name: 'User', params: { username: name } }"
+                    :to="{ name: 'User', params: { userName: name } }"
                   >
                     <img
                       :src="`https://picsum.photos/seed/${name}/200/300`"
@@ -88,40 +88,46 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import { notFound } from "@/routes";
 import * as Project from "@/api/project";
 
 export default defineComponent({
   props: {
-    username: String,
-    project: String,
+    userName: String,
+    projectName: String,
   },
   setup(props) {
-    const ready = ref(false);
-    const projectExists = ref(false);
-    const mainBranch = ref("");
-    const contributors = ref<string[]>([]);
+    const page = reactive({
+      ready: false,
+      valid: false, 
+    });
+    const project = ref<Project.Result>({
+      contributors: [],
+      mainBranch: "",
+      description: "",
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    });
 
     async function init() {
-      const project = await Project.find(props.username, props.project);
-      if (project === null) return notFound();
-      mainBranch.value = project.mainBranch;
-      contributors.value = project.contributors;
-      projectExists.value = true;
-      ready.value = true;
+      const result = await Project.find(props.userName, props.projectName);
+      if (result === null) return notFound();
+      project.value = result;
+      page.valid = true;
+      page.ready = true;
     }
 
-    onBeforeRouteUpdate(async (to, from) => {
+    onBeforeRouteUpdate((to) => {
       if (to.name === "Branch-default") {
-        ready.value = false;
+        page.ready = false;
         init();
       }
     });
 
     init();
-    return { ready, projectExists, mainBranch, contributors };
+    return { page, project };
   },
 });
 </script>

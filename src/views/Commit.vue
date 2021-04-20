@@ -4,13 +4,13 @@
       <div class="uk-child-width-auto" uk-grid>
         <div class="uk-width-expand">
           <router-link
-            :to="{ name: 'User', params: { username } }"
+            :to="{ name: 'User', params: { userName } }"
             class="uk-margin-small-right"
           >
             <img
-              :src="`https://picsum.photos/seed/${username}/200/300`"
-              :alt="username"
-              :uk-tooltip="`title: ${username}; pos: bottom`"
+              :src="`https://picsum.photos/seed/${userName}/200/300`"
+              :alt="userName"
+              :uk-tooltip="`title: ${userName}; pos: bottom`"
               class="rounded"
             />
           </router-link>
@@ -20,7 +20,7 @@
           <router-link
             :to="{
               name: 'Commit',
-              params: { username, project, branch, commit: '8f5e91' },
+              params: { userName, projectName, branchName, commitID: '8f5e91' },
             }"
           >
             <code>8f5e91</code>
@@ -39,21 +39,21 @@ import router from "@/routes";
 
 export default defineComponent({
   props: {
-    username: String,
-    project: String,
-    branch: String,
-    commit: String,
+    userName: String,
+    projectName: String,
+    branchName: String,
+    commitID: String,
   },
   setup(props) {
     console.log("commit", props);
-    if (props.commit == null) {
+    if (props.commitID == null) {
       router.push({
         name: "Files",
         params: {
-          username: props.username ?? "Steel",
-          project: props.project ?? "daft_punk",
-          branch: props.branch ?? "main",
-          commit: "8f5e91",
+          userName: props.userName ?? "Steel",
+          projectName: props.projectName ?? "daft_punk",
+          branchName: props.branchName ?? "main",
+          commitID: "8f5e91",
         },
       });
     }

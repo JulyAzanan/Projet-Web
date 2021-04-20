@@ -1,5 +1,5 @@
 <template>
-  Discussions: {{ username }} / {{ project }} / discussions
+  Discussions: {{ userName }} / {{ projectName }} / discussions
 </template>
 
 <script lang="ts">
@@ -7,8 +7,8 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    username: String,
-    project: String,
+    userName: String,
+    projectName: String,
   },
 });
 </script>

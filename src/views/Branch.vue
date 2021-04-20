@@ -9,7 +9,7 @@
                 <select
                   class="uk-select uk-form-width-small uk-margin-small-right"
                 >
-                  <option>{{ branch }}</option>
+                  <option>{{ branchName }}</option>
                   <option>dev</option>
                 </select>
                 <span>
@@ -61,37 +61,37 @@ import router, { notFound } from "@/routes";
 
 export default defineComponent({
   props: {
-    username: String,
-    project: String,
-    branch: String,
+    userName: String,
+    projectName: String,
+    branchName: String,
     mainBranch: String,
   },
   setup(props) {
     const ready = ref(false);
 
     async function init() {
-      if (props.branch == null) {
-        let branch: string;
+      if (props.branchName == null) {
+        let branchName: string;
         if (props.mainBranch == null) {
-          const project = await Project.find(props.username, props.project);
+          const project = await Project.find(props.userName, props.projectName);
           if (project === null) return notFound();
-          branch = project.mainBranch;
+          branchName = project.mainBranch;
         } else {
-          branch = props.mainBranch!;
+          branchName = props.mainBranch!;
         }
         await router.replace({
           name: "Commit-default",
           params: {
-            username: props.username!,
-            project: props.project!,
-            branch,
+            userName: props.userName!,
+            projectName: props.projectName!,
+            branchName,
           },
         });
       } else {
         const branch = await Branch.find(
-          props.username,
-          props.project,
-          props.branch
+          props.userName,
+          props.projectName,
+          props.branchName
         );
         if (branch === null) return notFound();
       }

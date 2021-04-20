@@ -14,7 +14,7 @@ const fileRoutes: RouteRecordRaw[] = [
   },
   {
     ...load("File"),
-    path: ":filepath", // affiche la partition en question
+    path: ":filePath", // affiche la partition en question
     props: true,
   },
 ]
@@ -23,12 +23,12 @@ const commitRoutes: RouteRecordRaw[] = [
   {
     ...load("Commit", "default"),
     path: "", // affiche le dernier commit par défaut
-    props: route => ({ commit: null, ...route.params }),
+    props: route => ({ commitID: null, ...route.params }),
     children: fileRoutes,
   },
   {
     ...load("Commit"),
-    path: ":commit", // affiche le commit en question
+    path: ":commitID", // affiche le commit en question
     props: true,
     children: fileRoutes,
   },
@@ -55,27 +55,27 @@ const routes: RouteRecordRaw[] = [
   },
   {
     ...load("User"),
-    path: "/-/:username", // liste des projets d'un utilisateur
+    path: "/-/:userName", // liste des projets d'un utilisateur
     props: route => ({ page: route.query.page ?? "1", ...route.params }),
   },
   {
     ...load("Project"),
-    path: "/-/:username/:project", // page d'un projet
+    path: "/-/:userName/:projectName", // page d'un projet
     props: true,
     children: [
       {
         path: "-",
-        redirect: to => ({ name: "Project", params: { username: to.params.username, project: to.params.project } })
+        redirect: to => ({ name: "Project", params: { userName: to.params.userName, projectName: to.params.projectName } })
       },
       {
         ...load("Branch", "default"),
         path: "", // affiche la branche main par défaut
-        props: route => ({ branch: null, ...route.params }),
+        props: route => ({ branchName: null, ...route.params }),
         children: commitRoutes,
       },
       {
         ...load("Branch"),
-        path: "-/:branch", // affiche les partitions d'une branche
+        path: "-/:branchName", // affiche les partitions d'une branche
         props: true,
         children: commitRoutes,
       },

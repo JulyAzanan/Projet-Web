@@ -8,11 +8,11 @@
             :to="{
               name: 'File',
               params: {
-                username,
-                project,
-                branch,
-                commit,
-                filepath: 'fichier_3615',
+                userName,
+                projectName,
+                branchName,
+                commitID,
+                filePath: 'fichier_3615',
               },
             }"
           >fichier_3615</router-link>
@@ -29,10 +29,10 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    username: String,
-    project: String,
-    branch: String,
-    commit: String,
+    userName: String,
+    projectName: String,
+    branchName: String,
+    commitID: String,
   },
   setup(props) {
     console.log("files", props)

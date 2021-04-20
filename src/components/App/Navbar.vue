@@ -58,7 +58,7 @@
       <ul class="uk-navbar-nav uk-visible@s">
         <!-- Profil utilisateur -->
         <li v-if="logged" class="uk-active">
-          <a class="username">{{ username }} </a>
+          <a class="username">{{ userName }} </a>
           <div class="uk-navbar-dropdown">
             <ul class="uk-nav uk-navbar-dropdown-nav">
               <Usernav />
@@ -105,10 +105,10 @@ export default defineComponent({
   },
   setup() {
     const logged = true;
-    const username = "Steel";
+    const userName = "Steel";
     return {
       logged,
-      username,
+      userName,
     };
   },
 });

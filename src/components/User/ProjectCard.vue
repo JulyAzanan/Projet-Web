@@ -18,16 +18,16 @@
         </div>
         <div class="uk-card-body">
           <p></p>
-          <h3 class="uk-card-title">{{project}}</h3>
+          <h3 class="uk-card-title">{{projectName}}</h3>
           <router-link
-            :to="{ name: 'Branch-default', params: { username, project } }"
+            :to="{ name: 'Branch-default', params: { userName, projectName } }"
             uk-margin
             class="uk-button uk-button-default"
           >
             Voir le projet
           </router-link>
           <p>Dernière mise à jour le : {{ updatedAt }}</p>
-          <p v-if="username != author">Créé par : {{ author }}</p>
+          <p v-if="userName != author">Créé par : {{ author }}</p>
         </div>
       </div>
     </div>
@@ -42,9 +42,9 @@ export default defineComponent({
     priv: Boolean,
     updatedAt: String,
     author: String,
-    username: String,
-    project: String,
-    branch: String,
+    userName: String,
+    projectName: String,
+    branchName: String,
   },
 });
 </script>

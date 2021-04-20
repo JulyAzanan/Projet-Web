@@ -3,10 +3,10 @@
     <div class="uk-container">
       <div uk-grid class="uk-margin-medium-bottom">
         <div class="uk-width-1-3@s uk-margin-large-top" uk-first-column>
-          <h2>Profil de {{ username }}</h2>
+          <h2>Profil de {{ userName }}</h2>
           <img
-            :src="`https://picsum.photos/seed/${username}/500/500`"
-            :alt="name"
+            :src="`https://picsum.photos/seed/${userName}/500/500`"
+            :alt="userName"
             class="rounded"
           />
           <div>
@@ -37,73 +37,73 @@
           >
             <ProjectCard
               :priv="true"
-              :project="'Nier: Automata'"
-              :username="username"
-              :author="username"
+              :projectName="'Nier: Automata'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'04/04/2021'"
               :branch="'main'"
             />
             <ProjectCard
               :priv="true"
-              :project="'Daft Punk'"
-              :username="username"
-              :author="username"
+              :projectName="'Daft Punk'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'04/04/2021'"
               :branch="'master'"
             />
             <ProjectCard
               :priv="false"
-              :project="'Tu'"
-              :username="username"
-              :author="username"
+              :projectName="'Tu'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'04/04/2021'"
               :branch="'branch1'"
             />
             <ProjectCard
               :priv="false"
-              :project="'Tournes'"
-              :username="username"
-              :author="username"
+              :projectName="'Tournes'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'04/04/2021'"
               :branch="'main'"
             />
             <ProjectCard
               :priv="false"
-              :project="'Joyeuses'"
-              :username="username"
-              :author="username"
+              :projectName="'Joyeuses'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'04/04/2021'"
               :branch="'ahahah'"
             />
             <ProjectCard
               :priv="false"
-              :project="'Pâques'"
-              :username="username"
-              :author="username"
+              :projectName="'Pâques'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'02/04/2021'"
               :branch="'Liora'"
             />
             <ProjectCard
               :priv="false"
-              :project="'foo'"
-              :username="username"
-              :author="username"
+              :projectName="'foo'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'05/04/2021'"
               :branch="'vitalité'"
             />
             <ProjectCard
               :priv="false"
-              :project="'bar'"
-              :username="username"
-              :author="username"
+              :projectName="'bar'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'01/04/2021'"
               :branch="'main'"
             />
             <ProjectCard
               :priv="false"
-              :project="'nya'"
-              :username="username"
-              :author="username"
+              :projectName="'nya'"
+              :userName="userName"
+              :author="userName"
               :updatedAt="'02/04/2021'"
               :branch="'main'"
             />
@@ -156,7 +156,7 @@ import ProjectCard from "@/components/User/ProjectCard.vue";
 
 export default defineComponent({
   props: {
-    username: String,
+    userName: String,
     page: String,
     // friendAmount: Number,
     // age: Number,
