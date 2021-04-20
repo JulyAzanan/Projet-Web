@@ -1,7 +1,7 @@
 <template>
   <div class="uk-section uk-section-default uk-section-small">
     <div class="uk-container">
-      <h3 v-if="ready">
+      <h3 v-if="projectExists">
         <router-link :to="{ name: 'User', params: { username } }">
           {{ username }}
         </router-link>
@@ -89,6 +89,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { onBeforeRouteUpdate } from "vue-router";
 import { notFound } from "@/routes";
 import * as Project from "@/api/project";
 
@@ -99,6 +100,7 @@ export default defineComponent({
   },
   setup(props) {
     const ready = ref(false);
+    const projectExists = ref(false);
     const mainBranch = ref("");
     const contributors = ref<string[]>([]);
 
@@ -107,11 +109,19 @@ export default defineComponent({
       if (project === null) return notFound();
       mainBranch.value = project.mainBranch;
       contributors.value = project.contributors;
+      projectExists.value = true;
       ready.value = true;
     }
 
+    onBeforeRouteUpdate(async (to, from) => {
+      if (to.name === "Branch-default") {
+        ready.value = false;
+        init();
+      }
+    });
+
     init();
-    return { ready, mainBranch, contributors };
+    return { ready, projectExists, mainBranch, contributors };
   },
 });
 </script>

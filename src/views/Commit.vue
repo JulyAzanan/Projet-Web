@@ -48,7 +48,7 @@ export default defineComponent({
     console.log("commit", props);
     if (props.commit == null) {
       router.push({
-        name: "Commit",
+        name: "Files",
         params: {
           username: props.username ?? "Steel",
           project: props.project ?? "daft_punk",
