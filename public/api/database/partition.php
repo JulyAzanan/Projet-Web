@@ -3,13 +3,30 @@ namespace Partition;
 
 include_once "config.php";
 
-
+/**
+ * Add a partition ($partition,$content) to a version of a branch of a project, 
+ * identified by $authorName, $project, $branch and $version
+ * 
+ * It handle: 
+ *
+ * Permissions : If you are a contributor or an admin, you can add a partition
+ * 
+ * If not, throw an forbidden_error
+ * 
+ * It throw:
+ * 
+ * branch if the selected branch does not exist
+ * 
+ * It return :
+ * 
+ * true on succes, false on failure
+ */
 function add($author, $project, $branch, $partition, $version ,$content, $loggedUser,)
 {
     check_not_null($author, $project, $branch, $partition,$version, $content, $loggedUser);
     if (! check_branch_exist($author,$project,$branch)){
         //Requested branch does not exist, aborting 
-        arg_error();
+        branch_error();
     }
     if(! admin_or_contributor($author,$project,$loggedUser)){
         //We are not an admin, we dont have the rights to add the partition 
@@ -36,12 +53,22 @@ function add($author, $project, $branch, $partition, $version ,$content, $logged
 /**
  * Return all partition (name+data) in an object of a given 
  * project ($project) made by ($author), on branch ($branch) and with version ($version)
- * It handle private and public project :
- * private projects are only listed if the $loggedUser is a contributor of this project or an admin
- * else, only public ones are listed
+ * 
+ * It handle:
+ * 
+ * Permissions : private projects are only considered if the $loggedUser is a contributor of this project or an admin
+ * 
+ * else, only public ones are considered
+ * 
  * It throw :
+ * 
  * branch_error if the project or the branch does not exist
+ * 
  * pdo_error if failed to execute the request
+ * 
+ * It return:
+ * 
+ * An array-like object that contain all the partition(name + content) of the requested version
  */
 function fetchAllFromVersion($first, $after, $author, $project,$branch, $version, $loggedUser)
 {
@@ -104,7 +131,26 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
     return $partitions;
 
 }
-
+/**
+ * Count the number of partitions of
+ * project ($project) made by ($author), on branch ($branch) and with version ($version)
+ * 
+ * It handle:
+ * 
+ * Permissions : number of partitions of private projects are only counted if the $loggedUser is a contributor of this project or an admin
+ * 
+ * else, only partition from public project are counted
+ * 
+ * It throw :
+ * 
+ * branch_error if the project or the branch does not exist
+ * 
+ * pdo_error if failed to execute the request
+ * 
+ * It return:
+ * 
+ * An array-like object that contain all the partition(name + content) of the requested version
+ */
 function countFromVersion($first, $after, $author, $project, $branch, $version, $loggedUser)
 {
     // Gérer cas projets privés et publics --Should be done
@@ -159,7 +205,30 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
     }
     
 }
-
+/**
+ * Return all partition (name+data) in an object of a given that contain $partition in their name from 
+ * project ($project) made by ($author), on branch ($branch) and with version ($version)
+ * 
+ * 
+ * /!\ $partition should only contain the name of teh partition, not the content
+ * 
+ * It handle:
+ * 
+ * Permissions : private projects are only considered if the $loggedUser is a contributor of this project or an admin
+ * 
+ * else, only public ones are considered
+ * 
+ * It throw :
+ * 
+ * branch_error if the project or the branch does not exist
+ * 
+ * pdo_error if failed to execute the request
+ * 
+ * It return:
+ * 
+ * An array-like object that contain all the partition(name + content) 
+ * of the requested version that have their name like $partition
+ */
 function seekPartition($first, $after, $author, $project, $branch, $version, $partition, $loggedUser)
 {
     // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$partition%
