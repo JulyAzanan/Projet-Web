@@ -17,12 +17,16 @@
         <ul class="uk-tab">
           <li>
             <router-link
-              :to="{ name: 'Branch-default', params: { userName, projectName } }"
+              :to="{
+                name: 'Branch-default',
+                params: { userName, projectName },
+              }"
               >Partitions</router-link
             >
           </li>
           <li>
-            <router-link :to="{ name: 'Pulls', params: { userName, projectName } }"
+            <router-link
+              :to="{ name: 'Pulls', params: { userName, projectName } }"
               >Changements
             </router-link>
           </li>
@@ -41,18 +45,18 @@
         >
           <component :is="Component">
             <template v-slot:sidebar>
+              <cite>
+                Créé le {{ project.createdAt.toLocaleString() }}
+              </cite><br>
+              <cite>
+                Mis à jour le {{ project.updatedAt.toLocaleString() }}
+              </cite>
               <h4>
                 <span class="uk-margin-small-right" uk-icon="icon: info"></span>
                 À propos
               </h4>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam
-                pellentesque turpis eu libero elementum, mattis egestas nisi
-                scelerisque. Nulla facilisi. Pellentesque lacinia felis non leo
-                scelerisque tristique. Suspendisse bibendum quam quis
-                ullamcorper lacinia. Ut nec semper enim, vitae efficitur felis.
-                Curabitur scelerisque dignissim metus, at sagittis tortor
-                scelerisque sit amet. Donec eu tincidunt justo.
+                {{ project.description }}
               </p>
 
               <hr class="uk-divider-small" />
@@ -65,7 +69,7 @@
                 Contributeurs
               </h4>
               <ul class="uk-grid-small uk-flex-middle" uk-grid>
-                <li v-for="name in contributors" :key="name">
+                <li v-for="name in project.contributors" :key="name">
                   <router-link
                     :to="{ name: 'User', params: { userName: name } }"
                   >
@@ -101,9 +105,10 @@ export default defineComponent({
   setup(props) {
     const page = reactive({
       ready: false,
-      valid: false, 
+      valid: false,
     });
-    const project = ref<Project.Result>({
+    const project = ref<Project.FindResult>({
+      private: false,
       contributors: [],
       mainBranch: "",
       description: "",

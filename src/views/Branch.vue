@@ -68,14 +68,19 @@ export default defineComponent({
   },
   setup(props) {
     const ready = ref(false);
+    const branch = ref<Branch.FindResult>({
+      lastCommit: "",
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    });
 
     async function init() {
       if (props.branchName == null) {
         let branchName: string;
         if (props.mainBranch == null) {
-          const project = await Project.find(props.userName, props.projectName);
-          if (project === null) return notFound();
-          branchName = project.mainBranch;
+          const result = await Project.find(props.userName, props.projectName);
+          if (result === null) return notFound();
+          branchName = result.mainBranch;
         } else {
           branchName = props.mainBranch!;
         }
@@ -88,12 +93,13 @@ export default defineComponent({
           },
         });
       } else {
-        const branch = await Branch.find(
+        const result = await Branch.find(
           props.userName,
           props.projectName,
           props.branchName
         );
-        if (branch === null) return notFound();
+        if (result === null) return notFound();
+        branch.value = result
       }
       ready.value = true;
     }
