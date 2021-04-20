@@ -74,6 +74,9 @@ function add($author, $project, $branch, $partitions, $loggedUser)
     return($reussite);
 }
 
+
+
+
 function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUser)
 {
     // Gérer cas projets privés et publics. Modifier ce qu'il faut pour order by createdAt asc ou desc
@@ -334,11 +337,57 @@ function seekVersion($first, $after, $author, $project, $branch, $version, $logg
     if (!check_project_exist($author, $project)) {
         project_error();
     }
-    if (!admin_or_contributor($author, $project, $loggedUser)) {
-        forbidden_error(); //We do not have the right to seek for Version a branch --> FORBIDDEN
+    if (admin_or_contributor($author, $project, $loggedUser)) {
+        /**
+         * We are an admin and/or a contributor -> W
+         */
+        $sql = "SELECT id,branchName
+        FROM version v
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
+        AND v.branchName = :bname
+
+        LIMIT :number_to_show OFFSET :offset ";
+
+        //Fuck off @July for putting so long SQL Requests 
+    } else {
+        /**
+         * We are not an admin and we are not a contributor
+         * So we
+         */
+        $sql = "SELECT id,branchName
+        FROM version v
+        JOIN project p 
+        ON
+        pa.projectName = p.name AND pa.authorName = p.name
+        WHERE v.projectName = :pname 
+        AND v.authorName = :pauthorname
+        AND v.branchName = :bname
+        AND V.id LIKE %:version%
+        AND p.private = 'f'
+        LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
+
     }
-
-
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    // ($first, $after, $author, $project, $version, $loggedUser)
+    $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
+    $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
+    $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
+    $stmt->bindValue(':version', $version, \PDO::PARAM_INT);
+    if (! $stmt->execute()){
+        //Request encoutered an error, aborting
+        PDO_error();
+    }
+    foreach ($stmt->fetchAll() as $version) {
+        $versions[] = (object) [
+            'name' => $version['name'],
+            'content' => $version['branchName'],
+        ];
+    }
+    return $versions;
     // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$version%
 }
 
