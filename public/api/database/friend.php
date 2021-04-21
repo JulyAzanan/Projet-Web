@@ -72,7 +72,7 @@ function remove($follower, $following, $loggedUser)
     }
 
     //We have the rights to do it
-    $sql = "DELETE FROM branch WHERE followerName = :fname AND followingName = :fingname ";
+    $sql = "DELETE FROM friends WHERE followerName = :fname AND followingName = :fingname ";
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':fname', $follower, \PDO::PARAM_STR);
@@ -121,7 +121,7 @@ function fetchAllFromUser($first, $after, $user)
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':fname', $user, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
-    $stmt->bindValue(':number_to_show', $first, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
     if (! $stmt->execute()){
         //An error occured
         PDO_error() ;
@@ -154,7 +154,7 @@ function countFromUser($user)
 {
     check_not_null($user);//Required here
     //Creating the request
-    $sql = "COUNT(*)
+    $sql = "SELECT COUNT(*)
         FROM friend
         WHERE followerName = :fname AND
         LIMIT :number_to_show OFFSET :offset " ;

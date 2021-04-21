@@ -3,6 +3,7 @@ namespace Version;
 
 include_once "config.php";
 include_once "partition.php"; //Useless or not ? 
+//include_once "args.php";
 
 /**
  * Add all partition contained in the $partition arg to the table partion
@@ -121,13 +122,13 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
     if (! check_project_exist($author, $project)){
         project_error();
     }
-
+    $realOrder = "";
     if ($order){
         $realOrder = "ASC" ;
     } else {
         $realOrder = "DESC";
     } 
-
+    $sql = "";
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
@@ -136,7 +137,7 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
         FROM version v
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
-        ORDER BY branchName :order
+        ORDER BY createdAt :order
         LIMIT :number_to_show OFFSET :offset ";
 
 
@@ -149,11 +150,11 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
         FROM version v
         JOIN project p 
         ON
-        v.projectName = p.name AND v.authorName = p.name
+        v.projectName = p.name AND v.authorName = p.authorName
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND p.private = 'f'
-        ORDER BY branchName :order 
+        ORDER BY createdAt :order 
         LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
 
     }
@@ -169,10 +170,11 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
         //Request encoutered an error, aborting
         PDO_error();
     }
+    $versions = [];
     foreach ($stmt->fetchAll() as $version) {
         $versions[] = (object) [
             'name' => $version['name'],
-            'content' => $version['branchName'],
+            'branchName' => $version['branchName'],
         ];
     }
     return $versions;
@@ -207,12 +209,13 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
     if (! check_branch_exist($author, $project,$branch)){
         branch_error();
     }
+    $realOrder = "";
     if ($order){
         $realOrder = "ASC" ;
     } else {
         $realOrder = "DESC";
     } 
-
+    $sql = "";
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
@@ -222,7 +225,7 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname
-        ORDER BY branchName :order
+        ORDER BY createdAt :order
         LIMIT :number_to_show OFFSET :offset ";
 
         //Fuck off @July for putting so long SQL Requests 
@@ -235,12 +238,12 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
         FROM version v
         JOIN project p 
         ON
-        pa.projectName = p.name AND pa.authorName = p.name
+        v.projectName = p.name AND v.authorName = p.authorName
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname
         AND p.private = 'f'
-        ORDER BY branchName :order
+        ORDER BY createdAt :order
         LIMIT :number_to_show OFFSET :offset ";//Here, only public project are listed
 
     }
@@ -257,6 +260,7 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
         //Request encoutered an error, aborting
         PDO_error();
     }
+    $versions = [];
     foreach ($stmt->fetchAll() as $version) {
         $versions[] = (object) [
             'name' => $version['name'],
@@ -294,18 +298,16 @@ function countFromProject($author, $project, $loggedUser)
         project_error();
     }
 
-
+    $sql = "";
 
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
          */
-        $sql = "COUNT(*)
+        $sql = "SELECT COUNT(*)
         FROM version v
         WHERE v.projectName = :pname 
-        AND v.authorName = :pauthorname
-        ORDER BY branchName :order
-        LIMIT :number_to_show OFFSET :offset ";
+        AND v.authorName = :pauthorname ";
 
         //Fuck off @July for putting so long SQL Requests 
     } else {
@@ -313,16 +315,14 @@ function countFromProject($author, $project, $loggedUser)
          * We are not an admin and we are not a contributor
          * So we
          */
-        $sql = "COUNT (*)
+        $sql = "SELECT COUNT (*)
         FROM version v
         JOIN project p 
         ON
-        pa.projectName = p.name AND pa.authorName = p.name
+        v.projectName = p.name AND v.authorName = p.authorName
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
-        AND p.private = 'f'
-        ORDER BY branchName :order 
-        LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
+        AND p.private = 'f' "; //Here, only public project are listed
 
     }
     $bd = connect();
@@ -363,24 +363,24 @@ function countFromProject($author, $project, $loggedUser)
 function countFromBranch($author, $project, $branch, $loggedUser)
 {
     // Gérer cas projets privés et publics
-    check_not_null($author, $project, $loggedUser);
+    check_not_null($author, $project, $loggedUser, $branch);
     if (! check_project_exist($author, $project)){
         project_error();
     }
+    if (! check_branch_exist($author, $project,$branch))
+        branch_error();
 
-
+    $sql = "";
 
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
          */
-        $sql = "COUNT(*)
+        $sql = "SELECT COUNT(*)
         FROM version v
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
-        AND v.branchName = bname
-        ORDER BY branchName :order
-        LIMIT :number_to_show OFFSET :offset ";
+        AND v.branchName = :bname ";
 
         //Fuck off @July for putting so long SQL Requests 
     } else {
@@ -388,17 +388,15 @@ function countFromBranch($author, $project, $branch, $loggedUser)
          * We are not an admin and we are not a contributor
          * So we
          */
-        $sql = "COUNT (*)
+        $sql = "SELECT COUNT (*)
         FROM version v
         JOIN project p
         ON v.projectName = p.name 
         AND v.authorName = p.authorName
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
-        AND v.branchName = bname
-        AND p.private = 'f'
-        ORDER BY branchName :order 
-        LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
+        AND v.branchName = :bname
+        AND p.private = 'f' "; //Here, only public project are listed
 
     }
     $bd = connect();
@@ -443,6 +441,9 @@ function seekVersion($first, $after, $author, $project, $branch, $version, $logg
     if (!check_project_exist($author, $project)) {
         branch_error();
     }
+    if (! check_branch_exist($author, $project,$branch))
+        branch_error();
+    $sql = "";
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
@@ -452,7 +453,7 @@ function seekVersion($first, $after, $author, $project, $branch, $version, $logg
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname
-
+        AND v.id LIKE %:version%
         LIMIT :number_to_show OFFSET :offset ";
 
         //Fuck off @July for putting so long SQL Requests 
@@ -465,11 +466,11 @@ function seekVersion($first, $after, $author, $project, $branch, $version, $logg
         FROM version v
         JOIN project p 
         ON
-        pa.projectName = p.name AND pa.authorName = p.name
+        v.projectName = p.name AND v.authorName = p.authorName
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname
-        AND V.id LIKE %:version%
+        AND v.id LIKE %:version%
         AND p.private = 'f'
         LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
 
@@ -487,9 +488,11 @@ function seekVersion($first, $after, $author, $project, $branch, $version, $logg
         //Request encoutered an error, aborting
         PDO_error();
     }
+    $versions = [];
     foreach ($stmt->fetchAll() as $version) {
         $versions[] = (object) [
-            'name' => $version['name'],
+            'id' => $version['id'],
+            'branchName' => $version['branchName']
         ];
     }
     return $versions;

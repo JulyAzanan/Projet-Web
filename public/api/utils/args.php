@@ -29,14 +29,14 @@ function check_contributor($User_to_check,$Project,$Project_Author_Name)
 {
     $bd = connect();
     //Select all contributor from project $Project 
-    $stmt = $bd->prepare("SELECT c.contributorname FROM contributor c JOIN Project p ON c.projectname = p.name AND c.authorname = p.authorname WHERE p.name = :pname AND p.authorname = :pauthorname");
+    $stmt = $bd->prepare("SELECT c.contributorName FROM contributor c JOIN project p ON c.projectName = p.name AND c.authorName = p.authorName WHERE p.name = :pname AND p.authorName = :pauthorname");
     //Binding args
     $stmt->bindValue(':pname', $Project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $Project_Author_Name, \PDO::PARAM_STR);
     $stmt->execute(); //Execute the request 
     //We select all contributors
     foreach ($stmt->fetchAll() as $res) {
-        if (strcmp($res['contributorname'],$User_to_check) == 0 )//Check if $User_to_check is a contributor of the selected project
+        if (strcmp($res['contributorName'],$User_to_check) == 0 )//Check if $User_to_check is a contributor of the selected project
         {
             return true;
         }
@@ -63,7 +63,7 @@ function admin_or_contributor($author, $project, $loggedUser){
 function check_project_exist($Project_Author_Name, $project){
     $bd = connect();
     //Select all contributor from project $Project 
-    $stmt = $bd->prepare("SELECT name FROM Project WHERE name = :pname AND authorname = :pauthorname");
+    $stmt = $bd->prepare("SELECT name FROM project WHERE name = :pname AND authorName = :pauthorname");
     //Binding args
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $Project_Author_Name, \PDO::PARAM_STR);
@@ -81,13 +81,13 @@ function check_branch_exist($Project_Author_Name, $project,$branch){
     //Selecting all project corresponding to our args
     $sql = "SELECT name
         FROM branch
-        WHERE authorname = :aname 
+        WHERE authorName = :aname 
         AND projectName = :pname 
         AND name = :bname ";
     $stmt = $bd->prepare($sql);
     //Binding args
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
-    $stmt->bindValue(':pauthorname', $Project_Author_Name, \PDO::PARAM_STR);
+    $stmt->bindValue(':aname', $Project_Author_Name, \PDO::PARAM_STR);
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
     if (! $stmt->execute()){//Execute the request 
         //Something went wrong

@@ -134,7 +134,7 @@ function remove($contributor, $authorName, $project, $loggedUser)
  */
 
 
-function fetchAllFromProject($first, $after, /*$contributor, Not needed right ?*/ $authorName, $project, $loggedUser)
+function fetchAllFromProject($first, $after, $authorName, $project, $loggedUser)
 {
     // Gérer cas projets privés et publics
     check_not_null($first, $after, $authorName, $project, $loggedUser);
@@ -142,6 +142,7 @@ function fetchAllFromProject($first, $after, /*$contributor, Not needed right ?*
     if (! check_project_exist($authorName, $project)) {
         project_error();
     }
+    $sql = "";
     if (admin_or_contributor($authorName, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
@@ -157,7 +158,7 @@ function fetchAllFromProject($first, $after, /*$contributor, Not needed right ?*
          */
         $sql = "SELECT contributorName
         FROM contributor c
-        JOIN Projet p ON
+        JOIN projet p ON
         c.projectName = p.name 
         AND c.authorName = p.authorName
         WHERE c.projectName = :pname 
@@ -170,16 +171,17 @@ function fetchAllFromProject($first, $after, /*$contributor, Not needed right ?*
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $authorName, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
-    $stmt->bindValue(':number_to_show', $first, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
     if (! $stmt->execute() ){
         PDO_error();
     };
+    $contributors = [];
     foreach ($stmt->fetchAll() as $contributor) {
-        $$contributors[] = (object) [
+        $contributors[] = (object) [
             'contributorName' => $contributor['contributorName'],
         ];
     }
-    return $branchs;
+    return $contributors;
 }
 /**
  * Count the number of contributors from a project, identified with $authorName and $project
@@ -200,7 +202,7 @@ function fetchAllFromProject($first, $after, /*$contributor, Not needed right ?*
  * 
  * An positive integer (0 included) on succes, and may return -1 if result are incoherent
  */
-function countFromProject(/*$contributor -> Not needed ?!?,*/ $authorName, $project, $loggedUser)
+function countFromProject($authorName, $project, $loggedUser)
 {
     // Gérer cas projets privés et publics
     check_not_null($authorName, $project, $loggedUser);
@@ -208,11 +210,12 @@ function countFromProject(/*$contributor -> Not needed ?!?,*/ $authorName, $proj
     if (! check_project_exist($authorName, $project)) {
         project_error();
     }
+    $sql = "";
     if (admin_or_contributor($authorName, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
          */
-        $sql = "COUNT(*)
+        $sql = "SELECT COUNT(*)
         FROM contributor c
         WHERE c.projectName = :pname 
         AND c.authorName = :pauthorname ";
@@ -221,9 +224,9 @@ function countFromProject(/*$contributor -> Not needed ?!?,*/ $authorName, $proj
          * We are not an admin and we are not a contributor
          * So we
          */
-        $sql = "COUNT(*)
+        $sql = "SELECT COUNT(*)
         FROM contributor c
-        JOIN Projet p ON
+        JOIN projet p ON
         c.projectName = p.name 
         AND c.authorName = p.authorName
         WHERE c.projectName = :pname 

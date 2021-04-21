@@ -77,7 +77,7 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
     if (! check_branch_exist($author, $project,$branch)){
         branch_error();
     }
-
+    $sql = "";
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
@@ -100,8 +100,8 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
         FROM partition pa
         JOIN project p 
         ON
-        pa.projectName = p.name AND pa.authorName = p.name
-        WHERE pa.projectname = :pname 
+        pa.projectName = p.name AND pa.authorName = p.authorName
+        WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
         AND pa.versionID = :branchid
@@ -158,12 +158,12 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
     if (! check_branch_exist($author, $project,$branch)){
         branch_error();
     }
-
+    $sql = "";
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
          */
-        $sql = "COUNT(*)
+        $sql = "SELECT COUNT(*)
         FROM partition pa
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
@@ -177,8 +177,11 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
          * We are not an admin and we are not a contributor
          * So we
          */
-        $sql = "COUNT(*)
+        $sql = "SELECT COUNT(*)
         FROM partition pa
+        JOIN project p 
+        ON
+        pa.projectName = p.name AND pa.authorName = p.authorName
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
@@ -233,6 +236,10 @@ function seekPartition($first, $after, $author, $project, $branch, $version, $pa
 {
     // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$partition%
     check_not_null($first, $after, $author, $project, $branch, $version, $partition, $loggedUser);
+    if (! check_branch_exist($author, $project,$branch)){
+        branch_error();
+    }
+    $sql = "";
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
@@ -243,8 +250,7 @@ function seekPartition($first, $after, $author, $project, $branch, $version, $pa
         AND pa.authorName = :pauthorname
         AND pa.branchName = bname
         AND pa.versionID = :versionID
-        AND pa.name LIKE %:partitionname%
-        LIMIT :number_to_show OFFSET :offset ";
+        AND pa.name LIKE %:partitionname% ";
         //Let see if it works
 
 
@@ -255,13 +261,15 @@ function seekPartition($first, $after, $author, $project, $branch, $version, $pa
          */
         $sql = "SELECT name
         FROM partition pa
+        JOIN project p 
+        ON
+        pa.projectName = p.name AND pa.authorName = p.authorName
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = bname
         AND pa.versionID = :versionID
         AND pa.name LIKE %:partitionName%
-        AND p.private = 'f'
-        LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
+        AND p.private = 'f' "; //Here, only public project are listed
 
     }
     $bd = connect();
