@@ -13,10 +13,9 @@
             <div>
               <button class="uk-button uk-button-text buttonNormalText">
                 <span class="uk-margin-small-right" uk-icon="icon: star"></span>
-                {{ user.friends }} abonnés
+                {{ user.followers }} abonnés
               </button>
             </div>
-            <!-- TODO : afficher une liste des amis quand on clique sur le bouton -->
             <div v-if="user.email">
               <span class="uk-margin-small-right" uk-icon="icon: mail"> </span>
               {{ user.email }}
@@ -47,32 +46,10 @@
                 :key="project.name"
                 :isPrivate="project.private"
                 :projectName="project.name"
-                :userName="userName"
-                :author="userName"
                 :updatedAt="project.updatedAt"
               />
             </div>
-            <ul class="uk-pagination uk-position-bottom-center" uk-margin>
-              <li :class="{ 'uk-disabled': page <= 1 }">
-                <router-link :to="{ query: { page: parseInt(page) - 1 + '' } }">
-                  <span uk-pagination-previous></span>
-                </router-link>
-              </li>
-              <li
-                v-for="i in pages"
-                :key="i"
-                :class="{ 'uk-active': i + '' == page }"
-              >
-                <router-link :to="{ query: { page: i + '' } }">
-                  <span> {{ i }}</span>
-                </router-link>
-              </li>
-              <li :class="{ 'uk-disabled': page >= pages }">
-                <router-link :to="{ query: { page: parseInt(page) + 1 + '' } }">
-                  <span uk-pagination-next></span>
-                </router-link>
-              </li>
-            </ul>
+            <Pagination :page="parseInt(page)" :pages="pages" />
           </div>
           <div v-else uk-spinner></div>
         </div>
@@ -82,10 +59,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import * as User from "@/api/user";
 import * as Project from "@/api/project";
 import ProjectCard from "@/components/User/ProjectCard.vue";
+import Pagination from "@/components/Pagination.vue";
 import router, { notFound } from "@/routes";
 
 export default defineComponent({
@@ -95,6 +73,7 @@ export default defineComponent({
   },
   components: {
     ProjectCard,
+    Pagination,
   },
   setup(props) {
     const ready = ref(false);
@@ -102,12 +81,12 @@ export default defineComponent({
     const user = ref<User.FetchResult>({
       email: "",
       age: 0,
-      friends: 0,
+      followers: 0,
       bio: "",
       projectCount: 0,
       projects: [],
     });
-    let pages = ref(0);
+    const pages = ref(0);
 
     watch(
       () => props.page,
@@ -143,7 +122,7 @@ export default defineComponent({
     }
 
     init();
-    return { ready, user, projectsLoaded, pages, console };
+    return { ready, user, projectsLoaded, pages };
   },
 });
 </script>

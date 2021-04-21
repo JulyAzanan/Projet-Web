@@ -6,116 +6,32 @@
         <div>
           <div class="uk-position-top-center">
             <div class="uk-inline">
-              <button
-                class="uk-form-icon"
-                uk-icon="icon: search"
-                v-on:click="changeMail()"
-              ></button>
+              <button class="uk-form-icon" uk-icon="icon: search"></button>
               <input
                 class="uk-input uk-form-width-large"
                 type="text"
                 placeholder="Rechercher un projet..."
-                id="cMail"
               />
             </div>
           </div>
           <div class="uk-container uk-margin-large-top uk-inline" uk-grid>
-            <div
-              class="uk-grid-column-small uk-child-width-1-4@s uk-text-center uk-margin-medium-bottom"
-              uk-grid
-            >
-              <ProjectCard
-              :priv="true"
-              :projectName="'Nier: Automata'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'main'"
-            />
-            <ProjectCard
-              :priv="true"
-              :projectName="'Daft Punk'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'master'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'Tu'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'branch1'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'Tournes'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'main'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'Joyeuses'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'ahahah'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'Pâques'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'02/04/2021'"
-              :branch="'Liora'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'foo'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'05/04/2021'"
-              :branch="'vitalité'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'bar'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'01/04/2021'"
-              :branch="'main'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'nya'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'02/04/2021'"
-              :branch="'main'"
-            />
+            <div v-if="ready">
+              <div
+                class="uk-grid-column-small uk-child-width-1-4@s uk-text-center uk-margin-medium-bottom"
+                uk-grid
+              >
+                <ProjectCard
+                  v-for="project in projects"
+                  :key="project.name"
+                  :isPrivate="project.private"
+                  :projectName="project.name"
+                  :author="project.author"
+                  :updatedAt="project.updatedAt"
+                />
+              </div>
+              <Pagination :page="parseInt(page)" :pages="pages" />
             </div>
-            <ul class="uk-pagination uk-position-bottom-center" uk-margin>
-              <li class="uk-disabled">
-                <a><span uk-pagination-previous></span></a>
-              </li>
-              <li class="uk-active"><span>1</span></li>
-              <li><a href="#">2</a></li>
-              <li><a href="#">3</a></li>
-              <li><a href="#">4</a></li>
-              <li><a href="#">5</a></li>
-              <li class="uk-disabled"><span>...</span></li>
-              <li><a href="#">8</a></li>
-              <li><a href="#">9</a></li>
-              <li><a href="#">10</a></li>
-              <li class="uk-disabled"><span>...</span></li>
-              <li><a href="#">20</a></li>
-              <li>
-                <a href="#"><span uk-pagination-next></span></a>
-              </li>
-            </ul>
+            <div v-else uk-spinner></div>
           </div>
         </div>
       </div>
@@ -124,8 +40,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import ProjectCard from "@/components/User/ProjectCard.vue";
+import Pagination from "@/components/Pagination.vue";
+import * as Project from "@/api/project";
+import router from "@/routes";
 
 export default defineComponent({
   props: {
@@ -133,6 +52,36 @@ export default defineComponent({
   },
   components: {
     ProjectCard,
+    Pagination,
+  },
+  setup(props) {
+    const ready = ref(false);
+    const projects = ref<Project.AllResult[]>([]);
+    const pages = ref(0);
+
+    watch(() => props.page, load);
+
+    async function load() {
+      ready.value = false;
+      const page = parseInt(props.page!);
+      const result = await Project.all(
+        Project.projectPerPage,
+        Project.projectPerPage * page
+      );
+      projects.value = result;
+      if (result.length === 0 && page != 1) {
+        router.replace({ query: { page: "1" } });
+      }
+      ready.value = true;
+    }
+
+    async function init() {
+      const count = await Project.count();
+      pages.value = Math.ceil(count / Project.projectPerPage);
+    }
+
+    init().then(load);
+    return { ready, projects, pages };
   },
 });
 </script>

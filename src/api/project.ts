@@ -8,6 +8,8 @@ interface BaseResult {
   description: string,
 }
 
+export const projectPerPage = 15;
+
 export interface FetchResult extends BaseResult {
   contributors: string[],
   branches: string[],
@@ -82,14 +84,49 @@ export interface AllResult extends AllOfResult {
   author: string
 }
 
-export async function all(_first: number, _after: number): Promise<AllOfResult[] | null> {
+export async function all(_first: number, _after: number): Promise<AllResult[]> {
   await sleep(500); // TODO
-  return []
+  return [{
+    author: "July",
+    private: true,
+    updatedAt: new Date(),
+    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+    name: "Nier: Automata",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+  }, {
+    author: "Steel",
+    private: false,
+    updatedAt: new Date(),
+    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+    name: "Daft Punk",
+    description: "Lorem ipsum dolor sit amet."
+  }, {
+    author: "Michel",
+    private: false,
+    updatedAt: new Date(),
+    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+    name: "Daft Punk",
+    description: "Lorem ipsum dolor sit amet."
+  }, {
+    author: "Annie",
+    private: false,
+    updatedAt: new Date(),
+    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+    name: "Daft Punk",
+    description: "Lorem ipsum dolor sit amet."
+  }, {
+    author: "Bernard",
+    private: false,
+    updatedAt: new Date(),
+    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+    name: "Daft Punk",
+    description: "Lorem ipsum dolor sit amet."
+  }]
 }
 
 export async function count(): Promise<number> {
   await sleep(500); // TODO
-  return 5;
+  return 52;
 }
 
 export async function countOf(user: Nil<string>): Promise<number> {

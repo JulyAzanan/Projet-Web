@@ -10,7 +10,7 @@
         </span>
         <img
           :src="`https://picsum.photos/seed/${userName}/100/100`"
-          :alt="name"
+          :alt="userName"
           class="rounded uk-margin-medium-top"
         />
         <div class="uk-card-body">

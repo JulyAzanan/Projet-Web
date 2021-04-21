@@ -27,7 +27,7 @@
             Voir le projet
           </router-link>
           <p>Dernière mise à jour le : {{ updatedAt.toLocaleString() }}</p>
-          <p v-if="userName != author">Créé par : {{ author }}</p>
+          <p v-if="author">Créé par : {{ author }}</p>
         </div>
       </div>
     </div>
@@ -42,7 +42,6 @@ export default defineComponent({
     isPrivate: Boolean,
     updatedAt: Date,
     author: String,
-    userName: String,
     projectName: String,
   },
 });

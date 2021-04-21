@@ -6,53 +6,30 @@
         <div>
           <div class="uk-position-top-center">
             <div class="uk-inline">
-              <button
-                class="uk-form-icon"
-                uk-icon="icon: search"
-                v-on:click="changeMail()"
-              ></button>
+              <button class="uk-form-icon" uk-icon="icon: search"></button>
               <input
                 class="uk-input uk-form-width-large"
                 type="text"
                 placeholder="Rechercher un utilisateur..."
-                id="cMail"
               />
             </div>
           </div>
           <div class="uk-container uk-margin-large-top uk-inline" uk-grid>
-            <div
-              class="uk-grid-column-small uk-child-width-1-6@s uk-text-center uk-margin-medium-bottom"
-              uk-grid
-            >
-              <FriendCard :userName="'July'" :followers="3615" />
-              <FriendCard :userName="'foo'" :followers="2" />
-              <FriendCard :userName="'bar'" :followers="1" />
-              <FriendCard :userName="'Annie'" :followers="42" />
-              <FriendCard :userName="'Elaim'" :followers="37" />
-              <FriendCard :userName="'gperdu'" :followers="354" />
-              <FriendCard :userName="'salut'" :followers="5" />
-              <FriendCard :userName="'toi'" :followers="225" />
-              <FriendCard :userName="'keur'" :followers="22326" />
+            <div v-if="ready">
+              <div
+                class="uk-grid-column-small uk-child-width-1-6@s uk-text-center uk-margin-medium-bottom"
+                uk-grid
+              >
+                <FriendCard
+                  v-for="user in users"
+                  :key="user.name"
+                  :userName="user.name"
+                  :followers="user.followers"
+                />
+              </div>
+              <Pagination :page="parseInt(page)" :pages="pages" />
             </div>
-            <ul class="uk-pagination uk-position-bottom-center" uk-margin>
-              <li class="uk-disabled">
-                <a><span uk-pagination-previous></span></a>
-              </li>
-              <li class="uk-active"><span>1</span></li>
-              <li><a href="#">2</a></li>
-              <li><a href="#">3</a></li>
-              <li><a href="#">4</a></li>
-              <li><a href="#">5</a></li>
-              <li class="uk-disabled"><span>...</span></li>
-              <li><a href="#">8</a></li>
-              <li><a href="#">9</a></li>
-              <li><a href="#">10</a></li>
-              <li class="uk-disabled"><span>...</span></li>
-              <li><a href="#">20</a></li>
-              <li>
-                <a href="#"><span uk-pagination-next></span></a>
-              </li>
-            </ul>
+            <div v-else uk-spinner></div>
           </div>
         </div>
       </div>
@@ -61,8 +38,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import FriendCard from "@/components/User/FriendCard.vue";
+import Pagination from "@/components/Pagination.vue";
+import * as User from "@/api/user";
+import router from "@/routes";
 
 export default defineComponent({
   props: {
@@ -70,6 +50,33 @@ export default defineComponent({
   },
   components: {
     FriendCard,
+    Pagination,
+  },
+  setup(props) {
+    const ready = ref(false);
+    const users = ref<User.AllResult[]>([]);
+    const pages = ref(0);
+
+    watch(() => props.page, load);
+
+    async function load() {
+      ready.value = false;
+      const page = parseInt(props.page!);
+      const result = await User.all(User.userPerPage, User.userPerPage * page);
+      users.value = result;
+      if (result.length === 0 && page != 1) {
+        router.replace({ query: { page: "1" } });
+      }
+      ready.value = true;
+    }
+
+    async function init() {
+      const count = await User.count();
+      pages.value = Math.ceil(count / User.projectPerPage);
+    }
+
+    init().then(load);
+    return { ready, users, pages };
   },
 });
 </script>
