@@ -3,6 +3,7 @@
 namespace Branch;
 
 include_once "config.php";
+//include_once "args.php";
 /**
  * Add a branch for a selected project
  * 
@@ -27,11 +28,11 @@ function add($author, $project, $branch, $loggedUser)
     //We are an either an admin, the creator or a contributor. We can add a branch
 
     //Always executed
-    $sql = "INSERT INTO branch VALUES (:name, updatedat, :authorname, :projectname)";
+    $sql = "INSERT INTO branch VALUES (:name, :updatedat, :authorname, :projectname)";
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':name', $branch, \PDO::PARAM_STR);
-    $stmt->bindValue(':apdatedat', "CURRENT_TIMESTAMP", \PDO::PARAM_STR); //Let see !
+    $stmt->bindValue(':updatedat', "CURRENT_TIMESTAMP", \PDO::PARAM_STR); //Let see !
     $stmt->bindValue(':authorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_INT);
     return $stmt->execute();
@@ -64,7 +65,7 @@ function remove($author, $project, $branch, $loggedUser)
         forbidden_error(); //We do not have the right to remove a branch --> FORBIDDEN
     }
     //Checking the name of the main branch. If we are trying to delete it, throw an request_error
-    $sql = "SELECT mainbranchname FROM Project WHERE name = :pname AND authorname = :pauthorname";
+    $sql = "SELECT mainBranchName FROM project WHERE name = :pname AND authorName = :pauthorname";
     //getting the main branch name of our project
 
     /**
@@ -85,7 +86,7 @@ function remove($author, $project, $branch, $loggedUser)
     $i = 0;
     foreach ($stmt->fetchAll() as $res) { //Should be only one result, but anyway i'm looping for safety reasons
         $i = $i + 1; //Counter
-        if (strcmp($res['mainbranchname'], $branch) == 0) //Check if strings are equal
+        if (strcmp($res['mainBranchName'], $branch) == 0) //Check if strings are equal
         {
             //Yes ? We are trying to delete the main branch. We should really not do taht
             request_error();
@@ -102,7 +103,7 @@ function remove($author, $project, $branch, $loggedUser)
      * If we are here, we should be able to remove the branch
      */
     //So creating the request and executing it
-    $sql = "DELETE FROM branch WHERE name = :bname AND pojectname = :pname AND authorname = :pauthorname";
+    $sql = "DELETE FROM branch WHERE name = :bname AND pojectName = :pname AND authorName = :pauthorname";
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
@@ -171,6 +172,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
         //Project does not exist. Aborting
         project_error();
     }
+    $sql = "";
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
@@ -187,7 +189,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
         $sql = "SELECT name
         FROM branch b
         JOIN projet p
-        ON b.projectName = p.name and b.authorName = p.name
+        ON b.projectName = p.name AND b.authorName = p.authorName
         WHERE b.projectName = :pname AND b.authorName = :pauthorname AND p.private = 'f'
         LIMIT :number_to_show OFFSET :offset ";
     }
@@ -210,6 +212,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
         PDO_error();
 
     }
+    $branchs = [];
     foreach ($stmt->fetchAll() as $branch) {
         $branchs[] = (object) [
             'name' => $branch['name'],
@@ -239,11 +242,12 @@ function countFromProject($author, $project, $loggedUser)
     if (!check_project_exist($author, $project)) {
         project_error();
     }
+    $sql = "";
     if (admin_or_contributor($author, $project, $loggedUser)) {
         /**
          * We are an admin and/or a contributor -> W
          */
-        $sql = "COUNT(*)
+        $sql = "SELECT COUNT(*)
         FROM branch b
         WHERE b.projectName = :pname 
         AND b.authorName = :pauthorname";
@@ -252,11 +256,11 @@ function countFromProject($author, $project, $loggedUser)
          * We are not an admin and we are not a contributor
          * So we
          */
-        $sql = "COUNT(*)
+        $sql = "SELECT COUNT(*)
         FROM branch b
         JOIN projet p
         ON b.projectName = p.name 
-        AND b.authorName = p.name
+        AND b.authorName = p.authorName
         WHERE b.projectName = :pname 
         AND b.authorName = :pauthorname 
         AND p.private = 'f' ";

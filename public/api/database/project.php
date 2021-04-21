@@ -3,6 +3,7 @@
 namespace Project;
 
 include_once "config.php";
+//include_once "args.php";
 
 use \PDO;
 use \Exception;
@@ -13,13 +14,13 @@ function add($author, $project, $private)
 
     check_not_null($author, $project, $private);
 
-    try {
+    /* try {
         $bd = connect();
         echo "Connecté\n";
     } catch (Exception $e) {
         die("Impossible de se connecter : " . $e->getMessage());
-    }
-
+    } */
+    $bd = connect();
     try {
         $bd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $bd->beginTransaction();
@@ -39,7 +40,7 @@ function add($author, $project, $private)
 
 
         $sql = "INSERT INTO branch 
-        VALUES (:name, :updatedat,:authorname, :projectName)";
+        VALUES (:name, :updatedAt,:authorName, :projectName)";
         $stmt = $bd->prepare($sql);
         //Binding values
         $stmt->bindValue(':name', "main", \PDO::PARAM_STR);
