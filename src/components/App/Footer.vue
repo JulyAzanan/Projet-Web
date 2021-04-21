@@ -4,11 +4,14 @@
       <h3>Musegit</h3>
       <div class="uk-grid-match uk-child-width-1-3@m" uk-grid>
         <div>
-          <p>Some bullshit</p>
+          <p>Work better, Compose together.</p>
         </div>
 
         <div>
-          <p>More bullshit</p>
+          <p>
+            Réalisé par Maël "Steel" Acier, Samuel "July" Benhaim, et Hugo "Le
+            Comploteur" Klein.
+          </p>
         </div>
 
         <div>
@@ -30,6 +33,14 @@
                 <span class="uk-margin-small-right" uk-icon="icon: mail"></span>
                 Contact
               </a>
+            </li>
+
+            <li :class="{ 'uk-active': $route.path === '/about' }">
+              <router-link to="/about">
+                <span class="uk-margin-small-right" uk-icon="icon: question">
+                </span>
+                À propos
+              </router-link>
             </li>
           </ul>
         </div>
