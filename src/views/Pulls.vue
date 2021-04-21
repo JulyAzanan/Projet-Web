@@ -1,5 +1,5 @@
 <template>
-  Pulls: {{ userName }} / {{ projectName }} / pulls
+  <p>Pulls: {{ userName }} / {{ projectName }} / pulls</p>
 </template>
 
 <script lang="ts">

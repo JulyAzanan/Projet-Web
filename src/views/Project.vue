@@ -38,54 +38,7 @@
           </li>
         </ul>
 
-        <router-view
-          v-if="page.ready"
-          :mainBranch="project.mainBranch"
-          :branches="branches"
-          v-slot="{ Component }"
-        >
-          <component :is="Component">
-            <template v-slot:sidebar>
-              <cite>
-                Créé le {{ project.createdAt.toLocaleString() }}
-              </cite><br>
-              <cite>
-                Mis à jour le {{ project.updatedAt.toLocaleString() }}
-              </cite>
-              <h4>
-                <span class="uk-margin-small-right" uk-icon="icon: info"></span>
-                À propos
-              </h4>
-              <p>
-                {{ project.description }}
-              </p>
-
-              <hr class="uk-divider-small" />
-
-              <h4>
-                <span
-                  class="uk-margin-small-right"
-                  uk-icon="icon: users"
-                ></span>
-                Contributeurs
-              </h4>
-              <ul class="uk-grid-small uk-flex-middle" uk-grid>
-                <li v-for="name in project.contributors" :key="name">
-                  <router-link
-                    :to="{ name: 'User', params: { userName: name } }"
-                  >
-                    <img
-                      :src="`https://picsum.photos/seed/${name}/200/300`"
-                      :alt="name"
-                      :uk-tooltip="`title: ${name}; pos: bottom`"
-                      class="rounded"
-                    />
-                  </router-link>
-                </li>
-              </ul>
-            </template>
-          </component>
-        </router-view>
+        <router-view v-if="page.ready" :project="project"> </router-view>
         <div v-else uk-spinner></div>
       </div>
     </div>
@@ -95,9 +48,8 @@
 <script lang="ts">
 import { defineComponent, ref, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
-import { notFound } from "@/routes";
+import router, { notFound } from "@/routes";
 import * as Project from "@/api/project";
-import * as Branch from "@/api/branch";
 
 export default defineComponent({
   props: {
@@ -109,45 +61,45 @@ export default defineComponent({
       ready: false,
       valid: false,
     });
-    const project = ref<Project.FindResult>({
+    const project = ref<Project.FetchResult>({
       private: false,
       contributors: [],
+      branches: [],
       mainBranch: "",
       description: "",
       updatedAt: new Date(),
       createdAt: new Date(),
     });
-    const branches = ref<string[]>([]);
 
     async function init() {
-      const result = await Project.find(props.userName, props.projectName);
+      const result = await Project.fetch(props.userName, props.projectName);
       if (result === null) return notFound();
       project.value = result;
+      if (router.currentRoute.value.name === "Branch-default") {
+        await router.replace({
+          name: "Commit-default",
+          params: {
+            userName: props.userName!,
+            projectName: props.projectName!,
+            branchName: project.value.mainBranch,
+          },
+        });
+      }
       page.valid = true;
       page.ready = true;
-      branches.value = await Branch.all(props.userName, props.projectName)
     }
 
     onBeforeRouteUpdate((to) => {
-      if (to.name === "Branch-default") {
+      if (to.name === "Project" || to.name === "Branch-default") {
         page.ready = false;
         init();
       }
     });
 
     init();
-    return { page, project, branches };
+    return { page, project };
   },
 });
 </script>
 
-<style lang="scss" scoped>
-img {
-  &.rounded {
-    object-fit: cover;
-    border-radius: 50%;
-    height: 50px;
-    width: 50px;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

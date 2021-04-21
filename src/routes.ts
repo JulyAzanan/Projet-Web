@@ -7,33 +7,6 @@ function load(name: string, prefix?: string) {
   }
 }
 
-const fileRoutes: RouteRecordRaw[] = [
-  {
-    ...load("Files"),
-    path: "", // affiche l'ensemble des partitions
-  },
-  {
-    ...load("File"),
-    path: ":filePath", // affiche la partition en question
-    props: true,
-  },
-]
-
-const commitRoutes: RouteRecordRaw[] = [
-  {
-    ...load("Commit", "default"),
-    path: "", // affiche le dernier commit par défaut
-    props: route => ({ commitID: null, ...route.params }),
-    children: fileRoutes,
-  },
-  {
-    ...load("Commit"),
-    path: ":commitID", // affiche le commit en question
-    props: true,
-    children: fileRoutes,
-  },
-]
-
 const routes: RouteRecordRaw[] = [
   {
     ...load("Home"),
@@ -71,13 +44,35 @@ const routes: RouteRecordRaw[] = [
         ...load("Branch", "default"),
         path: "", // affiche la branche main par défaut
         props: route => ({ branchName: null, ...route.params }),
-        children: commitRoutes,
       },
       {
         ...load("Branch"),
         path: "-/:branchName", // affiche les partitions d'une branche
         props: true,
-        children: commitRoutes,
+        children: [
+          {
+            ...load("Commit", "default"),
+            path: "", // affiche le dernier commit par défaut
+            props: route => ({ commitID: null, ...route.params }),
+          },
+          {
+            ...load("Commit"),
+            path: ":commitID", // affiche le commit en question
+            props: true,
+            children: [
+              {
+                ...load("Files"),
+                path: "", // affiche l'ensemble des partitions
+                props: true,
+              },
+              {
+                ...load("File"),
+                path: ":filePath", // affiche la partition en question
+                props: true,
+              },
+            ],
+          },
+        ],
       },
       {
         ...load("Pulls"),

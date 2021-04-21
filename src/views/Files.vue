@@ -1,7 +1,7 @@
 <template>
   <table class="uk-table uk-table-divider uk-table-hover">
     <tbody>
-      <tr v-for="i in [1,2,3,4,5]" :key="i">
+      <tr v-for="file in commit.files" :key="file.path">
         <td><input class="uk-checkbox" type="checkbox" /></td>
         <td class="uk-table-link">
           <router-link
@@ -12,13 +12,29 @@
                 projectName,
                 branchName,
                 commitID,
-                filePath: 'fichier_3615',
+                filePath: file.path,
               },
             }"
-          >fichier_3615</router-link>
+          >
+            {{ file.path }}
+          </router-link>
         </td>
-        <td>Description random</td>
-        <td class="uk-text-nowrap">Il y a 5 mois</td>
+        <td>
+          <router-link
+            :to="{
+              name: 'Files',
+              params: {
+                userName,
+                projectName,
+                branchName,
+                commitID: file.commitID,
+              },
+            }"
+          >
+            {{ file.commitMessage }}
+          </router-link>
+        </td>
+        <td class="uk-text-nowrap">{{ file.createdAt.toLocaleString() }}</td>
       </tr>
     </tbody>
   </table>
@@ -26,6 +42,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import * as Commit from "@/api/commit";
 
 export default defineComponent({
   props: {
@@ -33,9 +50,10 @@ export default defineComponent({
     projectName: String,
     branchName: String,
     commitID: String,
+    commit: Object as () => Commit.FetchResult,
   },
   setup() {
-    // 
-  }
+    //
+  },
 });
 </script>

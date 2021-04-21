@@ -3,49 +3,84 @@
     <div class="uk-container">
       <div class="uk-grid-divider" uk-grid>
         <div class="uk-width-2-3@s">
-          <div v-if="ready">
-            <div class="uk-child-width-auto" uk-grid>
-              <div class="uk-width-expand">
-                <select
-                  class="uk-select uk-form-width-small uk-margin-small-right"
-                  v-model="selectedBranch"
+          <div class="uk-child-width-auto" uk-grid>
+            <div class="uk-width-expand">
+              <select
+                class="uk-select uk-form-width-small uk-margin-small-right"
+                v-model="selectedBranch"
+              >
+                <option disabled value="">Branche:</option>
+                <option
+                  v-for="name in project.branches"
+                  :key="name"
+                  :value="name"
                 >
-                  <option disabled value="">Branche:</option>
-                  <option v-for="name in branches" :key="name" :value="name">
-                    {{ name }}
-                  </option>
-                </select>
-                <span>
-                  <span
-                    class="uk-margin-small-right"
-                    uk-icon="icon: git-branch"
-                  >
-                  </span>
-                  <strong>{{ branches.length }}</strong> branches
+                  {{ name }}
+                </option>
+              </select>
+              <span>
+                <span class="uk-margin-small-right" uk-icon="icon: git-branch">
                 </span>
-                <span class="uk-margin-small-left">
-                  <span class="uk-margin-small-right" uk-icon="icon: history">
-                  </span>
-                  <strong>56</strong> modifications
+                <strong>{{ project.branches.length }}</strong> branches
+              </span>
+              <span class="uk-margin-small-left" v-if="page.ready">
+                <span class="uk-margin-small-right" uk-icon="icon: history">
                 </span>
-              </div>
-              <div>
-                <button class="uk-button uk-button-primary">
-                  Télécharger<span
-                    class="uk-margin-small-left"
-                    uk-icon="icon: download"
-                  ></span>
-                </button>
+                <strong> {{ branch.commits.length }}</strong> modifications
+              </span>
+              <span v-else uk-spinner></span>
+            </div>
+            <div>
+              <button class="uk-button uk-button-primary">
+                Télécharger
+                <span
+                  class="uk-margin-small-left"
+                  uk-icon="icon: download"
+                ></span>
+              </button>
+            </div>
+          </div>
+          <div class="uk-margin" v-if="page.ready">
+            <div v-if="page.noCommitAvailable">
+              <div class="uk-alert-warning uk-alert" uk-alert="">
+                <strong>
+                  Il n'y a pas encore d'ajouts sur cette branche!
+                </strong>
               </div>
             </div>
-            <div class="uk-margin">
-              <router-view></router-view>
-            </div>
+            <router-view v-else :branch="branch"></router-view>
           </div>
           <div v-else uk-spinner></div>
         </div>
         <div class="uk-width-1-3@s">
-          <slot name="sidebar"></slot>
+          <cite> Créé le {{ project.createdAt.toLocaleString() }} </cite><br />
+          <cite> Mis à jour le {{ project.updatedAt.toLocaleString() }} </cite>
+          <h4>
+            <span class="uk-margin-small-right" uk-icon="icon: info"></span>
+            À propos
+          </h4>
+          <p>
+            {{ project.description }}
+          </p>
+
+          <hr class="uk-divider-small" />
+
+          <h4>
+            <span class="uk-margin-small-right" uk-icon="icon: users"></span>
+            Contributeurs
+          </h4>
+          <ul class="uk-grid-small uk-flex-middle" uk-grid>
+            <li v-for="name in project.contributors" :key="name">
+              <router-link :to="{ name: 'User', params: { userName: name } }">
+                <img
+                  :src="`https://picsum.photos/seed/${name}/200/300`"
+                  :alt="name"
+                  :uk-tooltip="`title: ${name}; pos: bottom`"
+                  class="rounded"
+                />
+              </router-link>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -54,7 +89,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "vue";
+import { defineComponent, ref, watch, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import * as Project from "@/api/project";
 import * as Branch from "@/api/branch";
@@ -65,14 +100,17 @@ export default defineComponent({
     userName: String,
     projectName: String,
     branchName: String,
-    branches: Array as () => string[],
-    mainBranch: String,
+    project: Object as () => Project.FetchResult,
   },
   setup(props) {
-    const ready = ref(false);
+    const page = reactive({
+      ready: false,
+      noCommitAvailable: false,
+    });
     const selectedBranch = ref(props.branchName);
-    const branch = ref<Branch.FindResult>({
-      lastCommit: "",
+    const branch = ref<Branch.FetchResult>({
+      lastCommit: null,
+      commits: [],
       updatedAt: new Date(),
       createdAt: new Date(),
     });
@@ -83,57 +121,57 @@ export default defineComponent({
         params: {
           userName: props.userName!,
           projectName: props.projectName!,
-          branchName: selectedBranch.value as string,
+          branchName: selectedBranch.value!,
         },
       });
     });
 
-    watch(
-      () => props.branchName,
-      (value) => {
-        selectedBranch.value = value;
-      }
-    );
-
     async function init() {
-      if (props.branchName == null) {
-        let branchName: string;
-        if (props.mainBranch == null) {
-          const result = await Project.find(props.userName, props.projectName);
-          if (result === null) return notFound();
-          branchName = result.mainBranch;
+      const result = await Branch.fetch(
+        props.userName,
+        props.projectName,
+        props.branchName
+      );
+      if (result === null) return notFound();
+      branch.value = result;
+      if (router.currentRoute.value.name === "Commit-default") {
+        if (branch.value.lastCommit) {
+          await router.replace({
+            name: "Files",
+            params: {
+              userName: props.userName!,
+              projectName: props.projectName!,
+              branchName: props.branchName!,
+              commitID: branch.value.lastCommit,
+            },
+          });
         } else {
-          branchName = props.mainBranch!;
+          page.noCommitAvailable = true;
         }
-        await router.replace({
-          name: "Commit-default",
-          params: {
-            userName: props.userName!,
-            projectName: props.projectName!,
-            branchName,
-          },
-        });
-      } else {
-        const result = await Branch.find(
-          props.userName,
-          props.projectName,
-          props.branchName
-        );
-        if (result === null) return notFound();
-        branch.value = result;
       }
-      ready.value = true;
+      page.ready = true;
     }
 
     onBeforeRouteUpdate((to) => {
-      if (to.name === "Commit-default") {
-        ready.value = false;
+      if (to.name === "Branch" || to.name === "Commit-default") {
+        page.ready = false;
         init();
       }
     });
 
     init();
-    return { ready, selectedBranch };
+    return { page, branch, selectedBranch };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+img {
+  &.rounded {
+    object-fit: cover;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+  }
+}
+</style>

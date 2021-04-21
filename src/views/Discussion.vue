@@ -1,5 +1,7 @@
 <template>
-  The project is {{ userName }} / {{ projectName }} / {{ discussion }}
+  <p>
+    The project is {{ userName }} / {{ projectName }} / {{ discussion }}
+  </p>
 </template>
 
 <script lang="ts">

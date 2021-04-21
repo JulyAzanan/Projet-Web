@@ -1,5 +1,5 @@
 <template>
-  The project is {{ userName }} / {{ projectName }} / {{ pull }}
+  <p>The project is {{ userName }} / {{ projectName }} / {{ pull }}</p>
 </template>
 
 <script lang="ts">
@@ -9,7 +9,7 @@ export default defineComponent({
   props: {
     userName: String,
     projectName: String,
-    pull: String
+    pull: String,
   },
 });
 </script>
