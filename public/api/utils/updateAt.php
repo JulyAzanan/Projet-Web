@@ -5,7 +5,7 @@ require_once "./error.php";
 use \Exception;
 use \PDOException;
 
-function change_upadtetedAt_project($project, $authorname)
+function change_updatedAt_project($project, $authorname)
 {
     check_not_null($project, $authorname);
     //This test shouldn't be required since it's already verified when calling the function 
@@ -48,7 +48,7 @@ function change_upadtetedAt_project($project, $authorname)
  * 
  * It handle: Nothing particular
  */
-function change_upadtetedAt_branch($project, $authorname, $branch)
+function change_updatedAt_branch($project, $authorname, $branch)
 {
 
 

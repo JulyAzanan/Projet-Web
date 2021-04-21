@@ -46,6 +46,12 @@ function add($author, $project, $branch, $partition, $commit ,$content, $loggedU
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':branchname', $branch, \PDO::PARAM_STR);
     $stmt->bindValue(':commitID', $commit, \PDO::PARAM_STR);
+    if (!change_updatedAt_project($project,$author)){
+        return false;
+    };
+    if (!change_updatedAt_branch($project,$author,$branch)){
+        return false;
+    };
     return($stmt->execute());
 }
 
