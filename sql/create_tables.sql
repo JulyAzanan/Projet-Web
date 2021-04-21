@@ -5,6 +5,7 @@ CREATE TABLE musician (
     email VARCHAR(100),
     latestCommit TIMESTAMP(3),
     age INTEGER,
+    bio TEXT,
 
     PRIMARY KEY (name)
 );
@@ -15,6 +16,7 @@ CREATE TABLE project (
     createdAt TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     authorName VARCHAR(42) NOT NULL,
     mainBranchName VARCHAR(42) NOT NULL,
+    description TEXT,
     private BOOLEAN NOT NULL,
 
     PRIMARY KEY (authorName,name)
@@ -29,12 +31,13 @@ CREATE TABLE branch (
     PRIMARY KEY (authorName,projectName,name)
 );
 
-CREATE TABLE version (
+CREATE TABLE commit (
     id TEXT NOT NULL,
     createdAt TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     authorName VARCHAR(42) NOT NULL,
     projectName VARCHAR(42) NOT NULL,
     branchName VARCHAR(42) NOT NULL,
+    message TEXT,
 
     PRIMARY KEY (authorName,projectName,branchName,id)
 );
@@ -45,9 +48,9 @@ CREATE TABLE partition (
     authorName VARCHAR(42) NOT NULL,
     projectName VARCHAR(42) NOT NULL,
     branchName VARCHAR(42) NOT NULL,
-    versionID TEXT NOT NULL,
+    commitID TEXT NOT NULL,
 
-    PRIMARY KEY (authorName,projectName,branchName,versionID)
+    PRIMARY KEY (authorName,projectName,branchName,commitID)
 );
 
 CREATE TABLE contributor (
@@ -73,9 +76,9 @@ ALTER TABLE project ADD FOREIGN KEY (authorName, name, mainBranchName) REFERENCE
 
 ALTER TABLE branch ADD FOREIGN KEY (authorName, projectName) REFERENCES project(authorName, name) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE version ADD FOREIGN KEY (authorName, projectName, branchName) REFERENCES branch(authorName, projectName, name) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE commit ADD FOREIGN KEY (authorName, projectName, branchName) REFERENCES branch(authorName, projectName, name) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE partition ADD FOREIGN KEY (authorName, projectName, branchName, versionID) REFERENCES version(authorName, projectName, branchName, id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE partition ADD FOREIGN KEY (authorName, projectName, branchName, commitID) REFERENCES commit(authorName, projectName, branchName, id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE contributor ADD FOREIGN KEY (contributorName) REFERENCES musician(name) ON DELETE CASCADE ON UPDATE CASCADE;
 

@@ -1,5 +1,5 @@
 <?php
-namespace Version;
+namespace Commit;
 
 include_once "config.php";
 include_once "partition.php"; //Useless or not ? 
@@ -18,9 +18,9 @@ include_once "partition.php"; //Useless or not ?
  * 
  * branch_error if given project/branch does not exist
  * 
- * forbidden_error if user dont have the right to add a version
+ * forbidden_error if user dont have the right to add a commit
  *  
- * arg_error if $partitions is empty (it is not allowed to create a version without any partition in it)
+ * arg_error if $partitions is empty (it is not allowed to create a commit without any partition in it)
  * 
  * PDO_error if the request cannot be executed
  * 
@@ -30,7 +30,7 @@ include_once "partition.php"; //Useless or not ?
  * 
  * False if one or more failed to be added
  */
-function add($author, $project, $branch, $partitions, $loggedUser)
+function add($author, $project, $branch, $partitions, $loggedUser, $message)
 {
     /* partitions est un tableau de : {
         name: string,
@@ -44,13 +44,13 @@ function add($author, $project, $branch, $partitions, $loggedUser)
         branch_error();
     }
     if (! admin_or_contributor($author,$project,$loggedUser)){
-        //We are not allowed to add a version. Aborting
+        //We are not allowed to add a commit. Aborting
         forbidden_error();
     }
-    //Adding version $version the the specified project
+    //Adding commit $commit the the specified project
 
 
-    //testing if we are not trying to create an empty version ($partitions being empty)
+    //testing if we are not trying to create an empty commit ($partitions being empty)
     $counter = 0;
     foreach($partitions as $partition){ //Absolutely disgusting but should work :/ 
         $counter += 1 ;
@@ -58,25 +58,26 @@ function add($author, $project, $branch, $partitions, $loggedUser)
     if ($counter <= 0){
         arg_error();
     }
-    //We are not trying to add empty version, let's create one version first
+    //We are not trying to add empty commit, let's create one commit first
 
-    //generating a random id for this version
+    //generating a random id for this commit
     $length = 10;    
-    $version = substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),1,$length); //Should be enough
+    $commit = substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'),1,$length); //Should be enough
 
     /**
      * Else we can use this:
-     * $version = md5(microtime())
+     * $commit = md5(microtime())
      */
-    $sql = "INSERT INTO version
-    VALUES (:id , :createdAt , :authorname, :projectname, :branchname)";
+    $sql = "INSERT INTO commit
+    VALUES (:id , :createdAt , :authorname, :projectname, :branchname, :message)";
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    $stmt->bindValue(':id', $version, \PDO::PARAM_STR);
+    $stmt->bindValue(':id', $commit, \PDO::PARAM_STR);
     $stmt->bindValue(':createdAt', "CURRENT_TIMESTAMP", \PDO::PARAM_STR); 
     $stmt->bindValue(':authorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':branchname', $branch, \PDO::PARAM_STR);
+    $stmt->bindValue(':message', $message, \PDO::PARAM_STR);
     if (! $stmt->execute()){
         //cannot execute the request. Aborting
         PDO_error();
@@ -86,7 +87,7 @@ function add($author, $project, $branch, $partitions, $loggedUser)
     foreach($partitions as $partition){
         $partitionName = $partition['name'];
         $content = $partition['content'] ;
-        $reussite = $reussite & (\Partition\add($author, $project, $branch,$partitionName,$version,$content,$loggedUser) );
+        $reussite = $reussite & (\Partition\add($author, $project, $branch,$partitionName,$commit,$content,$loggedUser) );
     }
     return($reussite);
 }
@@ -94,7 +95,7 @@ function add($author, $project, $branch, $partitions, $loggedUser)
 
 
 /**
- * Return all version (id) from 
+ * Return all commit (id) from 
  * project ($project) made by ($author), whatever the branch
  * 
  * It handle:
@@ -113,7 +114,7 @@ function add($author, $project, $branch, $partitions, $loggedUser)
  * 
  * It return:
  * 
- * An array-like object that contain all the version (id) and the branchname associated with the id of the requested project
+ * An array-like object that contain all the commit (id) and the branchname associated with the id of the requested project
  */
 function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUser)
 {
@@ -134,7 +135,7 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
          * We are an admin and/or a contributor -> W
          */
         $sql = "SELECT id,branchName
-        FROM version v
+        FROM commit v
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         ORDER BY createdAt :order
@@ -147,7 +148,7 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
          * So we
          */
         $sql = "SELECT id,branchName
-        FROM version v
+        FROM commit v
         JOIN project p 
         ON
         v.projectName = p.name AND v.authorName = p.authorName
@@ -160,7 +161,7 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    // ($first, $after, $author, $project, $version, $loggedUser)
+    // ($first, $after, $author, $project, $commit, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
@@ -170,19 +171,19 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
         //Request encoutered an error, aborting
         PDO_error();
     }
-    $versions = [];
-    foreach ($stmt->fetchAll() as $version) {
-        $versions[] = (object) [
-            'name' => $version['name'],
-            'branchName' => $version['branchName'],
+    $commits = [];
+    foreach ($stmt->fetchAll() as $commit) {
+        $commits[] = (object) [
+            'name' => $commit['name'],
+            'branchName' => $commit['branchName'],
         ];
     }
-    return $versions;
+    return $commits;
     
 }
 
 /**
- * Return all version (id) from 
+ * Return all commit (id) from 
  * project ($project) made by ($author), on branch ($branch)
  * 
  * It handle:
@@ -201,7 +202,7 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
  * 
  * It return:
  * 
- * An array-like object that contain all the version (id) of the requested project and requested branch
+ * An array-like object that contain all the commit (id) of the requested project and requested branch
  */
 function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $loggedUser)
 {
@@ -221,7 +222,7 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
          * We are an admin and/or a contributor -> W
          */
         $sql = "SELECT id,branchName
-        FROM version v
+        FROM commit v
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname
@@ -235,7 +236,7 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
          * So we
          */
         $sql = "SELECT id,branchName
-        FROM version v
+        FROM commit v
         JOIN project p 
         ON
         v.projectName = p.name AND v.authorName = p.authorName
@@ -249,7 +250,7 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    // ($first, $after, $author, $project, $version, $loggedUser)
+    // ($first, $after, $author, $project, $commit, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
@@ -260,18 +261,18 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
         //Request encoutered an error, aborting
         PDO_error();
     }
-    $versions = [];
-    foreach ($stmt->fetchAll() as $version) {
-        $versions[] = (object) [
-            'name' => $version['name'],
+    $commits = [];
+    foreach ($stmt->fetchAll() as $commit) {
+        $commits[] = (object) [
+            'name' => $commit['name'],
         ];
     }
-    return $versions;
+    return $commits;
     // Gérer cas projets privés et publics. Modifier ce qu'il faut pour order by createdAt asc ou desc
 }
 
 /**
- * Count all version (id) from 
+ * Count all commit (id) from 
  * project ($project) made by ($author), whatever the branch
  * 
  * It handle:
@@ -288,7 +289,7 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
  * 
  * It return:
  * 
- * An integer that represents the number of version in the requested project, all branches considered
+ * An integer that represents the number of commit in the requested project, all branches considered
  */
 function countFromProject($author, $project, $loggedUser)
 {
@@ -305,7 +306,7 @@ function countFromProject($author, $project, $loggedUser)
          * We are an admin and/or a contributor -> W
          */
         $sql = "SELECT COUNT(*)
-        FROM version v
+        FROM commit v
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname ";
 
@@ -316,7 +317,7 @@ function countFromProject($author, $project, $loggedUser)
          * So we
          */
         $sql = "SELECT COUNT (*)
-        FROM version v
+        FROM commit v
         JOIN project p 
         ON
         v.projectName = p.name AND v.authorName = p.authorName
@@ -327,7 +328,7 @@ function countFromProject($author, $project, $loggedUser)
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    // ($first, $after, $author, $project, $version, $loggedUser)
+    // ($first, $after, $author, $project, $commit, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     
@@ -341,7 +342,7 @@ function countFromProject($author, $project, $loggedUser)
     
 }
 /**
- * Count all version (id) from 
+ * Count all commit (id) from 
  * project ($project) made by ($author), in branch $branch
  * 
  * It handle:
@@ -358,7 +359,7 @@ function countFromProject($author, $project, $loggedUser)
  * 
  * It return:
  * 
- * An integer that represents the number of version in the requested project, on branch $branch
+ * An integer that represents the number of commit in the requested project, on branch $branch
  */
 function countFromBranch($author, $project, $branch, $loggedUser)
 {
@@ -377,7 +378,7 @@ function countFromBranch($author, $project, $branch, $loggedUser)
          * We are an admin and/or a contributor -> W
          */
         $sql = "SELECT COUNT(*)
-        FROM version v
+        FROM commit v
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname ";
@@ -389,7 +390,7 @@ function countFromBranch($author, $project, $branch, $loggedUser)
          * So we
          */
         $sql = "SELECT COUNT (*)
-        FROM version v
+        FROM commit v
         JOIN project p
         ON v.projectName = p.name 
         AND v.authorName = p.authorName
@@ -401,7 +402,7 @@ function countFromBranch($author, $project, $branch, $loggedUser)
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    // ($first, $after, $author, $project, $version, $loggedUser)
+    // ($first, $after, $author, $project, $commit, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
@@ -415,12 +416,12 @@ function countFromBranch($author, $project, $branch, $loggedUser)
 }
 
 /**
- * Search for all Version that look like $version, on project $project, made by 
+ * Search for all commit that look like $commit, on project $project, made by 
  * $author, on branch $branch
  * 
  * It handle:
  * 
- * Permission: If we are an admin or a contributor of the selected project, then we can seek all versions
+ * Permission: If we are an admin or a contributor of the selected project, then we can seek all commits
  * regardless if the project is public or private
  * 
  * If we are not, we can only seek if the project is public
@@ -432,12 +433,12 @@ function countFromBranch($author, $project, $branch, $loggedUser)
  * PDO_error if the request cannot be executed
  * 
  * It return:
- * an object array-like that contains all names that matched the $version arg
+ * an object array-like that contains all names that matched the $commit arg
  * 
  */
-function seekVersion($first, $after, $author, $project, $branch, $version, $loggedUser)
+function seekCommit($first, $after, $author, $project, $branch, $commit, $loggedUser)
 {
-    check_not_null($first, $after, $author, $project, $branch, $version, $loggedUser);
+    check_not_null($first, $after, $author, $project, $branch, $commit, $loggedUser);
     if (!check_project_exist($author, $project)) {
         branch_error();
     }
@@ -449,11 +450,11 @@ function seekVersion($first, $after, $author, $project, $branch, $version, $logg
          * We are an admin and/or a contributor -> W
          */
         $sql = "SELECT id,branchName
-        FROM version v
+        FROM commit v
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname
-        AND v.id LIKE %:version%
+        AND v.id LIKE %:commit%
         LIMIT :number_to_show OFFSET :offset ";
 
         //Fuck off @July for putting so long SQL Requests 
@@ -463,39 +464,39 @@ function seekVersion($first, $after, $author, $project, $branch, $version, $logg
          * So we
          */
         $sql = "SELECT id,branchName
-        FROM version v
+        FROM commit v
         JOIN project p 
         ON
         v.projectName = p.name AND v.authorName = p.authorName
         WHERE v.projectName = :pname 
         AND v.authorName = :pauthorname
         AND v.branchName = :bname
-        AND v.id LIKE %:version%
+        AND v.id LIKE %:commit%
         AND p.private = 'f'
         LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
 
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    // ($first, $after, $author, $project, $version, $loggedUser)
+    // ($first, $after, $author, $project, $commit, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
-    $stmt->bindValue(':version', $version, \PDO::PARAM_INT);
+    $stmt->bindValue(':commit', $commit, \PDO::PARAM_INT);
     if (! $stmt->execute()){
         //Request encoutered an error, aborting
         PDO_error();
     }
-    $versions = [];
-    foreach ($stmt->fetchAll() as $version) {
-        $versions[] = (object) [
-            'id' => $version['id'],
-            'branchName' => $version['branchName']
+    $commits = [];
+    foreach ($stmt->fetchAll() as $commit) {
+        $commits[] = (object) [
+            'id' => $commit['id'],
+            'branchName' => $commit['branchName']
         ];
     }
-    return $versions;
-    // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$version%
+    return $commits;
+    // Gérer cas projets privés et publics, $partitions unique pour une commit fixée. Utiliser LIKE %$commit%
 }
 

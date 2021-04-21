@@ -4,8 +4,8 @@ namespace Partition;
 include_once "config.php";
 
 /**
- * Add a partition ($partition,$content) to a version of a branch of a project, 
- * identified by $authorName, $project, $branch and $version
+ * Add a partition ($partition,$content) to a commit of a branch of a project, 
+ * identified by $authorName, $project, $branch and $commit
  * 
  * It handle: 
  *
@@ -21,9 +21,9 @@ include_once "config.php";
  * 
  * true on succes, false on failure
  */
-function add($author, $project, $branch, $partition, $version ,$content, $loggedUser,)
+function add($author, $project, $branch, $partition, $commit ,$content, $loggedUser,)
 {
-    check_not_null($author, $project, $branch, $partition,$version, $content, $loggedUser);
+    check_not_null($author, $project, $branch, $partition,$commit, $content, $loggedUser);
     if (! check_branch_exist($author,$project,$branch)){
         //Requested branch does not exist, aborting 
         branch_error();
@@ -33,11 +33,11 @@ function add($author, $project, $branch, $partition, $version ,$content, $logged
         forbidden_error();
     }
     /** 
-     * Creating a pseudo random versionID that relate to github's commit ID
+     * Creating a pseudo random commitID that relate to github's commit ID
     */
     
     $sql = "INSERT INTO partition
-    VALUES (:partname , :content , :authorname, :projectname, :branchname, :versionID)";
+    VALUES (:partname , :content , :authorname, :projectname, :branchname, :commitID)";
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':partname', $partition, \PDO::PARAM_STR);
@@ -45,14 +45,14 @@ function add($author, $project, $branch, $partition, $version ,$content, $logged
     $stmt->bindValue(':authorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':branchname', $branch, \PDO::PARAM_STR);
-    $stmt->bindValue(':versionID', $version, \PDO::PARAM_STR);
+    $stmt->bindValue(':commitID', $commit, \PDO::PARAM_STR);
     return($stmt->execute());
 }
 
 
 /**
  * Return all partition (name+data) in an object of a given 
- * project ($project) made by ($author), on branch ($branch) and with version ($version)
+ * project ($project) made by ($author), on branch ($branch) and with commit ($commit)
  * 
  * It handle:
  * 
@@ -68,12 +68,12 @@ function add($author, $project, $branch, $partition, $version ,$content, $logged
  * 
  * It return:
  * 
- * An array-like object that contain all the partition(name + content) of the requested version
+ * An array-like object that contain all the partition(name + content) of the requested commit
  */
-function fetchAllFromVersion($first, $after, $author, $project,$branch, $version, $loggedUser)
+function fetchAllFromCommit($first, $after, $author, $project,$branch, $commit, $loggedUser)
 {
     // Gérer cas projets privés et publics --Should be done
-    check_not_null($first, $after, $author, $project,$branch, $version, $loggedUser);
+    check_not_null($first, $after, $author, $project,$branch, $commit, $loggedUser);
     if (! check_branch_exist($author, $project,$branch)){
         branch_error();
     }
@@ -87,7 +87,7 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
-        AND pa.versionID = :branchid
+        AND pa.commitID = :branchid
         LIMIT :number_to_show OFFSET :offset ";
 
 
@@ -104,18 +104,18 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
-        AND pa.versionID = :branchid
+        AND pa.commitID = :branchid
         AND p.private = 'f' 
         LIMIT :number_to_show OFFSET :offset ";
 
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    // ($first, $after, $author, $project, $version, $loggedUser)
+    // ($first, $after, $author, $project, $commit, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
-    $stmt->bindValue(':branchid', $version, \PDO::PARAM_STR);
+    $stmt->bindValue(':branchid', $commit, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
     if (! $stmt->execute()){
@@ -133,7 +133,7 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
 }
 /**
  * Count the number of partitions of
- * project ($project) made by ($author), on branch ($branch) and with version ($version)
+ * project ($project) made by ($author), on branch ($branch) and with commit ($commit)
  * 
  * It handle:
  * 
@@ -149,12 +149,12 @@ function fetchAllFromVersion($first, $after, $author, $project,$branch, $version
  * 
  * It return:
  * 
- * An array-like object that contain all the partition(name + content) of the requested version
+ * An array-like object that contain all the partition(name + content) of the requested commit
  */
-function countFromVersion($first, $after, $author, $project, $branch, $version, $loggedUser)
+function countFromCommit($first, $after, $author, $project, $branch, $commit, $loggedUser)
 {
     // Gérer cas projets privés et publics --Should be done
-    check_not_null($first, $after, $author, $project,$branch, $version, $loggedUser);
+    check_not_null($first, $after, $author, $project,$branch, $commit, $loggedUser);
     if (! check_branch_exist($author, $project,$branch)){
         branch_error();
     }
@@ -168,7 +168,7 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
-        AND pa.versionId = :branchid
+        AND pa.commitId = :branchid
         LIMIT :number_to_show OFFSET :offset ";
 
 
@@ -185,18 +185,18 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = :bname
-        AND pa.versionId = :branchid
+        AND pa.commitId = :branchid
         AND p.private = 'f'
         LIMIT :number_to_show OFFSET :offset "; //Here, only public project are listed
 
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    // ($first, $after, $author, $project, $version, $loggedUser)
+    // ($first, $after, $author, $project, $commit, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
-    $stmt->bindValue(':branchid', $version, \PDO::PARAM_STR);
+    $stmt->bindValue(':branchid', $commit, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
     if (! $stmt->execute()){
@@ -210,7 +210,7 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
 }
 /**
  * Return all partition (name+data) in an object of a given that contain $partition in their name from 
- * project ($project) made by ($author), on branch ($branch) and with version ($version)
+ * project ($project) made by ($author), on branch ($branch) and with commit ($commit)
  * 
  * 
  * /!\ $partition should only contain the name of teh partition, not the content
@@ -230,12 +230,12 @@ function countFromVersion($first, $after, $author, $project, $branch, $version, 
  * It return:
  * 
  * An array-like object that contain all the partition(name + content) 
- * of the requested version that have their name like $partition
+ * of the requested commit that have their name like $partition
  */
-function seekPartition($first, $after, $author, $project, $branch, $version, $partition, $loggedUser)
+function seekPartition($first, $after, $author, $project, $branch, $commit, $partition, $loggedUser)
 {
-    // Gérer cas projets privés et publics, $partitions unique pour une version fixée. Utiliser LIKE %$partition%
-    check_not_null($first, $after, $author, $project, $branch, $version, $partition, $loggedUser);
+    // Gérer cas projets privés et publics, $partitions unique pour une commit fixée. Utiliser LIKE %$partition%
+    check_not_null($first, $after, $author, $project, $branch, $commit, $partition, $loggedUser);
     if (! check_branch_exist($author, $project,$branch)){
         branch_error();
     }
@@ -249,7 +249,7 @@ function seekPartition($first, $after, $author, $project, $branch, $version, $pa
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = bname
-        AND pa.versionID = :versionID
+        AND pa.commitID = :commitID
         AND pa.name LIKE %:partitionname% ";
         //Let see if it works
 
@@ -267,28 +267,28 @@ function seekPartition($first, $after, $author, $project, $branch, $version, $pa
         WHERE pa.projectName = :pname 
         AND pa.authorName = :pauthorname
         AND pa.branchName = bname
-        AND pa.versionID = :versionID
+        AND pa.commitID = :commitID
         AND pa.name LIKE %:partitionName%
         AND p.private = 'f' "; //Here, only public project are listed
 
     }
     $bd = connect();
     $stmt = $bd->prepare($sql);
-    // ($first, $after, $author, $project, $version, $loggedUser)
+    // ($first, $after, $author, $project, $commit, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
-    $stmt->bindValue(':versionID', $version, \PDO::PARAM_STR);
+    $stmt->bindValue(':commitID', $commit, \PDO::PARAM_STR);
     $stmt->bindValue(':partitionName', $partition, \PDO::PARAM_STR);
     if (! $stmt->execute()){
         //Request encoutered an error, aborting
         PDO_error();
     }
     foreach ($stmt->fetchAll() as $res) { //Ading them all into one object
-        $resVersions[] = (object) [
+        $rescommits[] = (object) [
             'name' => $res['name'],
         ];
     }
-    return $resVersions;
+    return $rescommits;
 }
 

@@ -1,5 +1,5 @@
 DROP TABLE partition;
-DROP TABLE version;
+DROP TABLE commit;
 DROP TABLE branch;
 DROP TABLE contributor;
 DROP TABLE friend;
