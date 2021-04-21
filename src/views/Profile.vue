@@ -102,7 +102,7 @@
           </div>
         </div>
         <div class="uk-width-2-3@s uk-container uk-margin-small-top uk-position-relative" uk-grid>
-          <h2 class="uk-text-center">Mes abonnements</h2>
+          <h2 class="uk-text-center">Mes amis</h2>
           <div
             class="uk-grid-column-small uk-grid-row-small uk-child-width-1-4@s uk-text-center uk-margin-medium-bottom"
             uk-grid

@@ -2,13 +2,17 @@
   <div>
     <div>
       <div class="uk-card uk-card-default uk-card-hover">
-          <span
-            uk-icon="icon: star"
-            :uk-tooltip="` ${followers} Abonnés`"
-            class="uk-position-top-right uk-margin-small-top uk-margin-small-right"
-          >
-          </span>
-
+        <span
+          uk-icon="icon: star"
+          :uk-tooltip="` ${followers} amis`"
+          class="uk-position-top-right uk-margin-small-top uk-margin-small-right"
+        >
+        </span>
+        <img
+          :src="`https://picsum.photos/seed/${userName}/100/100`"
+          :alt="name"
+          class="rounded uk-margin-medium-top"
+        />
         <div class="uk-card-body">
           <router-link
             :to="{ name: 'User', params: { userName } }"
@@ -16,7 +20,7 @@
             class="uk-button uk-button-default"
             uk-tooltip="Voir le profil"
           >
-            {{userName}}
+            {{ userName }}
           </router-link>
         </div>
       </div>
@@ -36,4 +40,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+img {
+  &.rounded {
+    object-fit: cover;
+    border-radius: 50%;
+    height: 100px;
+    width: 100px;
+  }
+}
 </style>
