@@ -47,6 +47,7 @@
                 :isPrivate="project.private"
                 :projectName="project.name"
                 :updatedAt="project.updatedAt"
+                :userName="userName"
               />
             </div>
             <Pagination :page="parseInt(page)" :pages="pages" />

@@ -25,8 +25,9 @@
                   :key="project.name"
                   :isPrivate="project.private"
                   :projectName="project.name"
-                  :author="project.author"
+                  :userName="project.author"
                   :updatedAt="project.updatedAt"
+                  showAuthor
                 />
               </div>
               <Pagination :page="parseInt(page)" :pages="pages" />

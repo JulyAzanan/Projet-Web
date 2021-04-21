@@ -18,7 +18,7 @@
         </div>
         <div class="uk-card-body">
           <p></p>
-          <h3 class="uk-card-title">{{projectName}}</h3>
+          <h3 class="uk-card-title">{{ projectName }}</h3>
           <router-link
             :to="{ name: 'Branch-default', params: { userName, projectName } }"
             uk-margin
@@ -27,7 +27,7 @@
             Voir le projet
           </router-link>
           <p>Dernière mise à jour le : {{ updatedAt.toLocaleString() }}</p>
-          <p v-if="author">Créé par : {{ author }}</p>
+          <p v-if="showAuthor">Créé par : {{ userName }}</p>
         </div>
       </div>
     </div>
@@ -41,8 +41,9 @@ export default defineComponent({
   props: {
     isPrivate: Boolean,
     updatedAt: Date,
-    author: String,
+    userName: String,
     projectName: String,
+    showAuthor: Boolean,
   },
 });
 </script>
