@@ -3,147 +3,78 @@
     <div class="uk-container">
       <div uk-grid class="uk-margin-medium-bottom">
         <div class="uk-width-1-3@s uk-margin-large-top" uk-first-column>
-          <h2>Profil de {{ userName }}</h2>
-          <img
-            :src="`https://picsum.photos/seed/${userName}/500/500`"
-            :alt="userName"
-            class="rounded"
-          />
-          <div>
-            <button class="uk-button uk-button-text buttonNormalText">
-              <span class="uk-margin-small-right" uk-icon="icon: star"></span>
-              {{ friendAmount }} abonnés
-            </button>
+          <div v-if="ready">
+            <h2>Profil de {{ userName }}</h2>
+            <img
+              :src="`https://picsum.photos/seed/${userName}/500/500`"
+              :alt="userName"
+              class="rounded"
+            />
+            <div>
+              <button class="uk-button uk-button-text buttonNormalText">
+                <span class="uk-margin-small-right" uk-icon="icon: star"></span>
+                {{ user.friends }} abonnés
+              </button>
+            </div>
+            <!-- TODO : afficher une liste des amis quand on clique sur le bouton -->
+            <div v-if="user.email">
+              <span class="uk-margin-small-right" uk-icon="icon: mail"> </span>
+              {{ user.email }}
+            </div>
+            <hr class="uk-divider-icon uk-margin-large-right" />
+            <div v-if="user.age">
+              <span
+                class="uk-margin-small-right"
+                uk-icon="icon: calendar"
+              ></span>
+              {{ user.age }} ans
+            </div>
           </div>
-          <!-- TODO : afficher une liste des amis quand on clique sur le bouton -->
-          <div v-if="email">
-            <span class="uk-margin-small-right" uk-icon="icon: mail"> </span>
-            {{ email }}
-          </div>
-          <hr class="uk-divider-icon uk-margin-large-right" />
-          <div v-if="age">
-            <span class="uk-margin-small-right" uk-icon="icon: calendar"></span>
-            {{ age }} ans
-          </div>
+          <div v-else uk-spinner></div>
         </div>
         <div
           class="uk-width-2-3@s uk-container uk-margin-small-top uk-position-relative"
           uk-grid
         >
           <h2>Projets récents</h2>
-          <div
-            class="uk-grid-column-small uk-grid-row-small uk-child-width-1-3@s uk-text-center uk-margin-medium-bottom"
-            uk-grid
-          >
-            <ProjectCard
-              :priv="true"
-              :projectName="'Nier: Automata'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'main'"
-            />
-            <ProjectCard
-              :priv="true"
-              :projectName="'Daft Punk'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'master'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'Tu'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'branch1'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'Tournes'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'main'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'Joyeuses'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'04/04/2021'"
-              :branch="'ahahah'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'Pâques'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'02/04/2021'"
-              :branch="'Liora'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'foo'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'05/04/2021'"
-              :branch="'vitalité'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'bar'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'01/04/2021'"
-              :branch="'main'"
-            />
-            <ProjectCard
-              :priv="false"
-              :projectName="'nya'"
-              :userName="userName"
-              :author="userName"
-              :updatedAt="'02/04/2021'"
-              :branch="'main'"
-            />
+          <div v-if="projectsLoaded">
+            <div
+              class="uk-grid-column-small uk-grid-row-small uk-child-width-1-3@s uk-text-center uk-margin-medium-bottom"
+              uk-grid
+            >
+              <ProjectCard
+                v-for="project in user.projects"
+                :key="project.name"
+                :isPrivate="project.private"
+                :projectName="project.name"
+                :userName="userName"
+                :author="userName"
+                :updatedAt="project.updatedAt"
+              />
+            </div>
+            <ul class="uk-pagination uk-position-bottom-center" uk-margin>
+              <li :class="{ 'uk-disabled': page <= 1 }">
+                <router-link :to="{ query: { page: parseInt(page) - 1 + '' } }">
+                  <span uk-pagination-previous></span>
+                </router-link>
+              </li>
+              <li
+                v-for="i in pages"
+                :key="i"
+                :class="{ 'uk-active': i + '' == page }"
+              >
+                <router-link :to="{ query: { page: i + '' } }">
+                  <span> {{ i }}</span>
+                </router-link>
+              </li>
+              <li :class="{ 'uk-disabled': page >= pages }">
+                <router-link :to="{ query: { page: parseInt(page) + 1 + '' } }">
+                  <span uk-pagination-next></span>
+                </router-link>
+              </li>
+            </ul>
           </div>
-          <ul class="uk-pagination uk-position-bottom-center" uk-margin>
-            <li class="uk-disabled">
-              <a><span uk-pagination-previous></span></a>
-            </li>
-            <li class="uk-active"><span>1</span></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
-            <li><a href="#">5</a></li>
-            <li class="uk-disabled"><span>...</span></li>
-            <li><a href="#">8</a></li>
-            <li><a href="#">9</a></li>
-            <li><a href="#">10</a></li>
-            <li class="uk-disabled"><span>...</span></li>
-            <li><a href="#">20</a></li>
-            <li>
-              <a href="#"><span uk-pagination-next></span></a>
-            </li>
-          </ul>
-          <!-- <h2>Activités de mes amis</h2>
-        <div
-          class="uk-grid-column-small uk-grid-row-small uk-child-width-1-3@s uk-text-center"
-          uk-grid
-        >
-          Générer quelques cartes de manière random, selon les projets récents des amis. Adapter si pas d'amis
-          <ProjectCard />
-          <ProjectCard />
-          <ProjectCard />
-          <ProjectCard />
-          <ProjectCard />
-          <ProjectCard />
-          <ProjectCard />
-          <ProjectCard />
-          <ProjectCard />
-        </div>
-        <p></p> -->
+          <div v-else uk-spinner></div>
         </div>
       </div>
     </div>
@@ -151,39 +82,68 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch, computed } from "vue";
+import * as User from "@/api/user";
+import * as Project from "@/api/project";
 import ProjectCard from "@/components/User/ProjectCard.vue";
+import router, { notFound } from "@/routes";
 
 export default defineComponent({
   props: {
     userName: String,
     page: String,
-    // friendAmount: Number,
-    // age: Number,
   },
   components: {
     ProjectCard,
   },
-  setup() {
-    const friendAmount = 3615;
-    const email = "maël@tutournes.troll";
-    const age = 69;
-    const modifyAge = ref(false);
-    const modifyPassword = ref(false);
+  setup(props) {
+    const ready = ref(false);
+    const projectsLoaded = ref(false);
+    const user = ref<User.FetchResult>({
+      email: "",
+      age: 0,
+      friends: 0,
+      bio: "",
+      projectCount: 0,
+      projects: [],
+    });
+    let pages = ref(0);
 
-    function changeMail() {
-      /* let mail = document.getElementById("cMail");
-      this.email = mail; */
+    watch(
+      () => props.page,
+      async () => {
+        window.scrollTo(0, 0);
+        projectsLoaded.value = false;
+        const page = parseInt(props.page!);
+        const result = await Project.allOf(
+          props.userName,
+          User.projectPerPage,
+          User.projectPerPage * page
+        );
+        if (result.length === 0 && page != 1) {
+          router.replace({ query: { page: "1" } });
+        } else {
+          user.value.projects = result;
+        }
+        projectsLoaded.value = true;
+      }
+    );
+
+    async function init() {
+      const page = parseInt(props.page!);
+      const result = await User.fetch(props.userName!, page);
+      if (result === null) return notFound();
+      user.value = result;
+      if (result.projects.length === 0 && page != 1) {
+        router.replace({ query: { page: "1" } });
+      }
+      pages.value = Math.ceil(result.projectCount / User.projectPerPage);
+      projectsLoaded.value = true;
+      ready.value = true;
     }
 
-    return {
-      friendAmount,
-      email,
-      age,
-      changeMail,
-      modifyAge,
-      modifyPassword,
-    };
+    init();
+    return { ready, user, projectsLoaded, pages, console };
   },
 });
 </script>

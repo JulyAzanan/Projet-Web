@@ -6,7 +6,7 @@ interface BaseResult {
 }
 
 export interface FetchResult extends BaseResult {
-  commits: string[],
+  commitsCount: number,
   lastCommit: string | null,
 }
 
@@ -15,7 +15,7 @@ export async function fetch(user?: string, project?: string, branch?: string): P
   await sleep(500);
   return {
     lastCommit: "8f5e91",
-    commits: ["8f5e91", "1ds849", "7q8d8s", "165qsd"],
+    commitsCount: 4,
     updatedAt: new Date(),
     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
   }

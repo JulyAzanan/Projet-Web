@@ -4,7 +4,7 @@
       <div class="uk-card uk-card-default uk-card-hover">
         <div class="uk-card-badge">
           <span
-            v-if="!priv"
+            v-if="!isPrivate"
             class="uk-margin-small-right"
             uk-icon="icon: users"
             uk-tooltip="Public"
@@ -26,7 +26,7 @@
           >
             Voir le projet
           </router-link>
-          <p>Dernière mise à jour le : {{ updatedAt }}</p>
+          <p>Dernière mise à jour le : {{ updatedAt.toLocaleString() }}</p>
           <p v-if="userName != author">Créé par : {{ author }}</p>
         </div>
       </div>
@@ -39,12 +39,11 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    priv: Boolean,
-    updatedAt: String,
+    isPrivate: Boolean,
+    updatedAt: Date,
     author: String,
     userName: String,
     projectName: String,
-    branchName: String,
   },
 });
 </script>

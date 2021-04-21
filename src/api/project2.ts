@@ -7,15 +7,6 @@ interface BaseResult {
   description: string,
 }
 
-export async function add(_author: string, _project: string, _isPrivate: boolean, _description: string): Promise<void> {
-  // TODO
-  return;
-}
-
-export async function remove(_author: string, _project: string): Promise<void> {
-  // TODO
-  return;
-}
 
 export interface FindResult extends BaseResult {
   contributors: string[],
@@ -122,13 +113,4 @@ export async function fetchAllFrom(first: number, after: number, user?: string):
   }];
 }
 
-export async function count(): Promise<number> {
-  await sleep(500); // TODO
-  return 5;
-}
 
-export async function countFrom(user?: string): Promise<number> {
-  if (user == null) return 0;
-  await sleep(500); // TODO
-  return 5;
-}

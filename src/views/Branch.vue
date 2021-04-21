@@ -26,7 +26,7 @@
               <span class="uk-margin-small-left" v-if="page.ready">
                 <span class="uk-margin-small-right" uk-icon="icon: history">
                 </span>
-                <strong> {{ branch.commits.length }}</strong> modifications
+                <strong> {{ branch.commitsCount }}</strong> modifications
               </span>
               <span v-else uk-spinner></span>
             </div>
@@ -110,7 +110,7 @@ export default defineComponent({
     const selectedBranch = ref(props.branchName);
     const branch = ref<Branch.FetchResult>({
       lastCommit: null,
-      commits: [],
+      commitsCount: 0,
       updatedAt: new Date(),
       createdAt: new Date(),
     });
