@@ -89,6 +89,13 @@ function add($author, $project, $branch, $partitions, $loggedUser, $message)
         $content = $partition['content'] ;
         $reussite = $reussite & (\Partition\add($author, $project, $branch,$partitionName,$commit,$content,$loggedUser) );
     }
+
+    if (!change_updatedAt_project($project,$author)){
+        return false;
+    };
+    if (!change_updatedAt_branch($project,$author,$branch)){
+        return false;
+    };
     return($reussite);
 }
 

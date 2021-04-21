@@ -107,6 +107,10 @@ function remove($author, $project, $branch, $loggedUser)
     $stmt->bindValue(':bname', $branch, \PDO::PARAM_STR);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
+
+    if (!change_updatedAt_project($project,$author)){
+        return false;
+    };
     return $stmt->execute();
     //Will return true on succes and false on failure
 
@@ -151,6 +155,14 @@ function rename($author, $project, $branch, $loggedUser, $new_branch_name)
     $stmt->bindValue(':new_branch_name', $new_branch_name, \PDO::PARAM_STR);
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
+
+    if (!change_updatedAt_project($project,$author)){
+        return false;
+    };
+
+    if (!change_updatedAt_branch($project,$author,$branch)){
+        return false;
+    };
     return $stmt->execute();
 }
 /**
