@@ -1,5 +1,5 @@
 <?php
-include_once "./database/user.php";
+include_once "database/user.php";
 
 // $res = add_user("tes", "passwd", NULL, NULL);
 // echo $res;
@@ -7,6 +7,18 @@ include_once "./database/user.php";
 // var_dump($_GET['q']);
 // echo "|";
 // var_dump($_POST['q']);
+
+
+if (isset($_SERVER["HTTP_AUTHORIZATION"]) && 0 === stripos($_SERVER["HTTP_AUTHORIZATION"], 'basic ')) {
+    $exploded = explode(':', base64_decode(substr($_SERVER["HTTP_AUTHORIZATION"], 6)), 2);
+    if (2 == \count($exploded)) {
+        list($user, $password) = $exploded;
+    }
+}
+
+echo "end";
+
+die;
 
 echo json_encode(\User\find("jenexistepas"));
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once "./error.php";
+require_once "error.php";
 
 function check_not_null(...$args)
 {

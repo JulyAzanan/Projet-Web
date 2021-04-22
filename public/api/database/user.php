@@ -2,8 +2,8 @@
 namespace User;
 
 include_once "config.php";
-include_once "../utils/error.php";
-include_once "../utils/args.php";
+include_once __DIR__ . "/../utils/error.php";
+include_once __DIR__ . "/../utils/args.php";
 
 /**
  * Permet de créer un nouvel utilisateur

@@ -9,7 +9,7 @@
           de travailler à plusieurs sur une même partition, voir un historique des versions de cette dernière, et même pouvoir partager son contenu avec
           tous les utilisateurs ! Créé par trois étudiants de l'ENSIIE, et alliant des fonctionnalités de Github et de Musescore, amis compositeurs, 
           si vous vous êtes déjà retrouvés dans la situation embêtante où vous travailliez sur la même partition avec un ami, et que devoir l'envoyer
-          à l'autre pour la moindre petite modification vous embâtait, alors n'attendez plus, et utilisez MuseGit !
+          à l'autre pour la moindre petite modification vous embêtait, alors n'attendez plus, et utilisez MuseGit !
         </p>
         <h2>Comment utiliser Musegit?</h2>
         <p>Pour utiliser Musegit, rien de plus simple ! Vous pourrez voir les projets publics des autres utilisateurs, même en étant hors connexion,

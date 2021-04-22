@@ -1,13 +1,13 @@
 <?php
 
-require_once "./database/musician.php";
-require_once "./utils/auth.php";
-require_once "./utils/error.php";
-require_once "./utils/request.php";
+require_once "database/user.php";
+require_once "utils/auth.php";
+require_once "utils/error.php";
+require_once "utils/request.php";
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case "POST":
-        if (\User\find($_POST['username']) != null) {
+        if (\User\find($_POST['user']) != null) {
             http_response_code(400);
             echo "<h1> 400 </h1><br>";
             echo "User already exists";
@@ -20,7 +20,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             die;
         }
 
-        $ok = \User\add($_POST['username'], $_POST['password'], $_POST['email'], $_POST['age']);
+        $ok = \User\add($_POST['user'], $_POST['password'], $_POST['email'], $_POST['age']);
         if (!$ok) {
             PDO_error();
         }
@@ -28,7 +28,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
     case "DELETE":
         $_DELETE = get_DELETE();
-        $user = auth($_DELETE);
+        $user = auth();
         $ok = \User\remove($_DELETE['user'], $user);
         if (!$ok) {
             PDO_error();
@@ -37,35 +37,40 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
     case "PATCH":
         $_PATCH = get_PATCH();
-        $user = auth($_DELETE);
-        $ok = \User\update($_DELETE['user'], $_DELETE['password'], $_DELETE['email'], intval($_DELETE['age']));
+        $user = auth();
+        $ok = \User\update($_PATCH['user'], $_PATCH['password'], $_PATCH['email'], intval($_PATCH['age']));
         if (!$ok) {
             PDO_error();
         }
         break;
 
     case "GET":
-        switch ($_GET['query']) {
-            case 'fetchAll':
-                echo json_encode(\User\fetchAll($_GET['first'], $_GET['after']));
-                break;
-
-            case 'count':
-                echo json_encode(\User\count());
-                break;
-
-            case 'findByEmail':
-                echo json_encode(\User\findByEmail($_GET['email']));
-                break;
-
-            case 'find':
-                echo json_encode(\User\find($_GET['user']));
-                break;
-
-            default:
-                query_error();
+        if(isset($_GET['q'])) {
+            switch ($_GET['q']) {
+                case 'login':
+                    auth();
+                    break;
+                case 'fetchAll':
+                    echo json_encode(\User\fetchAll($_GET['first'], $_GET['after']));
+                    break;
+    
+                case 'count':
+                    echo json_encode(\User\count());
+                    break;
+    
+                case 'findByEmail':
+                    echo json_encode(\User\findByEmail($_GET['email']));
+                    break;
+    
+                case 'find':
+                    echo json_encode(\User\find($_GET['user']));
+                    break;
+    
+                default:
+                    query_error();
+            }
+            break;
         }
-        break;
 
     default:
         request_error();

@@ -21,7 +21,7 @@ include_once "config.php";
  * 
  * true on succes, false on failure
  */
-function add($author, $project, $branch, $partition, $commit ,$content, $loggedUser,)
+function add($author, $project, $branch, $partition, $commit ,$content, $loggedUser)
 {
     check_not_null($author, $project, $branch, $partition,$commit, $content, $loggedUser);
     if (! check_branch_exist($author,$project,$branch)){
