@@ -22,3 +22,4 @@ package-lock.json
 *.njsproj
 *.sln
 *.sw?
+public/api/database/project_alternate.php
