@@ -15,8 +15,8 @@
             />
           </button>
           <div>
-              <span class="uk-margin-small-right" uk-icon="icon: user"></span>
-              {{userName}}
+            <span class="uk-margin-small-right" uk-icon="icon: user"></span>
+            {{ userName }}
           </div>
           <!-- TODO : afficher une liste des amis quand on clique sur le bouton -->
           <div>
@@ -101,21 +101,24 @@
             </button>
           </div>
         </div>
-        <div class="uk-width-2-3@s uk-container uk-margin-small-top uk-position-relative" uk-grid>
+        <div
+          class="uk-width-2-3@s uk-container uk-margin-small-top uk-position-relative"
+          uk-grid
+        >
           <h2 class="uk-text-center">Mes amis</h2>
           <div
             class="uk-grid-column-small uk-grid-row-small uk-child-width-1-4@s uk-text-center uk-margin-medium-bottom"
             uk-grid
           >
-            <FriendCard :userName="'July'" :followers="3615"/>
-            <FriendCard :userName="'foo'" :followers="2"/>
-            <FriendCard :userName="'bar'" :followers="1"/>
-            <FriendCard :userName="'Annie'" :followers="42"/>
-            <FriendCard :userName="'Elaim'" :followers="37"/>
-            <FriendCard :userName="'gperdu'" :followers="354"/>
-            <FriendCard :userName="'salut'" :followers="5"/>
-            <FriendCard :userName="'toi'" :followers="225"/>
-            <FriendCard :userName="'keur'" :followers="22326"/>
+            <FriendCard :userName="'July'" :followers="3615" />
+            <FriendCard :userName="'foo'" :followers="2" />
+            <FriendCard :userName="'bar'" :followers="1" />
+            <FriendCard :userName="'Annie'" :followers="42" />
+            <FriendCard :userName="'Elaim'" :followers="37" />
+            <FriendCard :userName="'gperdu'" :followers="354" />
+            <FriendCard :userName="'salut'" :followers="5" />
+            <FriendCard :userName="'toi'" :followers="225" />
+            <FriendCard :userName="'keur'" :followers="22326" />
           </div>
           <ul class="uk-pagination uk-position-bottom-center" uk-margin>
             <li class="uk-disabled">
@@ -143,7 +146,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
+import store from "@/app/store";
+import router from "@/app/routes";
 import FriendCard from "@/components/User/FriendCard.vue";
 
 export default defineComponent({
@@ -152,7 +157,11 @@ export default defineComponent({
     // email: String,
   },
   components: {
-      FriendCard
+    FriendCard,
+  },
+  beforeRouteEnter(to, from, next) {
+    if (store.state.loggedIn) next();
+    else next({ name: "Login", query: { redirect: to.fullPath } });
   },
   setup() {
     const email = "test@example.com";
@@ -160,6 +169,17 @@ export default defineComponent({
     const modifyAge = ref(false);
     const modifyPassword = ref(false);
     const age = 20;
+
+    watch(
+      () => store.state.loggedIn,
+      () => {
+        router.replace({
+          name: "Login",
+          query: { redirect: router.currentRoute.value.fullPath },
+        });
+      }
+    );
+    
     return {
       email,
       modifyEmail,

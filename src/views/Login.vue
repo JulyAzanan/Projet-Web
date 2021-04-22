@@ -54,34 +54,43 @@ import store from "@/app/store";
 import router from "@/app/routes";
 import { notifyWarning } from "@/utils/notification";
 import * as User from "@/api/user";
-import sleep from "@/api/sleep"
 
 export default defineComponent({
   props: {
     redirect: String,
   },
+  beforeRouteEnter(_to, from, next) {
+    next((vm) => {
+      // @ts-ignore
+      vm.from = from
+      console.log(vm)
+    });
+  },
   setup(props) {
     const userName = ref("");
     const password = ref("");
+    const from = ref({ name: "Home" });
 
     async function login() {
       if (userName.value === "" || password.value === "") return;
       const success = await User.login(userName.value, password.value);
       if (success) {
         store.commit("login", [userName.value, password.value]);
-        const route = router.resolve(props.redirect ?? "/");
-        if (route.matched.length > 0) {
-          await router.push(route);
-        } else {
-          await router.push({ name: "Home" });
+        if (props.redirect !== undefined) {
+          const route = router.resolve(props.redirect);
+          if (route.matched.length > 0) {
+            return router.replace(route);
+          }
         }
+        return router.replace(from.value);
       } else {
         userName.value = "";
+        password.value = "";
         notifyWarning("Nom d'utilisateur ou mot de passe invalide.");
       }
     }
 
-    return { userName, password, login };
+    return { userName, password, login, from };
   },
 });
 </script>
