@@ -22,7 +22,7 @@ include_once "config.php";
  * 
  * true on succes, false on failure
  */
-function add($contributor, $authorName, $project, $loggedUser){
+function add(string $contributor,string $authorName,string $project,string $loggedUser){
     check_not_null($contributor, $authorName, $project, $loggedUser);
     if (! check_project_exist($authorName, $project)) {
         project_error();
@@ -67,7 +67,7 @@ function add($contributor, $authorName, $project, $loggedUser){
  * 
  * true on succes, false on failure
  */
-function remove($contributor, $authorName, $project, $loggedUser)
+function remove(string $contributor,string $authorName,string $project,string $loggedUser)
 {
     //Gérer le cas de se retirer soi-même si on veut quitter, mais si on n'est pas l'auteur, 
     //alors on ne peut pas kick les autres --> Should be done 
@@ -134,7 +134,7 @@ function remove($contributor, $authorName, $project, $loggedUser)
  */
 
 
-function fetchAllFromProject($first, $after, $authorName, $project, $loggedUser)
+function fetchAllFromProject(int $first,int $after,string $authorName,string $project,string $loggedUser)
 {
     // Gérer cas projets privés et publics
     check_not_null($first, $after, $authorName, $project, $loggedUser);
@@ -202,7 +202,7 @@ function fetchAllFromProject($first, $after, $authorName, $project, $loggedUser)
  * 
  * An positive integer (0 included) on succes, and may return -1 if result are incoherent
  */
-function countFromProject($authorName, $project, $loggedUser)
+function countFromProject(string $authorName,string $project,string $loggedUser)
 {
     // Gérer cas projets privés et publics
     check_not_null($authorName, $project, $loggedUser);

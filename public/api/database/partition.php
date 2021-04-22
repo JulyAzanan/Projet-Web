@@ -21,7 +21,7 @@ include_once "config.php";
  * 
  * true on succes, false on failure
  */
-function add($author, $project, $branch, $partition, $commit ,$content, $loggedUser)
+function add(string $author,string $project,string $branch, $partition,string $commit ,string $content,string $loggedUser)
 {
     check_not_null($author, $project, $branch, $partition,$commit, $content, $loggedUser);
     if (! check_branch_exist($author,$project,$branch)){
@@ -76,7 +76,7 @@ function add($author, $project, $branch, $partition, $commit ,$content, $loggedU
  * 
  * An array-like object that contain all the partition(name + content) of the requested commit
  */
-function fetchAllFromCommit($first, $after, $author, $project,$branch, $commit, $loggedUser)
+function fetchAllFromCommit(int $first,int $after,string $author,string $project,string $branch,string $commit,string $loggedUser)
 {
     // Gérer cas projets privés et publics --Should be done
     check_not_null($first, $after, $author, $project,$branch, $commit, $loggedUser);
@@ -157,7 +157,7 @@ function fetchAllFromCommit($first, $after, $author, $project,$branch, $commit, 
  * 
  * An array-like object that contain all the partition(name + content) of the requested commit
  */
-function countFromCommit($first, $after, $author, $project, $branch, $commit, $loggedUser)
+function countFromCommit(int $first,int $after,string $author,string $project,string $branch,string $commit,string $loggedUser)
 {
     // Gérer cas projets privés et publics --Should be done
     check_not_null($first, $after, $author, $project,$branch, $commit, $loggedUser);
@@ -238,7 +238,7 @@ function countFromCommit($first, $after, $author, $project, $branch, $commit, $l
  * An array-like object that contain all the partition(name + content) 
  * of the requested commit that have their name like $partition
  */
-function seekPartition($first, $after, $author, $project, $branch, $commit, $partition, $loggedUser)
+function seekPartition(int $first,int $after,string $author,string $project,string $branch,string $commit,string $partition,string $loggedUser)
 {
     // Gérer cas projets privés et publics, $partitions unique pour une commit fixée. Utiliser LIKE %$partition%
     check_not_null($first, $after, $author, $project, $branch, $commit, $partition, $loggedUser);

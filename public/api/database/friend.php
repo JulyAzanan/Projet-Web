@@ -20,7 +20,7 @@ include_once "config.php";
  * 
  * true on succes, false on failure
  */
-function add($follower, $following, $loggedUser)
+function add(string $follower,string $following,string $loggedUser)
 {
     //Adding $follower to the list of personn following $following
     // if and only if $follower = $loggedUser or $loggedUser is an admin
@@ -59,7 +59,7 @@ function add($follower, $following, $loggedUser)
  * 
  * true on succes, false on failure
  */
-function remove($follower, $following, $loggedUser)
+function remove(string $follower,string $following,string $loggedUser)
 {
     //Removing $follower to the list of personn following $following
     // if and only if $follower = $loggedUser or $loggedUser is an admin
@@ -102,7 +102,7 @@ function remove($follower, $following, $loggedUser)
  * an objet , array-like that contains the name of all people that
  * $user is following 
  */
-function fetchAllFromUser($first, $after, $user)
+function fetchAllFromUser(int $first,int $after,string $user)
 {
     //first is the first we want to see
     //after is the number after first we want to see
@@ -150,7 +150,7 @@ function fetchAllFromUser($first, $after, $user)
  * an integer ,that count the number of people that
  * $user is following 
  */
-function countFromUser($user)
+function countFromUser(string $user)
 {
     check_not_null($user);//Required here
     //Creating the request

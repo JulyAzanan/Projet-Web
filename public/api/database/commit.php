@@ -30,7 +30,7 @@ include_once "partition.php"; //Useless or not ?
  * 
  * False if one or more failed to be added
  */
-function add($author, $project, $branch, $partitions, $loggedUser, $message)
+function add(string $author,string $project,string $branch, $partitions,string $loggedUser,string $message)
 {
     /* partitions est un tableau de : {
         name: string,
@@ -123,7 +123,7 @@ function add($author, $project, $branch, $partitions, $loggedUser, $message)
  * 
  * An array-like object that contain all the commit (id) and the branchname associated with the id of the requested project
  */
-function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUser)
+function fetchAllFromProject(int $first,int $after,string $author,string $project,string $order,string $loggedUser)
 {
     // Gérer cas projets privés et publics. Modifier ce qu'il faut pour order by createdAt asc ou desc
     check_not_null($first, $after, $author, $project,$order, $loggedUser);
@@ -211,7 +211,7 @@ function fetchAllFromProject($first, $after, $author, $project,$order, $loggedUs
  * 
  * An array-like object that contain all the commit (id) of the requested project and requested branch
  */
-function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $loggedUser)
+function fetchAllFromBranch(int $first,int $after,string $author,string $project,string $branch,string $order,string $loggedUser)
 {
     check_not_null($first, $after, $author, $project,$branch,$order, $loggedUser);
     if (! check_branch_exist($author, $project,$branch)){
@@ -298,7 +298,7 @@ function fetchAllFromBranch($first, $after, $author, $project, $branch,$order, $
  * 
  * An integer that represents the number of commit in the requested project, all branches considered
  */
-function countFromProject($author, $project, $loggedUser)
+function countFromProject(string $author,string $project,string $loggedUser)
 {
     // Gérer cas projets privés et publics
     check_not_null($author, $project, $loggedUser);
@@ -368,7 +368,7 @@ function countFromProject($author, $project, $loggedUser)
  * 
  * An integer that represents the number of commit in the requested project, on branch $branch
  */
-function countFromBranch($author, $project, $branch, $loggedUser)
+function countFromBranch(string $author,string $project,string $branch,string $loggedUser)
 {
     // Gérer cas projets privés et publics
     check_not_null($author, $project, $loggedUser, $branch);
@@ -443,7 +443,7 @@ function countFromBranch($author, $project, $branch, $loggedUser)
  * an object array-like that contains all names that matched the $commit arg
  * 
  */
-function seekCommit($first, $after, $author, $project, $branch, $commit, $loggedUser)
+function seekCommit(int $first,int $after,string $author,string $project,string $branch,string $commit,string $loggedUser)
 {
     check_not_null($first, $after, $author, $project, $branch, $commit, $loggedUser);
     if (!check_project_exist($author, $project)) {

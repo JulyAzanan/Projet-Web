@@ -16,7 +16,7 @@ include_once "config.php";
  * If not, return false
  */
 
-function add($author, $project, $branch, $loggedUser)
+function add(string $author,string $project,string $branch,string $loggedUser)
 {
     check_not_null($author, $project, $branch, $loggedUser);
     if (!check_project_exist($author, $project)) {
@@ -54,7 +54,7 @@ function add($author, $project, $branch, $loggedUser)
  * 
  * If faild to remove, return false
  */
-function remove($author, $project, $branch, $loggedUser)
+function remove(string $author,string $project,string $branch,string $loggedUser)
 {
     // ne pas supprimer la branche principale
     if (!check_project_exist($author, $project)) {
@@ -108,7 +108,7 @@ function remove($author, $project, $branch, $loggedUser)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
 
-    if (!change_updatedAt_project($project,$author)){
+    if (!change_updatedAt_project($project, $author)) {
         return false;
     };
     return $stmt->execute();
@@ -127,7 +127,7 @@ function remove($author, $project, $branch, $loggedUser)
  * 
  * Return true if succesfully removed, false if not
  */
-function rename($author, $project, $branch, $loggedUser, $new_branch_name)
+function rename(string $author,string $project,string $branch,string $loggedUser,string $new_branch_name)
 {
     if (!check_project_exist($author, $project)) {
         project_error();
@@ -156,11 +156,11 @@ function rename($author, $project, $branch, $loggedUser, $new_branch_name)
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
 
-    if (!change_updatedAt_project($project,$author)){
+    if (!change_updatedAt_project($project, $author)) {
         return false;
     };
 
-    if (!change_updatedAt_branch($project,$author,$branch)){
+    if (!change_updatedAt_branch($project, $author, $branch)) {
         return false;
     };
     return $stmt->execute();
@@ -176,7 +176,7 @@ function rename($author, $project, $branch, $loggedUser, $new_branch_name)
  * 
  *  if argument are not valid, throw
  */
-function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
+function fetchAllFromProject(int $first,int $after,string $author,string $project,string $loggedUser)
 {
     check_not_null($first, $after, $author, $project, $loggedUser);
 
@@ -219,10 +219,9 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
     $stmt->bindValue(':pauthorname', $author, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
-    if (! $stmt->execute()){
+    if (!$stmt->execute()) {
         //failed to execute query
         PDO_error();
-
     }
     $branchs = [];
     foreach ($stmt->fetchAll() as $branch) {
@@ -247,7 +246,7 @@ function fetchAllFromProject($first, $after, $author, $project, $loggedUser)
  * 
  * Return -1 if not able to count
  */
-function countFromProject($author, $project, $loggedUser)
+function countFromProject(string $author,string $project,string $loggedUser)
 {
     check_not_null($author, $project, $loggedUser);
 
@@ -290,5 +289,3 @@ function countFromProject($author, $project, $loggedUser)
     } else return -1; //Failed to execute, returning -1 as expected
     // Gérer cas projets privés et publics --> Done
 }
-
-
