@@ -1,4 +1,5 @@
-import { notifyError } from "../utils/error";
+import { notifyError } from "./notification";
+import store from "@/app/store"
 
 const connection = process.env.NODE_ENV === 'development'
   ? "http://localhost:8888/"

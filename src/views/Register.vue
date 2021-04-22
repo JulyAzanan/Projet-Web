@@ -2,7 +2,7 @@
   <div class="background">
     <div class="uk-card uk-card-default uk-card-body uk-position-center">
       <h3 class="uk-card-title">Connexion</h3>
-      <form class="uk-form-stacked" onsubmit="return false;">
+      <form class="uk-form-stacked">
         <span class="uk-form-label">
           Pas encore de compte ?
           <router-link to="/register">S'enregistrer</router-link>
@@ -12,7 +12,6 @@
           <div class="uk-inline">
             <span class="uk-form-icon" uk-icon="icon: user"></span>
             <input
-              v-model="userName"
               class="uk-input"
               type="text"
               placeholder="Nom d'utilisateur"
@@ -26,7 +25,6 @@
           <div class="uk-inline">
             <span class="uk-form-icon" uk-icon="icon: lock"></span>
             <input
-              v-model="password"
               class="uk-input"
               type="password"
               placeholder="Mot de passe"
@@ -36,10 +34,7 @@
         </div>
 
         <div class="uk-width-auto">
-          <button
-            @click="login"
-            class="uk-button uk-button-default uk-width-1-1"
-          >
+          <button class="uk-button uk-button-default uk-width-1-1">
             se connecter
           </button>
         </div>
@@ -49,41 +44,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import store from "@/app/store";
-import router from "@/app/routes";
-import { notifyWarning } from "@/utils/notification";
-import * as User from "@/api/user";
-import sleep from "@/api/sleep"
+import { defineComponent } from "vue";
 
-export default defineComponent({
-  props: {
-    redirect: String,
-  },
-  setup(props) {
-    const userName = ref("");
-    const password = ref("");
-
-    async function login() {
-      if (userName.value === "" || password.value === "") return;
-      const success = await User.login(userName.value, password.value);
-      if (success) {
-        store.commit("login", [userName.value, password.value]);
-        const route = router.resolve(props.redirect ?? "/");
-        if (route.matched.length > 0) {
-          await router.push(route);
-        } else {
-          await router.push({ name: "Home" });
-        }
-      } else {
-        userName.value = "";
-        notifyWarning("Nom d'utilisateur ou mot de passe invalide.");
-      }
-    }
-
-    return { userName, password, login };
-  },
-});
+export default defineComponent({});
 </script>
 
 <style lang="scss" scoped>

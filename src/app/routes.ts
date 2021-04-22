@@ -107,6 +107,7 @@ const routes: RouteRecordRaw[] = [
   {
     ...load("Login"),
     path: '/login', // page de connexion
+    props: route => ({ redirect: route.query.redirect ?? "/" }),
   },
   {
     ...load("Register"),

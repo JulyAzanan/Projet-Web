@@ -93,7 +93,7 @@ import { defineComponent, ref, watch, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import * as Project from "@/api/project";
 import * as Branch from "@/api/branch";
-import router, { notFound } from "@/routes";
+import router, { notFound } from "@/app/routes";
 
 export default defineComponent({
   props: {

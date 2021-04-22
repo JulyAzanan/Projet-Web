@@ -24,6 +24,7 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   setup() {
+    // TODO
     const publicProjects: string[] = [
       "Projet 3615",
       "Nier: Automata",

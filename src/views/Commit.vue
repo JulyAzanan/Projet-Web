@@ -31,7 +31,7 @@ import { defineComponent, ref, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import * as Branch from "@/api/branch";
 import * as Commit from "@/api/commit";
-import { notFound } from "@/routes";
+import { notFound } from "@/app/routes";
 
 export default defineComponent({
   props: {

@@ -65,7 +65,7 @@ import * as User from "@/api/user";
 import * as Project from "@/api/project";
 import ProjectCard from "@/components/User/ProjectCard.vue";
 import Pagination from "@/components/Pagination.vue";
-import router, { notFound } from "@/routes";
+import router, { notFound } from "@/app/routes";
 
 export default defineComponent({
   props: {

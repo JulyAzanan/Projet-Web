@@ -8,3 +8,11 @@ export function notifyError(message: string, err: any) {
     timeout: 10000,
   })
 }
+export function notifyWarning(message: string) {
+  uk.notification({
+    message: `<span uk-icon='icon: warning'></span> ${message}`,
+    status: "warning",
+    pos: "top-center",
+    timeout: 10000,
+  })
+}

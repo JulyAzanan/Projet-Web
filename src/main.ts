@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import uk from 'uikit';
 import App from './App.vue'
-import { notifyError } from "./utils/error"
+import { notifyError } from "./utils/notification"
 import router from './app/routes'
 import store from './app/store'
 // @ts-ignore

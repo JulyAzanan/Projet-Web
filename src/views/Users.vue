@@ -42,7 +42,7 @@ import { defineComponent, ref, watch } from "vue";
 import FriendCard from "@/components/User/FriendCard.vue";
 import Pagination from "@/components/Pagination.vue";
 import * as User from "@/api/user";
-import router from "@/routes";
+import router from "@/app/routes";
 
 export default defineComponent({
   props: {

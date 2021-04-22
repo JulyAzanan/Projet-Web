@@ -1,5 +1,6 @@
 <?php
 
+require_once "utils/cors.php";
 require_once "database/user.php";
 require_once "utils/auth.php";
 require_once "utils/error.php";
@@ -71,6 +72,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
             }
             break;
         }
+    
+    case "OPTIONS":
+        preflight();
+        break;
 
     default:
         request_error();

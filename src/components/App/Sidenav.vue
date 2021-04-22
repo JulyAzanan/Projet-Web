@@ -35,7 +35,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, computed } from "vue";
+import store from "@/app/store"
 import Links from "./Links.vue";
 import Usernav from "./Usernav.vue";
 import Login from "./Login.vue";
@@ -53,11 +54,9 @@ export default defineComponent({
     Search,
   },
   setup() {
-    const logged = true;
-    const userName = "Steel";
     return {
-      userName,
-      logged,
+      userName: computed(() => store.state.user),
+      logged: computed(() => store.state.loggedIn),
     };
   },
 });

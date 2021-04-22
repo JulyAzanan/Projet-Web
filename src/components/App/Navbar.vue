@@ -3,7 +3,7 @@
     <div class="uk-navbar-left search-overlay">
       <!-- Logo -->
       <div class="uk-navbar-item">
-        <router-link to="/">
+        <router-link :to="{ name: 'Home'}">
           <img src="@/assets/logo_simple.png" width="50" alt="" />
           <img src="@/assets/logo_text.png" width="100" alt="" />
         </router-link>
@@ -84,7 +84,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, computed } from "vue";
+import store from "@/app/store";
 import Sidenav from "./Sidenav.vue";
 import Links from "./Links.vue";
 import Usernav from "./Usernav.vue";
@@ -104,11 +105,9 @@ export default defineComponent({
     Search,
   },
   setup() {
-    const logged = true;
-    const userName = "Steel";
     return {
-      logged,
-      userName,
+      logged: computed(() => store.state.loggedIn),
+      userName: computed(() => store.state.user),
     };
   },
 });

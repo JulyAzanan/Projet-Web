@@ -30,7 +30,7 @@
   </li>
 
   <li>
-    <a cli>
+    <a @click="logout">
       <span class="uk-margin-small-right" uk-icon="icon: sign-out"></span>
       Déconnexion
     </a>
@@ -38,12 +38,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, computed } from "vue";
+import store from "@/app/store";
 
 export default defineComponent({
   setup() {
     return {
-      userName: "Steel",
+      userName: computed(() => store.state.user),
+      logout: () => {
+        store.commit("logout");
+      }
     };
   },
 });

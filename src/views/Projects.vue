@@ -45,7 +45,7 @@ import { defineComponent, ref, watch } from "vue";
 import ProjectCard from "@/components/User/ProjectCard.vue";
 import Pagination from "@/components/Pagination.vue";
 import * as Project from "@/api/project";
-import router from "@/routes";
+import router from "@/app/routes";
 
 export default defineComponent({
   props: {
