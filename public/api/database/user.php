@@ -11,7 +11,8 @@ include_once __DIR__ . "/../utils/args.php";
 function add($user, $password, $email, $age)
 {
     check_not_null($user, $password);
-    if (strlen($name) <= 0 || strlen($password) <= 0) {
+    //Changing from $name to $user
+    if (strlen($user) <= 0 || strlen($password) <= 0) {
         arg_error();
     }
     $passwordHash = hash("sha256", $password);
@@ -47,6 +48,8 @@ function update($user, $password, $email, $age, $loggedUser)
     $bd = connect();
     if ($age != null) {
         $sql = "UPDATE musician SET age = :age WHERE name = :user";
+        //Added $stmt = $bd->prepare($sql);
+        $stmt = $bd->prepare($sql);
         $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
         $stmt->bindValue(':age', $age, \PDO::PARAM_INT);
         $stmt = $bd->prepare($sql);
