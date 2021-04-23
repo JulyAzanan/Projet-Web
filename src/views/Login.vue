@@ -5,7 +5,14 @@
       <form class="uk-form-stacked" onsubmit="return false;">
         <span class="uk-form-label">
           Pas encore de compte ?
-          <router-link to="/register">S'enregistrer</router-link>
+          <router-link
+            :to="{
+              name: 'Register',
+              query: { redirect: from.fullPath },
+            }"
+            replace
+            >S'enregistrer</router-link
+          >
         </span>
 
         <div class="uk-margin">
@@ -62,8 +69,7 @@ export default defineComponent({
   beforeRouteEnter(_to, from, next) {
     next((vm) => {
       // @ts-ignore
-      vm.from = from
-      console.log(vm)
+      vm.from = from;
     });
   },
   setup(props) {

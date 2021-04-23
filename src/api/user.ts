@@ -15,30 +15,34 @@ interface BaseResult {
 }
 
 export async function login(user: string, password: string): Promise<boolean> {
-  store.commit("signIn", [user, password])
+  store.commit("login", [user, password]);
+  return true;
+  /* store.commit("signIn", [user, password])
   const response = await Request.get("api/user.php?q=login")
   if (response.status === 401) return false;
   if (response.ok) {
     store.commit("login", [user, password]);
     return true;
   }
-  return Request.exception(response);
+  return Request.exception(response); */
 }
 
 export function logout(): void {
   store.commit("logout");
 }
 
-export async function register(user: string, password: string, email?: string, age?: number): Promise<boolean> {
-  const response = await Request.post("api/user.php", JSON.stringify({
+export async function register(user: string, password: string, email: Nil<string>, age?: Nil<number>): Promise<boolean> {
+  store.commit("login", [user, password]);
+  return true;
+  /* const response = await Request.post("api/user.php", JSON.stringify({
     user, password, email, age
   }), "application/json");
   if (response.ok) {
     store.commit("login", [user, password]);
     return true;
   }
-  if (response.status === 513) return false;
-  return Request.exception(response);
+  if (response.status === 400) return false;
+  return Request.exception(response); */
 }
 
 export interface FetchResult extends BaseResult {

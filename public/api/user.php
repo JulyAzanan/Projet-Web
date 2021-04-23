@@ -8,20 +8,21 @@ require_once "utils/request.php";
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case "POST":
-        if (\User\find($_POST['user']) != null) {
+        $data = get_JSON();
+        if (\User\find($data->user) != null) {
             http_response_code(400);
             echo "<h1> 400 </h1><br>";
             echo "User already exists";
             die;
         }
-        if (\User\findByEmail($_POST['email']) != null) {
+        if (\User\findByEmail($data->email) != null) {
             http_response_code(400);
             echo "<h1> 400 </h1><br>";
             echo "Email already exists";
             die;
         }
-
-        $ok = \User\add($_POST['user'], $_POST['password'], $_POST['email'], $_POST['age']);
+        return;
+        $ok = \User\add($data->user, $data->password, $data->email, $data->age);
         if (!$ok) {
             PDO_error();
         }

@@ -112,6 +112,7 @@ const routes: RouteRecordRaw[] = [
   {
     ...load("Register"),
     path: '/register', // page d'inscription
+    props: route => ({ redirect: route.query.redirect }),
   },
   {
     ...load("About"),

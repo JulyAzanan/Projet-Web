@@ -9,7 +9,7 @@
           <button class="uk-button uk-button-text">
             <img
               :src="`https://picsum.photos/seed/${userName}/500/500`"
-              :alt="name"
+              :alt="userName"
               uk-tooltip="title: Modifier ma photo de profil; pos: top'"
               class="rounded"
             />
@@ -172,14 +172,9 @@ export default defineComponent({
 
     watch(
       () => store.state.loggedIn,
-      () => {
-        router.replace({
-          name: "Login",
-          query: { redirect: router.currentRoute.value.fullPath },
-        });
-      }
+      () => router.replace({ name: "Login" })
     );
-    
+
     return {
       email,
       modifyEmail,
