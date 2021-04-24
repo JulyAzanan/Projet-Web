@@ -3,6 +3,7 @@
 function PDO_error()
 {
     header("HTTP/1.1 513 PDO Error");
+    echo "<h1> 513 PDO Error </h1>";
     die;
 }
 
@@ -43,6 +44,6 @@ function branch_error()
 function forbidden_error()
 {
     http_response_code(403);
-    echo "<h1> 400 Forbidden </h1>";
+    echo "<h1> 403 Forbidden </h1>";
     die;
 }

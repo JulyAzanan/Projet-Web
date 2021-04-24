@@ -67,7 +67,7 @@ function get_real_order($order){
             break;
         
         case "MA":
-            $real_order = "updatedAt DESC" ;
+            $real_order = "updatedAt ASC" ;
             break;
 
         case "MD":

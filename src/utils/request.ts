@@ -15,18 +15,18 @@ function getPassword(): string {
 
 function getHeaders(): Headers {
   const headers = new Headers();
-  headers.set('Authorization', 'Basic ' + btoa(`${getUser()}:${getPassword()}`));
+  if (localStorage.getItem("loggedUser")) headers.set('Authorization', 'Basic ' + btoa(`${getUser()}:${getPassword()}`));
   return headers;
 }
 
 function createRequest(method: string) {
-  return async (url: string, body: BodyInit, contentType = "application/x-www-form-urlencoded") => {
+  return async (url: string, body: any) => {
     const headers = getHeaders();
-    headers.set('Content-Type', contentType);
+    headers.set('Content-Type', "application/json");
     return fetch(connection + url, {
       method,
       headers,
-      body,
+      body: JSON.stringify(body),
     });
   }
 }
@@ -47,3 +47,9 @@ export async function get(url: string) {
 export const post = createRequest("POST");
 export const delete_ = createRequest("DELETE");
 export const patch = createRequest("PATCH");
+
+export async function json(url: string, params?: Record<string, any>): Promise<any> {
+  const response = await get(url + params ? `?${new URLSearchParams(params)}`: "" );
+  if (response.ok) return response.json();
+  return exception(response);
+}

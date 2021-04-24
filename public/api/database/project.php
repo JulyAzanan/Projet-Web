@@ -3,6 +3,7 @@
 namespace Project;
 
 include_once "config.php";
+include_once __DIR__ . "/../utils/order.php";
 //include_once "args.php";
 
 use \PDO;
@@ -110,7 +111,7 @@ function remove(string $author,string $project,string $loggedUser)
     }
 }
 
-function fetchAll(int $first, int $after, string $order,string $loggedUser)
+function fetchAll(int $first, int $after, string $order, string $loggedUser)
 {
 
 
@@ -151,10 +152,9 @@ function fetchAll(int $first, int $after, string $order,string $loggedUser)
     // Gérer cas projets privés et publics. Modifier ce qu'il faut pour un order by date de création ou de modif, asc ou desc
 }
 
-function fetchAllFromUser(int $first,int $after,string $user,string $order,string $loggedUser)
+function fetchAllFromUser(int $first, int $after, string $user, string $order, $loggedUser)
 {
-
-    check_not_null($first, $after, $user, $order, $loggedUser);
+    check_not_null($first, $after, $user, $order);
     if ($first < 0 || $after < 0) {
         //Cannot use negative values
         arg_error();
@@ -221,10 +221,10 @@ function count(string $loggedUser)
     //Gérer cas des projets privés et publics
 }
 
-function countFromUser(string $user,string $loggedUser)
+function countFromUser(string $user, $loggedUser)
 {
 
-    check_not_null($user,$loggedUser);
+    check_not_null($user);
 
 
     $sql = "SELECT COUNT(*)
@@ -232,7 +232,7 @@ function countFromUser(string $user,string $loggedUser)
         JOIN contributor c
         ON p.authorName = c.authorName
         AND p.name = c.projectName
-        WHERE  P.authorName = :authorName
+        WHERE  p.authorName = :authorName
         AND (p.private = 'f' OR c.contributorName = :contributorname) ";
 
     $bd = connect();

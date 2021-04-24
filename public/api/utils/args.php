@@ -5,7 +5,7 @@ require_once "error.php";
 function check_not_null(...$args)
 {
     foreach ($args as $arg) {
-        if ($arg == null) {
+        if ($arg === null) {
             arg_error();
         }
     }
@@ -21,7 +21,7 @@ function check_owner($owner, $loggedUser)
 // Return false if we are the admin or the owner 
 function check_owner_bool($owner, $loggedUser)
 {
-    return $loggedUser != $owner || $loggedUser != "admin";
+    return !($loggedUser === $owner || $loggedUser === "admin");
 }
 
 //Return true if $User_to_check is a contributor of $Project made by $Project_Author_Name
@@ -36,7 +36,7 @@ function check_contributor($User_to_check,$Project,$Project_Author_Name)
     $stmt->execute(); //Execute the request 
     //We select all contributors
     foreach ($stmt->fetchAll() as $res) {
-        if (strcmp($res['contributorName'],$User_to_check) == 0 )//Check if $User_to_check is a contributor of the selected project
+        if (strcmp($res['contributorName'],$User_to_check) === 0 )//Check if $User_to_check is a contributor of the selected project
         {
             return true;
         }
@@ -68,7 +68,7 @@ function check_project_exist($Project_Author_Name, $project){
     $stmt->bindValue(':pname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':pauthorname', $Project_Author_Name, \PDO::PARAM_STR);
     $stmt->execute(); //Execute the request 
-    return ($stmt->rowCount() == 1 ) ; //Check if we found the requested project
+    return ($stmt->rowCount() === 1 ) ; //Check if we found the requested project
 }
 /**
  * Return true if the project of name $project made
@@ -94,5 +94,5 @@ function check_branch_exist($Project_Author_Name, $project,$branch){
         PDO_error();
     } 
     //Ensure that we have one and only one branch of project that has the requested name
-    return ($stmt->rowCount() == 1 ) ; //Check if we found the requested project
+    return ($stmt->rowCount() === 1 ) ; //Check if we found the requested project
 }

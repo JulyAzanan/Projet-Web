@@ -9,6 +9,10 @@ include_once "database/user.php";
 // var_dump($_POST['q']);
 
 
+echo json_encode(42);
+
+die;
+
 if (isset($_SERVER["HTTP_AUTHORIZATION"]) && 0 === stripos($_SERVER["HTTP_AUTHORIZATION"], 'basic ')) {
     $exploded = explode(':', base64_decode(substr($_SERVER["HTTP_AUTHORIZATION"], 6)), 2);
     if (2 == \count($exploded)) {

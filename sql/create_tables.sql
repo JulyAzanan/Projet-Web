@@ -6,6 +6,7 @@ CREATE TABLE musician (
     latestCommit TIMESTAMP(3),
     age INTEGER,
     bio TEXT,
+    picture TEXT,
 
     PRIMARY KEY (name)
 );
@@ -38,6 +39,7 @@ CREATE TABLE commit (
     projectName VARCHAR(42) NOT NULL,
     branchName VARCHAR(42) NOT NULL,
     message TEXT,
+    publisherName VARCHAR(42) NOT NULL,
 
     PRIMARY KEY (authorName,projectName,branchName,id)
 );
@@ -73,6 +75,8 @@ CREATE UNIQUE INDEX musician_email_unique ON musician(email);
 ALTER TABLE project ADD FOREIGN KEY (authorName) REFERENCES musician(name) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE project ADD FOREIGN KEY (authorName, name, mainBranchName) REFERENCES branch(authorName, projectName, name) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE commit ADD FOREIGN KEY (publisherName) REFERENCES musician(name) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE branch ADD FOREIGN KEY (authorName, projectName) REFERENCES project(authorName, name) ON DELETE CASCADE ON UPDATE CASCADE;
 
