@@ -99,7 +99,8 @@ function update($user, $password, $email, $age, $bio, $picture, $loggedUser)
     return true;
 }
 
-function getFollowersCount($user)
+function getFollowersCount($user) //Gens qui suivent $user
+
 {
     check_not_null($user);
     $bd = connect();
@@ -112,25 +113,53 @@ function getFollowersCount($user)
     return $stmt->fetch(\PDO::FETCH_ASSOC)['count'];
 }
 
+function getFollowing($user) //Gens que $user suit
+
+{
+    check_not_null($user);
+    $bd = connect();
+    $stmt = $bd->prepare("SELECT name, picture, bio, (SELECT COUNT(ff.followingName) FROM friend ff WHERE ff.followingName = name) AS fcount FROM musician JOIN friend f ON f.followerName = :user");
+    $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
+    if (!$stmt->execute()) {
+        //failed to execute query
+        PDO_error();
+    }
+    $res = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $res[] = (object) [
+            'name' => $row['name'],
+            'picture' => $row['picture'],
+            'bio' => $row['bio'],
+            'count' => $row['fcount'],
+        ];
+    }
+    return $res;
+}
+
+function getProfile($loggedUser)
+{
+    check_not_null($loggedUser);
+    $userInfo = find($loggedUser);
+    $friends = getFollowing($loggedUser);
+    $userInfo->following = $friends;
+    return $userInfo;
+}
+
 function getUser($user, $first, $after, $loggedUser)
 {
     check_not_null($user, $first, $after);
     $userInfo = find($user);
-    if ($userInfo === null) return null;
+    if ($userInfo === null) {
+        return null;
+    }
+
     $projects = \Project\fetchAllFromUser($first, $after, $user, "", $loggedUser);
     $projectCount = \Project\countFromUser($user, $loggedUser);
     $followers = getFollowersCount($user);
-    $res = (object) [
-        'email' => $userInfo->email,
-        'latestCommit' => $userInfo->latestCommit,
-        'age' => $userInfo->age,
-        'bio' => $userInfo->bio,
-        'picture' => $userInfo->picture,
-        'followers' => $followers,
-        'projectCount' => $projectCount,
-        'projects' => $projects,
-    ];
-    return $res;
+    $userInfo->followers = $followers;
+    $userInfo->projectCount = $projectCount;
+    $userInfo->projects = $projects;
+    return $userInfo;
 }
 
 /**
@@ -184,7 +213,10 @@ function findByEmail($email)
         PDO_error();
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
-    if ($res['user'] === null) return null;
+    if ($res['user'] === null) {
+        return null;
+    }
+
     $user = (object) [
         'name' => $res['name'],
         'latestCommit' => $res['latestcommit'],
@@ -205,7 +237,9 @@ function find($user)
         PDO_error();
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
-    if ($res['name'] === null) return null;
+    if ($res['name'] === null) {
+        return null;
+    }
     $user = (object) [
         'email' => $res['email'],
         'latestCommit' => $res['latestcommit'],
