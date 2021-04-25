@@ -1,32 +1,32 @@
 <?php
 namespace Friend;
 
-include_once "config.php";
+include_once __DIR__ . "/config.php";
 /**
- * Add the personn $follower to the list of follower that follow $following 
- * 
+ * Add the personn $follower to the list of follower that follow $following
+ *
  * It handle:
- * 
- * Permission: If you are an admin, you can add to the list of persons 
+ *
+ * Permission: If you are an admin, you can add to the list of persons
  * following $following anyone, even if it's not you you can
- * 
+ *
  * If not, only added if $loggedUser = $follower
- * 
+ *
  * It throw:
- * 
- * forbidden_error if you dont have the right to add ($follower != $loggeduser and != admin) 
- * 
- * It return: 
- * 
+ *
+ * forbidden_error if you dont have the right to add ($follower != $loggeduser and != admin)
+ *
+ * It return:
+ *
  * true on succes, false on failure
  */
-function add(string $follower,string $following,string $loggedUser)
+function add($follower, $following, $loggedUser)
 {
     //Adding $follower to the list of personn following $following
     // if and only if $follower = $loggedUser or $loggedUser is an admin
-    check_not_null($follower,$following,$loggedUser);
-    
-    if (check_owner_bool($follower, $loggedUser) ){
+    check_not_null($follower, $following, $loggedUser);
+
+    if (check_owner_bool($follower, $loggedUser)) {
         //Return False if we are an admin or if $follower = $loggedUser
         //So here, we are not an admin
         forbidden_error();
@@ -37,139 +37,146 @@ function add(string $follower,string $following,string $loggedUser)
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':followername', $follower, \PDO::PARAM_STR);
-    $stmt->bindValue(':followingname', $following, \PDO::PARAM_STR); 
+    $stmt->bindValue(':followingname', $following, \PDO::PARAM_STR);
     return $stmt->execute();
     //Will return true on succes and false on failure
 }
 /**
  * Remove the personn $follower to the list of follower that follow $following
- * 
+ *
  * It handle:
- * 
- * Permission: If you are an admin, you can aremove of the list of persons 
+ *
+ * Permission: If you are an admin, you can aremove of the list of persons
  * following $following anyone, even if it's not you you can
- * 
+ *
  * If not, only removed if $loggedUser = $follower
- * 
+ *
  * It throw:
- * 
- * forbidden_error if you dont have the right to add ($follower != $loggeduser and != admin) 
- * 
- * It return: 
- * 
+ *
+ * forbidden_error if you dont have the right to add ($follower != $loggeduser and != admin)
+ *
+ * It return:
+ *
  * true on succes, false on failure
  */
-function remove(string $follower,string $following,string $loggedUser)
+function remove($follower, $following, $loggedUser)
 {
     //Removing $follower to the list of personn following $following
     // if and only if $follower = $loggedUser or $loggedUser is an admin
-    check_not_null($follower,$following,$loggedUser);
-    
-    if (check_owner_bool($follower, $loggedUser) ){
+    check_not_null($follower, $following, $loggedUser);
+
+    if (check_owner_bool($follower, $loggedUser)) {
         //Return False if we are an admin or if $follower = $loggedUser
         //So here, we are not an admin
         forbidden_error();
     }
 
     //We have the rights to do it
-    $sql = "DELETE FROM friends WHERE followerName = :fname AND followingName = :fingname ";
+    $sql = "DELETE FROM friend WHERE followerName = :fname AND followingName = :fingname ";
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':fname', $follower, \PDO::PARAM_STR);
-    $stmt->bindValue('fingname', $following, \PDO::PARAM_STR); 
+    $stmt->bindValue(':fingname', $following, \PDO::PARAM_STR);
     return $stmt->execute();
     //Will return true on succes and false on failure
 }
 
-
 /**
  * Gather all the persons that $user is following
- * 
+ *
  * It handle:
- * 
+ *
  * Limits with $first and $after. Start at $first and show $after people after that
- * 
+ *
  * It DOES NOT handle:
- * 
+ *
  * Permission: AnyOne can see the list of people that $user is following
- * 
+ *
  * It throw:
- * 
+ *
  * PDO_ERROR() if the request failed to execute
- * 
- * It return: 
- * 
+ *
+ * It return:
+ *
  * an objet , array-like that contains the name of all people that
- * $user is following 
+ * $user is following
  */
-function fetchAllFromUser(int $first,int $after,string $user)
+function fetchAll($first, $after, $user)
 {
-    //first is the first we want to see
-    //after is the number after first we want to see
-    check_not_null($first,$after,$user);
-    if ($first < 0 || $after < 0) {
-        //Cannot use negative number here 
-        arg_error();
-    }
-    //Creating the request
-    $sql = "SELECT followingName
-        FROM friend
-        WHERE followerName = :fname 
-        LIMIT :number_to_show OFFSET :offset " ;
-        //Binding values
+    check_not_null($user);
     $bd = connect();
-    $stmt = $bd->prepare($sql);
-    $stmt->bindValue(':fname', $user, \PDO::PARAM_STR);
-    $stmt->bindValue(':number_to_show', $after, \PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $first, \PDO::PARAM_INT);
-    if (! $stmt->execute()){
-        //An error occured
-        PDO_error() ;
+    $stmt = $bd->prepare("SELECT name, picture, bio, (SELECT COUNT(ff.followingName) FROM friend ff WHERE ff.followingName = name) AS fcount
+    FROM musician JOIN friend f ON f.followerName = :user
+    LIMIT :number_to_show OFFSET :offset ");
+    $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
+    $stmt->bindValue(':number_to_show', $first, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $after, \PDO::PARAM_INT);
+    if (!$stmt->execute()) {
+        //failed to execute query
+        PDO_error();
     }
-    //Executed Fine, getting all of them into an object :)
-    foreach ($stmt->fetchAll() as $friend) {
-        $friends[] = (object) [
-            'friend' => $friend['followingName'],
+    $res = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $res[] = (object) [
+            'name' => $row['name'],
+            'picture' => $row['picture'],
+            'bio' => $row['bio'],
+            'followers' => $row['fcount'],
         ];
     }
-    return $friends ;
+    return $res;
 }
 /**
  * Gather all the persons that $user is following
- * 
+ *
  * It DOES NOT handle:
- * 
+ *
  * Permission: AnyOne can see the count of people that $user is following
- * 
+ *
  * It throw:
- * 
+ *
  * PDO_ERROR() if the request failed to execute
- * 
- * It return: 
- * 
+ *
+ * It return:
+ *
  * an integer ,that count the number of people that
- * $user is following 
+ * $user is following
  */
-function countFromUser(string $user)
+function count($user)
 {
-    check_not_null($user);//Required here
+    check_not_null($user); //Required here
     //Creating the request
     $sql = "SELECT COUNT(*)
         FROM friend
-        WHERE followerName = :fname AND
-        LIMIT :number_to_show OFFSET :offset " ;
-        //Binding the request
+        WHERE followingName = :fname";
+    //Binding the request
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':fname', $user, \PDO::PARAM_STR);
     //Executing
-    if (! $stmt->execute()){
+    if (!$stmt->execute()) {
         //An error occured
-        PDO_error() ;
+        PDO_error();
     }
-    //Executed Fine, getting the result
-    foreach ($stmt->fetchAll() as $friend) {
-        //Should be only one result, but idk how to do it so i'm using this for safety 
-        return($friend[0]) ;
+    $res = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $res['count'];
+}
+
+function find($follower, $following)
+{
+    check_not_null($follower, $following);
+
+    $sql = "SELECT followingName, followerName FROM friend
+    WHERE followingName = :followingName AND followerName = :followerName";
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    $stmt->bindValue(':followingName', $following, \PDO::PARAM_STR);
+    $stmt->bindValue(':followerName', $follower, \PDO::PARAM_STR);
+    //Executing
+    if (!$stmt->execute()) {
+        //An error occured
+        PDO_error();
     }
+    $res = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $stmt->rowCount() != 0;
 }

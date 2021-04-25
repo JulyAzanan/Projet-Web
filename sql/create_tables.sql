@@ -52,7 +52,7 @@ CREATE TABLE partition (
     branchName VARCHAR(42) NOT NULL,
     commitID TEXT NOT NULL,
 
-    PRIMARY KEY (authorName,projectName,branchName,commitID)
+    PRIMARY KEY (authorName,projectName,branchName,commitID, name)
 );
 
 CREATE TABLE contributor (

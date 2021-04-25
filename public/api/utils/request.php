@@ -1,6 +1,7 @@
 <?php
 
-function get_JSON() {
+function get_JSON()
+{
     return json_decode(file_get_contents('php://input'));
 }
 

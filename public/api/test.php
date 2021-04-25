@@ -1,5 +1,5 @@
 <?php
-include_once "database/user.php";
+include_once __DIR__ . "/database/user.php";
 
 // $res = add_user("tes", "passwd", NULL, NULL);
 // echo $res;
@@ -8,6 +8,9 @@ include_once "database/user.php";
 // echo "|";
 // var_dump($_POST['q']);
 
+echo md5(microtime());
+
+die;
 
 echo json_encode(42);
 

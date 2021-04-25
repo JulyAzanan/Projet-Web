@@ -2,27 +2,28 @@
 
 namespace Project;
 
-include_once "config.php";
+include_once __DIR__ . "/config.php";
+include_once __DIR__ . "/contributor.php";
+include_once __DIR__ . "/branch.php";
 include_once __DIR__ . "/../utils/order.php";
-//include_once "args.php";
+include_once __DIR__ . "/../utils/args.php";
 
 use \PDO;
-use \Exception;
 
-function add(string $author,string $project,bool $private, $description, string $loggedUser)
+function add($author, $project, $private, $description, $loggedUser)
 {
     check_not_null($author, $project, $private, $loggedUser);
 
     check_owner($author, $loggedUser);
-    
+
     $bd = connect();
-    
+
     try {
         $bd->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         $bd->beginTransaction();
 
         //Creating the 1 request
-        $sql = "INSERT INTO project 
+        $sql = "INSERT INTO project
         VALUES (:name, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :authorName, 'main', :description, :private)";
         $stmt = $bd->prepare($sql);
         //Binding values
@@ -34,7 +35,7 @@ function add(string $author,string $project,bool $private, $description, string 
         //Placing in queue
         $stmt->execute();
 
-        $sql = "INSERT INTO branch 
+        $sql = "INSERT INTO branch
         VALUES (:name, CURRENT_TIMESTAMP,:authorName, :projectName)";
         $stmt = $bd->prepare($sql);
         //Binding values
@@ -46,7 +47,7 @@ function add(string $author,string $project,bool $private, $description, string 
 
         //Executing the queue
         $bd->commit();
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         $bd->rollBack();
         echo "Failed: " . $e->getMessage();
         return false;
@@ -93,7 +94,7 @@ function update($author, $project, $private, $description, $mainBranchName, $log
     return true;
 }
 
-function remove(string $author,string $project,string $loggedUser)
+function remove($author, $project, $loggedUser)
 {
     // retirer les branches en premier et utiliser une transaction pour supprimer la branche main
     check_not_null($author, $project, $loggedUser);
@@ -101,18 +102,17 @@ function remove(string $author,string $project,string $loggedUser)
     //No right to emove if we are not the admin or the creator of the project
     check_owner($author, $loggedUser);
 
-
     $bd = connect();
 
     /**
-     * Removing all branches except and the project at the same time, 
+     * Removing all branches except and the project at the same time,
      * Using a transaction
      */
     try {
         $bd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $bd->beginTransaction();
         //Creating the 1 request
-        $sql = "DELETE FROM branch 
+        $sql = "DELETE FROM branch
         WHERE projectName = :pname AND authorName = :pauthorName";
         $stmt = $bd->prepare($sql);
         //Binding values
@@ -120,7 +120,6 @@ function remove(string $author,string $project,string $loggedUser)
         $stmt->bindValue(':pauthorName', $author, \PDO::PARAM_STR);
         //Placing in queue
         $stmt->execute();
-
 
         $sql = "DELETE FROM project
         WHERE name = :pname AND authorName = :pauthorName";
@@ -141,7 +140,17 @@ function remove(string $author,string $project,string $loggedUser)
     return true;
 }
 
-function fetchAll(int $first, int $after, string $order, $loggedUser)
+function getProject($user, $project, $loggedUser)
+{
+    check_not_null($user, $project);
+
+    $projectInfo = find($user, $project, $loggedUser);
+    $projectInfo->contributors = \Contributor\fetchAll($user, $project, $loggedUser);
+    $projectInfo->branches = \Branch\fetchAll($user, $project, $loggedUser);
+    return $projectInfo;
+}
+
+function fetchAll($first, $after, $order, $loggedUser)
 {
     check_not_null($first, $after, $order);
     if ($first < 0 || $after < 0) {
@@ -151,13 +160,13 @@ function fetchAll(int $first, int $after, string $order, $loggedUser)
 
     $real_order = get_real_order($order);
 
-    $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private 
-        FROM project p 
-        WHERE p.private = 'f' 
+    $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private
+        FROM project p
+        WHERE p.private = 'f'
         OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName)
-        OR :contributorname = 'admin' 
-        ORDER BY " . $real_order  . " 
-        LIMIT :number_to_show OFFSET :offset "; 
+        OR :contributorname = 'admin'
+        ORDER BY " . $real_order . "
+        LIMIT :number_to_show OFFSET :offset ";
 
     $bd = connect();
     $stmt = $bd->prepare($sql);
@@ -182,7 +191,7 @@ function fetchAll(int $first, int $after, string $order, $loggedUser)
     // Gérer cas projets privés et publics. Modifier ce qu'il faut pour un order by date de création ou de modif, asc ou desc
 }
 
-function fetchAllFromUser(int $first, int $after, string $user, string $order, $loggedUser)
+function fetchAllFromUser($first, $after, $user, $order, $loggedUser)
 {
     check_not_null($first, $after, $user, $order);
     if ($first < 0 || $after < 0) {
@@ -190,17 +199,14 @@ function fetchAllFromUser(int $first, int $after, string $user, string $order, $
         arg_error();
     }
 
-
     $real_order = get_real_order($order);
-
 
     $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private
     FROM project p
     WHERE p.authorName = :pauthorname
     AND ( p.private = 'f' OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName) OR p.authorName = :contributorname OR :contributorname = 'admin' )
-    ORDER BY " . $real_order  . " 
+    ORDER BY " . $real_order . "
     LIMIT :number_to_show OFFSET :offset ";
-
 
     $bd = connect();
     $stmt = $bd->prepare($sql);
@@ -232,7 +238,7 @@ function count($loggedUser)
 {
     $sql = "SELECT COUNT(*)
         FROM project p
-        WHERE p.private = 'f' 
+        WHERE p.private = 'f'
         OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName)
         OR p.authorName = :contributorname
         OR :contributorname = 'admin'";
@@ -252,11 +258,10 @@ function count($loggedUser)
     //Gérer cas des projets privés et publics
 }
 
-function countFromUser(string $user, $loggedUser)
+function countFromUser($user, $loggedUser)
 {
 
     check_not_null($user);
-
 
     $sql = "SELECT COUNT(*)
         FROM project p
@@ -278,14 +283,13 @@ function countFromUser(string $user, $loggedUser)
     //Gérer cas des projets privés et publics
 }
 
-function seekFromAuthor(int $first,int $after,string $author,string $project, $loggedUser)
+function seekFromAuthor($first, $after, $author, $project, $loggedUser)
 {
     check_not_null($first, $after, $author, $project);
     if ($first < 0 || $after < 0) {
         //Cannot use negative values
         arg_error();
     }
-    
 
     $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private
     FROM project p
@@ -293,7 +297,6 @@ function seekFromAuthor(int $first,int $after,string $author,string $project, $l
     AND p.name LIKE :projectname
     AND ( p.private = 'f' OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName) OR p.authorName = :contributorname OR :contributorname = 'admin' )
     LIMIT :number_to_show OFFSET :offset ";
-
 
     $bd = connect();
     $stmt = $bd->prepare($sql);
@@ -322,22 +325,19 @@ function seekFromAuthor(int $first,int $after,string $author,string $project, $l
     // Gérer cas projets privés et publics
 }
 
-
-function seek(int $first,int $after,string $project, $loggedUser)
+function seek($first, $after, $project, $loggedUser)
 {
     check_not_null($first, $after, $project);
     if ($first < 0 || $after < 0) {
         //Cannot use negative values
         arg_error();
     }
-    
 
     $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private
     FROM project p
     WHERE p.name LIKE :projectname
     AND ( p.private = 'f' OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName) OR p.authorName = :contributorname OR :contributorname = 'admin' )
     LIMIT :number_to_show OFFSET :offset ";
-
 
     $bd = connect();
     $stmt = $bd->prepare($sql);
@@ -365,27 +365,19 @@ function seek(int $first,int $after,string $project, $loggedUser)
     // Gérer cas projets privés et publics
 }
 
-function find($user, string $project, $loggedUser)
+function find($user, $project, $loggedUser)
 {
     check_not_null($user, $project);
-    if ($first < 0 || $after < 0) {
-        //Cannot use negative values
-        arg_error();
-    }
-    
 
     $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private
     FROM project p
     WHERE p.name = :projectname
     AND ( p.private = 'f' OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName) OR p.authorName = :contributorname OR :contributorname = 'admin' )";
 
-
     $bd = connect();
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':projectname', $project, \PDO::PARAM_STR);
     $stmt->bindValue(':contributorname', $loggedUser, \PDO::PARAM_STR);
-    $stmt->bindValue(':number_to_show', $first, \PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $after, \PDO::PARAM_INT);
     if (!$stmt->execute()) {
         //failed to execute query
         PDO_error();
@@ -396,7 +388,7 @@ function find($user, string $project, $loggedUser)
     }
     $proj = (object) [
         'name' => $res['name'],
-        'authorName' => $res['authorName'],
+        'authorName' => $res['authorname'],
         'updatedAt' => $res['updatedat'],
         'createdAt' => $res['createdat'],
         'description' => $res['description'],

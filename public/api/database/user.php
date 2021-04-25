@@ -1,8 +1,9 @@
 <?php
 namespace User;
 
-include_once "config.php";
-include_once "project.php";
+include_once __DIR__ . "/config.php";
+include_once __DIR__ . "/project.php";
+include_once __DIR__ . "/friend.php";
 include_once __DIR__ . "/../utils/error.php";
 include_once __DIR__ . "/../utils/args.php";
 
@@ -99,49 +100,11 @@ function update($user, $password, $email, $age, $bio, $picture, $loggedUser)
     return true;
 }
 
-function getFollowersCount($user) //Gens qui suivent $user
-
-{
-    check_not_null($user);
-    $bd = connect();
-    $stmt = $bd->prepare("SELECT COUNT(followingName) FROM friend WHERE followingName = :user");
-    $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
-    if (!$stmt->execute()) {
-        //failed to execute query
-        PDO_error();
-    }
-    return $stmt->fetch(\PDO::FETCH_ASSOC)['count'];
-}
-
-function getFollowing($user) //Gens que $user suit
-
-{
-    check_not_null($user);
-    $bd = connect();
-    $stmt = $bd->prepare("SELECT name, picture, bio, (SELECT COUNT(ff.followingName) FROM friend ff WHERE ff.followingName = name) AS fcount FROM musician JOIN friend f ON f.followerName = :user");
-    $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
-    if (!$stmt->execute()) {
-        //failed to execute query
-        PDO_error();
-    }
-    $res = [];
-    foreach ($stmt->fetchAll() as $row) {
-        $res[] = (object) [
-            'name' => $row['name'],
-            'picture' => $row['picture'],
-            'bio' => $row['bio'],
-            'count' => $row['fcount'],
-        ];
-    }
-    return $res;
-}
-
-function getProfile($loggedUser)
+function getProfile($first, $after, $loggedUser)
 {
     check_not_null($loggedUser);
     $userInfo = find($loggedUser);
-    $friends = getFollowing($loggedUser);
-    $userInfo->following = $friends;
+    $userInfo->following = \Friend\fetchAll($first, $after, $loggedUser);
     return $userInfo;
 }
 
@@ -155,7 +118,7 @@ function getUser($user, $first, $after, $loggedUser)
 
     $projects = \Project\fetchAllFromUser($first, $after, $user, "", $loggedUser);
     $projectCount = \Project\countFromUser($user, $loggedUser);
-    $followers = getFollowersCount($user);
+    $followers = \Friend\count($user);
     $userInfo->followers = $followers;
     $userInfo->projectCount = $projectCount;
     $userInfo->projects = $projects;
@@ -219,6 +182,7 @@ function findByEmail($email)
 
     $user = (object) [
         'name' => $res['name'],
+        'email' => $res['email'],
         'latestCommit' => $res['latestcommit'],
         'age' => $res['age'],
         'bio' => $res['bio'],
@@ -241,6 +205,7 @@ function find($user)
         return null;
     }
     $user = (object) [
+        'name' => $res['name'],
         'email' => $res['email'],
         'latestCommit' => $res['latestcommit'],
         'age' => $res['age'],

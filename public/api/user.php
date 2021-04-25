@@ -1,10 +1,10 @@
 <?php
 
-require_once "utils/cors.php";
-require_once "database/user.php";
-require_once "utils/auth.php";
-require_once "utils/error.php";
-require_once "utils/request.php";
+require_once __DIR__ . "/utils/cors.php";
+require_once __DIR__ . "/database/user.php";
+require_once __DIR__ . "/utils/auth.php";
+require_once __DIR__ . "/utils/error.php";
+require_once __DIR__ . "/utils/request.php";
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case "GET":
