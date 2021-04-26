@@ -30,12 +30,6 @@
               >Changements
             </router-link>
           </li>
-          <li>
-            <router-link
-              :to="{ name: 'Discussions', params: { userName, projectName } }"
-              >Discussions
-            </router-link>
-          </li>
         </ul>
 
         <router-view v-if="page.ready" :project="project"> </router-view>

@@ -13,13 +13,6 @@
     </router-link>
   </li>
 
-  <li>
-    <router-link to="/friends">
-      <span class="uk-margin-small-right" uk-icon="icon: users"></span>
-      Mes amis
-    </router-link>
-  </li>
-
   <li class="uk-nav-divider"></li>
 
   <li>

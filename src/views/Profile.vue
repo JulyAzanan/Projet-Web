@@ -7,9 +7,14 @@
             <h2 class="uk-text-center">
               Modifier les informations de mon profil
             </h2>
-            <button class="uk-button uk-button-text">
+            <div uk-form-custom>
+              <input
+                @change="changePicture"
+                type="file"
+                accept="image/x-png,image/gif,image/jpeg"
+              />
               <UserPicture :user="user" :size="15" />
-            </button>
+            </div>
             <div>
               <span class="uk-margin-small-right" uk-icon="icon: user"></span>
               {{ user.name }}
@@ -189,6 +194,22 @@ export default defineComponent({
       ready.value = true;
     }
 
+    function changePicture(event: InputEvent) {
+      const element = event.currentTarget as HTMLInputElement;
+      const fileList = element.files;
+      if (fileList?.length === 0) return;
+      const file = fileList?.item(0) as File;
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = async () => {
+        const content = reader.result as string;
+        await User.update(store.state.user, {
+          picture: content,
+        })
+        user.value.picture = content;
+      }
+    }
+
     init();
 
     return {
@@ -196,6 +217,7 @@ export default defineComponent({
       user,
       friendLoaded,
       pages,
+      changePicture,
     };
   },
 });

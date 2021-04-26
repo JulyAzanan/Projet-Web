@@ -8,7 +8,7 @@
           class="uk-position-top-right uk-margin-small-top uk-margin-small-right"
         >
         </span>
-        <UserPicture :user="user" :size="7" />
+        <UserPicture :user="user" :size="7" class="uk-margin-medium-top" />
         <div class="uk-card-body">
           <router-link
             :to="{ name: 'User', params: { userName: user.name } }"

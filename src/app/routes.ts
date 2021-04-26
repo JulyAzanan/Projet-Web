@@ -84,16 +84,6 @@ const routes: RouteRecordRaw[] = [
         path: "pulls/:pull", // pull request
         props: true,
       },
-      {
-        ...load("Discussions"),
-        path: "discussions", // discussions sur le projet
-        props: true,
-      },
-      {
-        ...load("Discussion"),
-        path: "discussions/:discussion", // discussions sur le projet
-        props: true,
-      },
     ]
   },
   {

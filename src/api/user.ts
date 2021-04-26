@@ -60,16 +60,20 @@ export async function remove(user: string): Promise<boolean> {
     return Request.exception(response); */
 }
 
-export async function update(user: string, password: Nil<string>, email: Nil<string>, age: Nil<number>, bio: Nil<string>, picture: Nil<string>): Promise<boolean> {
+export interface UpdateInput {
+  password?: string,
+  email?: string,
+  age?: number,
+  bio?: string,
+  picture?: string,
+}
+
+export async function update(user: string, content: UpdateInput): Promise<boolean> {
   await sleep(500);
   return true;
   /* const response = await Request.patch("api/user.php", {
     user,
-    password,
-    email,
-    age,
-    bio,
-    picture,
+    ...content,
   });
   if (response.status === 401) return false;
   if (response.ok) return true;
