@@ -20,11 +20,10 @@
                 class="uk-grid-column-small uk-child-width-1-6@s uk-text-center uk-margin-medium-bottom"
                 uk-grid
               >
-                <FriendCard
+                <UserCard
                   v-for="user in users"
                   :key="user.name"
-                  :userName="user.name"
-                  :followers="user.followers"
+                  :user="user"
                 />
               </div>
               <Pagination :page="parseInt(page)" :pages="pages" />
@@ -39,7 +38,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
-import FriendCard from "@/components/User/FriendCard.vue";
+import UserCard from "@/components/User/UserCard.vue";
 import Pagination from "@/components/Pagination.vue";
 import * as User from "@/api/user";
 import router from "@/app/routes";
@@ -49,7 +48,7 @@ export default defineComponent({
     page: String,
   },
   components: {
-    FriendCard,
+    UserCard,
     Pagination,
   },
   setup(props) {
@@ -62,7 +61,7 @@ export default defineComponent({
     async function load() {
       ready.value = false;
       const page = parseInt(props.page!);
-      const result = await User.all(User.userPerPage, User.userPerPage * page);
+      const result = await User.all(page);
       users.value = result;
       if (result.length === 0 && page != 1) {
         router.replace({ query: { page: "1" } });

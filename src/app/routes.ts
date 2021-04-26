@@ -103,6 +103,7 @@ const routes: RouteRecordRaw[] = [
   {
     ...load("Profile"),
     path: '/profile', // profil utilisateur
+    props: route => ({ page: route.query.page ?? "1" }),
   },
   {
     ...load("Login"),

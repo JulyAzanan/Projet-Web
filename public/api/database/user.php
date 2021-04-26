@@ -105,6 +105,7 @@ function getProfile($first, $after, $loggedUser)
     check_not_null($loggedUser);
     $userInfo = find($loggedUser);
     $userInfo->following = \Friend\fetchAll($first, $after, $loggedUser);
+    $userInfo->followingCount = \Friend\count($loggedUser);
     return $userInfo;
 }
 

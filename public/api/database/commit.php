@@ -3,6 +3,7 @@ namespace Commit;
 
 include_once __DIR__ . "/config.php";
 include_once __DIR__ . "/partition.php";
+include_once __DIR__ . "/user.php";
 include_once __DIR__ . "/../utils/args.php";
 include_once __DIR__ . "/../utils/updateAt.php";
 
@@ -99,6 +100,7 @@ function getCommit($author, $project, $branch, $commit, $loggedUser)
 {
     $commitInfo = find($author, $project, $branch, $commit, $loggedUser);
     $commitInfo->partitions = \Partition\fetchAll($author, $project, $branch, $commit, $loggedUser);
+    $commitInfo->publisher = \User\find($commitInfo->publisherName);
     return $commitInfo;
 }
 

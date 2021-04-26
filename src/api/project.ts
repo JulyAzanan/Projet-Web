@@ -11,7 +11,10 @@ interface BaseResult {
 export const projectPerPage = 15;
 
 export interface FetchResult extends BaseResult {
-  contributors: string[],
+  contributors: {
+    name: string,
+    picture?: string,
+  }[],
   branches: string[],
   mainBranch: string,
 }
@@ -21,7 +24,11 @@ export async function fetch(user: Nil<string>, project: Nil<string>): Promise<Fe
   await sleep(500); // TODO
   return {
     private: false,
-    contributors: ["Steel", "July", "Michel"],
+    contributors: [{
+      name: "Steel"
+    }, {
+      name: "July"
+    }, { name: "Michel" }],
     branches: ["main", "dev", "prod"],
     mainBranch: "main",
     updatedAt: new Date(),

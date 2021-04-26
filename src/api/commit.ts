@@ -1,16 +1,17 @@
 import sleep from "./sleep";
+import * as User from "./user"
 
 interface BaseResult {
-  author: string,
   message: string,
   createdAt: Date,
 }
 
 export interface FetchResult extends BaseResult {
+  publisher: User.BaseResult,
   files: {
     path: string,
-    commitID: string,
-    commitMessage: string,
+    id: string,
+    message: string,
     createdAt: Date,
   }[],
 }
@@ -20,32 +21,34 @@ export async function fetch(user?: string, project?: string, branch?: string, co
   await sleep(500); // TODO
   return {
     createdAt: new Date(),
-    author: "Steel",
+    publisher: {
+      name: "Steel",
+    },
     message: "Hello world uwu",
     files: [{
       path: "file_3615",
-      commitID: "dqzd48",
-      commitMessage: "Pour tout n dans la vie",
+      id: "dqzd48",
+      message: "Pour tout n dans la vie",
       createdAt: new Date(new Date().getTime() - 34 * 60 * 1011),
     },{
       path: "fack",
-      commitID: "2qz56d",
-      commitMessage: "Parfois la raison elle s'appelle pas q !",
+      id: "2qz56d",
+      message: "Parfois la raison elle s'appelle pas q !",
       createdAt: new Date(new Date().getTime() - 35 * 60 * 1011),
     },{
       path: "matez",
-      commitID: "6zerfez",
-      commitMessage: "Qu'est ce que je dou ?",
+      id: "6zerfez",
+      message: "Qu'est ce que je dou ?",
       createdAt: new Date(new Date().getTime() - 34 * 64 * 1011),
     },{
       path: "hein",
-      commitID: "dqzd48",
-      commitMessage: "Pour tout n dans la vie",
+      id: "dqzd48",
+      message: "Pour tout n dans la vie",
       createdAt: new Date(new Date().getTime() - 34 * 60 * 1011),
     },{
       path: "suff",
-      commitID: "16z68c",
-      commitMessage: "La dem est triv'!",
+      id: "16z68c",
+      message: "La dem est triv'!",
       createdAt: new Date(new Date().getTime() - 34 * 60 * 10151),
     }],
    };

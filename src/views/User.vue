@@ -5,11 +5,7 @@
         <div class="uk-width-1-3@s uk-margin-large-top" uk-first-column>
           <div v-if="ready">
             <h2>Profil de {{ userName }}</h2>
-            <img
-              :src="`https://picsum.photos/seed/${userName}/500/500`"
-              :alt="userName"
-              class="rounded"
-            />
+            <UserPicture :user="user" :size="12" />
             <div>
               <button class="uk-button uk-button-text buttonNormalText">
                 <span class="uk-margin-small-right" uk-icon="icon: star"></span>
@@ -20,7 +16,6 @@
               <span class="uk-margin-small-right" uk-icon="icon: mail"> </span>
               {{ user.email }}
             </div>
-            <hr class="uk-divider-icon uk-margin-large-right" />
             <div v-if="user.age">
               <span
                 class="uk-margin-small-right"
@@ -28,6 +23,8 @@
               ></span>
               {{ user.age }} ans
             </div>
+            <hr class="uk-divider-icon uk-margin-large-right" />
+            <p>{{ user.bio }}</p>
           </div>
           <div v-else uk-spinner></div>
         </div>
@@ -65,6 +62,7 @@ import * as User from "@/api/user";
 import * as Project from "@/api/project";
 import ProjectCard from "@/components/User/ProjectCard.vue";
 import Pagination from "@/components/Pagination.vue";
+import UserPicture from "@/components/User/UserPicture.vue";
 import router, { notFound } from "@/app/routes";
 
 export default defineComponent({
@@ -75,15 +73,14 @@ export default defineComponent({
   components: {
     ProjectCard,
     Pagination,
+    UserPicture,
   },
   setup(props) {
     const ready = ref(false);
     const projectsLoaded = ref(false);
     const user = ref<User.FetchResult>({
-      email: "",
-      age: 0,
+      name: "",
       followers: 0,
-      bio: "",
       projectCount: 0,
       projects: [],
     });

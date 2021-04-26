@@ -6,13 +6,9 @@
           <router-link
             :to="{ name: 'User', params: { userName: commit.author } }"
             class="uk-margin-small-right"
+            :uk-tooltip="`title: ${commit.author}; pos: bottom`"
           >
-            <img
-              :src="`https://picsum.photos/seed/${commit.author}/200/300`"
-              :alt="commit.author"
-              :uk-tooltip="`title: ${commit.author}; pos: bottom`"
-              class="rounded"
-            />
+            <UserPicture :user="commit.publisher" :size="2" />
           </router-link>
           <strong>{{ commit.author }}</strong> {{ commit.message }}
         </div>
@@ -29,6 +25,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
+import UserPicture from "@/components/User/UserPicture.vue"
 import * as Branch from "@/api/branch";
 import * as Commit from "@/api/commit";
 import { notFound } from "@/app/routes";
@@ -41,13 +38,18 @@ export default defineComponent({
     commitID: String,
     branch: Object as () => Branch.FetchResult,
   },
+  components: {
+    UserPicture
+  },
   setup(props) {
     const page = reactive({
       ready: false,
     });
     const commit = ref<Commit.FetchResult>({
       createdAt: new Date(),
-      author: "",
+      publisher: {
+        name: ""
+      },
       message: "",
       files: [],
     });
@@ -76,14 +78,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-img {
-  &.rounded {
-    object-fit: cover;
-    border-radius: 50%;
-    height: 30px;
-    width: 30px;
-  }
-}
-</style>

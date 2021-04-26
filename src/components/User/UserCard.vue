@@ -4,23 +4,19 @@
       <div class="uk-card uk-card-default uk-card-hover">
         <span
           uk-icon="icon: star"
-          :uk-tooltip="` ${followers} amis`"
+          :uk-tooltip="` ${user.followers} amis`"
           class="uk-position-top-right uk-margin-small-top uk-margin-small-right"
         >
         </span>
-        <img
-          :src="`https://picsum.photos/seed/${userName}/100/100`"
-          :alt="userName"
-          class="rounded uk-margin-medium-top"
-        />
+        <UserPicture :user="user" :size="7" />
         <div class="uk-card-body">
           <router-link
-            :to="{ name: 'User', params: { userName } }"
+            :to="{ name: 'User', params: { userName: user.name } }"
             uk-margin
             class="uk-button uk-button-default"
             uk-tooltip="Voir le profil"
           >
-            {{ userName }}
+            {{ user.name }}
           </router-link>
         </div>
       </div>
@@ -30,12 +26,16 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import * as User from "@/api/user"
+import UserPicture from "./UserPicture.vue"
 
 export default defineComponent({
   props: {
-    userName: String,
-    followers: Number,
+    user: Object as () => User.AllResult
   },
+  components: {
+    UserPicture
+  }
 });
 </script>
 

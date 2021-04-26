@@ -27,11 +27,11 @@
                 userName,
                 projectName,
                 branchName,
-                commitID: file.commitID,
+                commitID: file.id,
               },
             }"
           >
-            {{ file.commitMessage }}
+            {{ file.message }}
           </router-link>
         </td>
         <td class="uk-text-nowrap">{{ file.createdAt.toLocaleString() }}</td>

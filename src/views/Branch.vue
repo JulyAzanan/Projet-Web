@@ -70,14 +70,9 @@
             Contributeurs
           </h4>
           <ul class="uk-grid-small uk-flex-middle" uk-grid>
-            <li v-for="name in project.contributors" :key="name">
-              <router-link :to="{ name: 'User', params: { userName: name } }">
-                <img
-                  :src="`https://picsum.photos/seed/${name}/200/300`"
-                  :alt="name"
-                  :uk-tooltip="`title: ${name}; pos: bottom`"
-                  class="rounded"
-                />
+            <li v-for="user in project.contributors" :key="user.name">
+              <router-link :to="{ name: 'User', params: { userName: user.name } }" :uk-tooltip="`title: ${user.name}; pos: bottom`">
+                <UserPicture :user="user" :size="3" />
               </router-link>
             </li>
           </ul>
@@ -94,6 +89,7 @@ import { onBeforeRouteUpdate } from "vue-router";
 import * as Project from "@/api/project";
 import * as Branch from "@/api/branch";
 import router, { notFound } from "@/app/routes";
+import UserPicture from "@/components/User/UserPicture.vue"
 
 export default defineComponent({
   props: {
@@ -101,6 +97,9 @@ export default defineComponent({
     projectName: String,
     branchName: String,
     project: Object as () => Project.FetchResult,
+  },
+  components: {
+    UserPicture
   },
   setup(props) {
     const page = reactive({
@@ -164,14 +163,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-img {
-  &.rounded {
-    object-fit: cover;
-    border-radius: 50%;
-    height: 50px;
-    width: 50px;
-  }
-}
-</style>

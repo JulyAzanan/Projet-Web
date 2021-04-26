@@ -105,7 +105,7 @@ function fetchAll($first, $after, $user)
 {
     check_not_null($user);
     $bd = connect();
-    $stmt = $bd->prepare("SELECT name, picture, bio, (SELECT COUNT(ff.followingName) FROM friend ff WHERE ff.followingName = name) AS fcount
+    $stmt = $bd->prepare("SELECT name, picture, bio, email, age, latestCommit, (SELECT COUNT(ff.followingName) FROM friend ff WHERE ff.followingName = name) AS followers
     FROM musician JOIN friend f ON f.followerName = :user
     LIMIT :number_to_show OFFSET :offset ");
     $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
@@ -118,10 +118,13 @@ function fetchAll($first, $after, $user)
     $res = [];
     foreach ($stmt->fetchAll() as $row) {
         $res[] = (object) [
-            'name' => $row['name'],
-            'picture' => $row['picture'],
-            'bio' => $row['bio'],
-            'followers' => $row['fcount'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'latestCommit' => $user['latestcommit'],
+            'age' => $user['age'],
+            'bio' => $user['bio'],
+            'picture' => $user['picture'],
+            'followers' => $user['followers'],
         ];
     }
     return $res;
