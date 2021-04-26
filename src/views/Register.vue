@@ -9,10 +9,12 @@
             <input
               v-model="userName"
               class="uk-input"
+              :class="{ 'uk-form-danger': invalidUser }"
               type="text"
               placeholder="Nom d'utilisateur"
               required
               autofocus
+              @input="checkUser"
             />
           </div>
         </div>
@@ -36,6 +38,8 @@
             <input
               v-model="email"
               class="uk-input"
+              :class="{ 'uk-form-danger': invalidEmail }"
+              @input="checkEmail"
               type="email"
               placeholder="Email"
             />
@@ -59,7 +63,8 @@
         <div class="uk-width-auto">
           <button
             @click="register"
-            class="uk-button uk-button-default uk-width-1-1"
+            class="uk-button uk-button-primary uk-width-1-1"
+            :disabled="invalidUser || invalidEmail"
           >
             Créer un compte
           </button>
@@ -75,6 +80,7 @@ import store from "@/app/store";
 import router from "@/app/routes";
 import { notifyWarning } from "@/utils/notification";
 import * as User from "@/api/user";
+import debounce from "@/utils/debounce";
 
 export default defineComponent({
   props: {
@@ -85,6 +91,8 @@ export default defineComponent({
     const password = ref("");
     const email = ref("");
     const age = ref("");
+    const invalidUser = ref(false);
+    const invalidEmail = ref(false);
 
     async function register() {
       if (userName.value === "" || password.value === "") return;
@@ -110,7 +118,28 @@ export default defineComponent({
       }
     }
 
-    return { userName, password, email, age, register };
+    async function userExists() {
+      invalidUser.value = await User.find(userName.value);
+    }
+
+    async function emailExists() {
+      invalidEmail.value = await User.findByEmail(email.value);
+    }
+
+    const checkUser = debounce(userExists, 500);
+    const checkEmail = debounce(emailExists, 500);
+
+    return {
+      userName,
+      password,
+      email,
+      age,
+      register,
+      invalidUser,
+      invalidEmail,
+      checkUser,
+      checkEmail,
+    };
   },
 });
 </script>

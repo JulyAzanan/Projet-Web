@@ -12,6 +12,10 @@
                   accept="image/x-png,image/gif,image/jpeg"
                 />
                 <UserPicture :user="user" :size="15" />
+                <a
+                  class="uk-position-absolute uk-transform-center edit-marker"
+                  uk-marker
+                ></a>
               </div>
             </div>
             <h2 class="uk-text-center">
@@ -25,6 +29,8 @@
                   <div class="uk-form-controls">
                     <input
                       v-model="user.email"
+                      @input="checkEmail"
+                      :class="{ 'uk-form-danger': invalidEmail }"
                       class="uk-input uk-form-width-large"
                       id="form-h-text"
                       type="email"
@@ -78,11 +84,23 @@
                 <div class="uk-margin">
                   <div class="uk-form-controls">
                     <button
-                      @click="update"
-                      class="uk-button uk-button-default uk-width-1-1"
+                      @click="updateAccount"
+                      class="uk-button uk-button-primary uk-width-1-1"
+                      :disabled="invalidEmail"
                     >
                       Mettre à jour
                     </button>
+                  </div>
+                </div>
+
+                <div class="uk-margin">
+                  <div class="uk-form-controls">
+                    <a
+                      class="uk-button uk-button-danger uk-width-1-1"
+                      href="#delete-account"
+                      uk-toggle
+                      >Supprimer le compte</a
+                    >
                   </div>
                 </div>
               </form>
@@ -112,6 +130,28 @@
         </div>
       </div>
     </div>
+    <div id="delete-account" uk-modal>
+      <div class="uk-modal-dialog uk-modal-body">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <h2 class="uk-modal-title">Attention</h2>
+        <p>
+          Vous êtes sur le point de supprimer votre compte.
+          Cette action est irréversible, êtes vous sûr de vouloir poursuivre ?
+        </p>
+        <p class="uk-text-right">
+          <button
+            class="uk-button uk-button-default uk-modal-close uk-margin-small-right"
+            type="button"
+          >
+            Annuler
+          </button>
+          <button class="uk-button uk-button-danger uk-modal-close" type="button" @click="deleteAccount">
+            Supprimer le compte
+          </button>
+        </p>
+
+      </div>
+    </div>
   </div>
 </template>
 
@@ -124,6 +164,7 @@ import Pagination from "@/components/Pagination.vue";
 import UserCard from "@/components/User/UserCard.vue";
 import store from "@/app/store";
 import router, { notFound } from "@/app/routes";
+import debounce from "@/utils/debounce";
 
 export default defineComponent({
   props: {
@@ -149,6 +190,7 @@ export default defineComponent({
     });
     const pages = ref(0);
     const newPassword = ref<string | null>("");
+    const invalidEmail = ref(false);
 
     watch(
       () => props.page,
@@ -200,7 +242,7 @@ export default defineComponent({
       };
     }
 
-    async function update() {
+    async function updateAccount() {
       return User.edit(store.state.user, {
         email: user.value.email,
         age: user.value.age,
@@ -208,6 +250,20 @@ export default defineComponent({
         password: newPassword.value === "" ? null : newPassword.value,
       });
     }
+    async function deleteAccount() {
+      await User.remove(store.state.user);
+      store.commit("logout");
+    }
+
+    async function emailExists() {
+      if (user.value.email) {
+        invalidEmail.value = await User.findByEmail(user.value.email);
+      } else {
+        invalidEmail.value = false;
+      }
+    }
+
+    const checkEmail = debounce(emailExists, 500);
 
     init();
 
@@ -218,7 +274,10 @@ export default defineComponent({
       pages,
       changePicture,
       newPassword,
-      update,
+      updateAccount,
+      deleteAccount,
+      checkEmail,
+      invalidEmail,
     };
   },
 });
@@ -228,7 +287,13 @@ export default defineComponent({
 .uk-form-label {
   width: auto;
 }
+
 .uk-form-controls {
   margin-left: 8em;
+}
+
+.edit-marker {
+  right: 5%;
+  bottom: 0%;
 }
 </style>

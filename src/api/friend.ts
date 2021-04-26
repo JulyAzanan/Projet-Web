@@ -4,7 +4,7 @@ import * as Request from "../utils/request"
 
 export const friendPerPage = 6;
 
-export async function add(follower: string, following: string) {
+export async function add(follower: string, following: string): Promise<boolean> {
   await sleep(500);
   return true;
   // 
@@ -16,7 +16,7 @@ export async function add(follower: string, following: string) {
   return Request.exception(response);
 }
 
-export async function remove(follower: string, following: string) {
+export async function remove(follower: string, following: string): Promise<boolean> {
   await sleep(500);
   return true;
   // 

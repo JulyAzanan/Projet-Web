@@ -46,6 +46,7 @@ export default defineComponent({
       ready: false,
     });
     const commit = ref<Commit.FetchResult>({
+      id: "",
       createdAt: new Date(),
       publisher: {
         name: ""

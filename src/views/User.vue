@@ -4,13 +4,43 @@
       <div uk-grid class="uk-margin-medium-bottom">
         <div class="uk-width-1-3@s uk-margin-large-top" uk-first-column>
           <div v-if="ready">
-            <h2>Profil de {{ userName }}</h2>
-            <UserPicture :user="user" :size="12" />
-            <div>
-              <button class="uk-button uk-button-text buttonNormalText">
-                <span class="uk-margin-small-right" uk-icon="icon: star"></span>
-                {{ user.followers }} abonnés
+            <div class="uk-text-center">
+              <UserPicture :user="user" :size="15" />
+              <h2>
+                {{ userName }}
+              </h2>
+              <button
+                v-if="following"
+                class="uk-button uk-button-danger"
+                @click="unfollow"
+              >
+                <span
+                  class="uk-margin-small-right"
+                  uk-icon="icon: heart"
+                  :disabled="store.state.loggedIn"
+                ></span>
+                Se désabonner
               </button>
+              <button v-else class="uk-button uk-button-danger" @click="follow">
+                <span
+                  class="uk-margin-small-right"
+                  uk-icon="icon: heart"
+                  :disabled="store.state.loggedIn"
+                ></span>
+                S'abonner
+              </button>
+              <button
+                class="uk-button uk-button-default uk-margin-small-left"
+                @click="support"
+              >
+                <span class="uk-margin-small-right" uk-icon="icon: star"></span>
+                Soutenir
+              </button>
+            </div>
+            <hr class="uk-divider-icon" />
+            <div>
+              <span class="uk-margin-small-right" uk-icon="icon: star"></span>
+              {{ user.followers }} abonnés
             </div>
             <div v-if="user.email">
               <span class="uk-margin-small-right" uk-icon="icon: mail"> </span>
@@ -23,7 +53,6 @@
               ></span>
               {{ user.age }} ans
             </div>
-            <hr class="uk-divider-icon uk-margin-large-right" />
             <p>{{ user.bio }}</p>
           </div>
           <div v-else uk-spinner></div>
@@ -58,12 +87,15 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch } from "vue";
+import supportEvent from "canvas-confetti";
 import * as User from "@/api/user";
 import * as Project from "@/api/project";
+import * as Friend from "@/api/friend";
 import ProjectCard from "@/components/User/ProjectCard.vue";
 import Pagination from "@/components/Pagination.vue";
 import UserPicture from "@/components/User/UserPicture.vue";
 import router, { notFound } from "@/app/routes";
+import store from "@/app/store";
 
 export default defineComponent({
   props: {
@@ -85,6 +117,7 @@ export default defineComponent({
       projects: [],
     });
     const pages = ref(0);
+    const following = ref(false);
 
     watch(
       () => props.page,
@@ -111,12 +144,46 @@ export default defineComponent({
         router.replace({ query: { page: "1" } });
       }
       pages.value = Math.ceil(result.projectCount / Project.perPage);
+      if (store.state.loggedIn) {
+        following.value = await Friend.isFriend(
+          store.state.user,
+          user.value.name
+        );
+      }
       projectsLoaded.value = true;
       ready.value = true;
     }
 
+    async function follow() {
+      await Friend.add(store.state.user, user.value.name);
+      following.value = true;
+    }
+
+    async function unfollow() {
+      await Friend.remove(store.state.user, user.value.name);
+      following.value = false;
+    }
+
+    function support() {
+      supportEvent({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.7 },
+      });
+    }
+
     init();
-    return { ready, user, projectsLoaded, pages };
+    return {
+      ready,
+      user,
+      projectsLoaded,
+      pages,
+      follow,
+      unfollow,
+      store,
+      following,
+      support,
+    };
   },
 });
 </script>
