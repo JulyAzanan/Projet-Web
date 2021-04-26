@@ -4,100 +4,89 @@
       <div uk-grid class="uk-margin-medium-bottom">
         <div class="uk-width-1-3@s uk-margin-medium-right">
           <div v-if="ready">
+            <div class="uk-text-center">
+              <div uk-form-custom>
+                <input
+                  @change="changePicture"
+                  type="file"
+                  accept="image/x-png,image/gif,image/jpeg"
+                />
+                <UserPicture :user="user" :size="15" />
+              </div>
+            </div>
             <h2 class="uk-text-center">
-              Modifier les informations de mon profil
-            </h2>
-            <div uk-form-custom>
-              <input
-                @change="changePicture"
-                type="file"
-                accept="image/x-png,image/gif,image/jpeg"
-              />
-              <UserPicture :user="user" :size="15" />
-            </div>
-            <div>
-              <span class="uk-margin-small-right" uk-icon="icon: user"></span>
               {{ user.name }}
-            </div>
-            <!-- TODO : afficher une liste des amis quand on clique sur le bouton -->
-            <div>
-              <!-- v-on:click="modifyEmail = !modifyEmail" -->
-              <button
-                class="uk-button uk-button-text buttonNormalText"
-                v-if="user.email"
-                uk-tooltip="title: Modifier mon adresse email.; pos: top"
-              >
-                <span class="uk-margin-small-right" uk-icon="icon: mail"></span>
-                Email actuel : {{ user.email }}
-              </button>
-              <!-- <div v-if="!user.email || modifyEmail">
-                <div class="uk-inline">
-                  <button
-                    class="uk-form-icon"
-                    uk-icon="icon: pencil"
-                    v-on:click="changeMail()"
-                  ></button>
-                  <input
-                    class="uk-input"
-                    type="email"
-                    placeholder="Entrer une adresse mail"
-                  />
-                </div>
-              </div> -->
-            </div>
+            </h2>
             <hr class="uk-divider-icon" />
             <div>
-              <!-- v-on:click="modifyAge = !modifyAge" -->
-              <button
-                v-if="user.age > 0"
-                class="uk-button uk-button-text buttonNormalText"
-                uk-tooltip="title: Modifier mon âge.; pos: top"
-              >
-                <span
-                  class="uk-margin-small-right"
-                  uk-icon="icon: calendar"
-                ></span>
-                {{ user.age }} ans
-              </button>
-              <!-- <div v-if="!user.age || modifyAge">
-                <div class="uk-inline">
-                  <button
-                    class="uk-form-icon"
-                    href="#"
-                    uk-icon="icon: pencil"
-                  ></button>
-                  <input
-                    class="uk-input"
-                    type="text"
-                    placeholder="Entrez votre âge."
-                  />
+              <form class="uk-form-horizontal">
+                <div class="uk-margin">
+                  <label class="uk-form-label" for="form-h-text">Email</label>
+                  <div class="uk-form-controls">
+                    <input
+                      v-model="user.email"
+                      class="uk-input uk-form-width-large"
+                      id="form-h-text"
+                      type="email"
+                      autofocus
+                      placeholder="email@example.com"
+                    />
+                  </div>
                 </div>
-              </div> -->
+
+                <div class="uk-margin">
+                  <label class="uk-form-label" for="form-h-text">Age</label>
+                  <div class="uk-form-controls">
+                    <input
+                      v-model="user.age"
+                      class="uk-input uk-form-width-large"
+                      id="form-h-text"
+                      type="number"
+                      placeholder="42"
+                    />
+                  </div>
+                </div>
+
+                <div class="uk-margin">
+                  <label class="uk-form-label" for="form-h-textarea">Bio</label>
+                  <div class="uk-form-controls">
+                    <textarea
+                      v-model="user.bio"
+                      class="uk-textarea uk-form-width-large"
+                      id="form-h-textarea"
+                      rows="5"
+                      placeholder="Quelques mots..."
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div class="uk-margin">
+                  <label class="uk-form-label" for="form-h-text"
+                    >Mot de passe</label
+                  >
+                  <div class="uk-form-controls">
+                    <input
+                      v-model="newPassword"
+                      class="uk-input uk-form-width-large"
+                      id="form-h-text"
+                      type="password"
+                      placeholder="Nouveau mot de passe"
+                    />
+                  </div>
+                </div>
+
+                <div class="uk-margin">
+                  <div class="uk-form-controls">
+                    <button
+                      @click="update"
+                      class="uk-button uk-button-default uk-width-1-1"
+                    >
+                      Mettre à jour
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
-            <!-- v-on:click="modifyPassword = !modifyPassword" -->
-            <button
-              v-if="user.age > 0"
-              class="uk-button uk-button-text buttonNormalText"
-            >
-              Modifier mon mot de passe
-            </button>
-            <!-- <div v-if="modifyPassword" class="uk-margin-small-top">
-              <input
-                class="uk-input"
-                type="password"
-                placeholder="Ancien mot de passe."
-                required
-              />
-              <input
-                class="uk-input"
-                type="password"
-                placeholder="Nouveau mot de passe."
-                required
-              />
-              <button class="uk-button uk-button-default buttonNormalText">
-                Confirmer
-              </button>
-            </div> -->
           </div>
           <div v-else uk-spinner></div>
         </div>
@@ -159,6 +148,7 @@ export default defineComponent({
       followingCount: 0,
     });
     const pages = ref(0);
+    const newPassword = ref<string | null>("");
 
     watch(
       () => props.page,
@@ -205,9 +195,18 @@ export default defineComponent({
         const content = reader.result as string;
         await User.update(store.state.user, {
           picture: content,
-        })
+        });
         user.value.picture = content;
-      }
+      };
+    }
+
+    async function update() {
+      return User.update(store.state.user, {
+        email: user.value.email,
+        age: user.value.age,
+        bio: user.value.bio,
+        password: newPassword.value === "" ? null : newPassword.value,
+      });
     }
 
     init();
@@ -218,7 +217,18 @@ export default defineComponent({
       friendLoaded,
       pages,
       changePicture,
+      newPassword,
+      update,
     };
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.uk-form-label {
+  width: auto;
+}
+.uk-form-controls {
+  margin-left: 8em;
+}
+</style>

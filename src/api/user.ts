@@ -61,11 +61,11 @@ export async function remove(user: string): Promise<boolean> {
 }
 
 export interface UpdateInput {
-  password?: string,
-  email?: string,
-  age?: number,
-  bio?: string,
-  picture?: string,
+  password?: string | null,
+  email?: string | null,
+  age?: number | null,
+  bio?: string | null,
+  picture?: string | null,
 }
 
 export async function update(user: string, content: UpdateInput): Promise<boolean> {
