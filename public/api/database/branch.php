@@ -3,6 +3,7 @@
 namespace Branch;
 
 include_once __DIR__ . "/config.php";
+include_once __DIR__ . "/commit.php";
 include_once __DIR__ . "/../utils/args.php";
 include_once __DIR__ . "/../utils/updateAt.php";
 /**
@@ -183,7 +184,7 @@ function find($author, $project, $branch, $loggedUser)
         PDO_error();
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
-    if ($res['name'] === null) {
+    if ($stmt->rowCount() === 0) {
         return null;
     }
     $br = (object) [
@@ -236,7 +237,14 @@ function fetchAll($author, $project, $loggedUser)
         ];
     }
     return $branchs;
+}
 
+function getBranch($author, $project, $branch, $loggedUser) {
+    check_not_null($author, $project, $branch);
+    $branchInfo = find($author, $project, $branch, $loggedUser);
+    $branchInfo->commitsCount = \Commit\count($author, $project, $branch, $loggedUser);
+    $branchInfo->lastCommit = \Commit\getLatest($author, $project, $branch, $loggedUser);
+    return $branchInfo;
 }
 /**
  * Count the number of branches for a given project

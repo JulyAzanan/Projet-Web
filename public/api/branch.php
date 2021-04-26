@@ -22,7 +22,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
                 case 'find':
                     $user = auth();
-                    echo json_encode(\Branch\find($_GET['user'], $_GET['project'], $_GET['branch'], $user));
+                    echo json_encode(\Branch\find($_GET['user'], $_GET['project'], $_GET['branch'], $user) !== null);
+                    break;
+
+                case 'getBranch':
+                    $user = auth();
+                    echo json_encode(\Branch\getBranch($_GET['user'], $_GET['project'], $_GET['branch'], $user));
                     break;
 
                 default:

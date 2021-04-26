@@ -72,6 +72,41 @@ function add($author, $project, $branch, $partition, $commit, $content, $loggedU
  *
  * An array-like object that contain all the partition(name + content) of the requested commit
  */
+function download($author, $project, $branch, $commit, $loggedUser)
+{
+    // Gérer cas projets privés et publics --Should be done
+    check_not_null($author, $project, $branch, $commit);
+    if (!check_branch_exist($author, $project, $branch)) {
+        branch_error();
+    }
+    $sql = "SELECT DISTINCT ON(p.name) p.name, c.createdAt, p.content FROM partition p JOIN commit c
+    ON p.commitID = c.id AND p.authorName = c.authorName AND p.branchName = c.branchName AND p.projectName = c.projectName
+    JOIN project pp ON pp.name = p.projectName AND pp.authorName = p.authorName
+    WHERE p.authorName = :authorName AND p.projectName = :projectName AND p.branchName = :branchName AND c.createdAt <= (SELECT cc.createdAt FROM commit cc WHERE cc.authorName = :authorName AND cc.projectName = :projectName AND cc.branchName = :branchName AND cc.id = :id)
+    AND ( pp.private = 'f' OR :loggedUser IN (SELECT ccc.contributorName FROM contributor ccc WHERE ccc.projectName = p.projectName AND ccc.authorName = p.authorName) OR p.authorName = :loggedUser OR :loggedUser = 'admin' )
+    ORDER BY p.name ASC, c.createdAt DESC";
+
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    // ($first, $after, $author, $project, $commit, $loggedUser)
+    $stmt->bindValue(':projectName', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':authorName', $author, \PDO::PARAM_STR);
+    $stmt->bindValue(':branchName', $branch, \PDO::PARAM_STR);
+    $stmt->bindValue(':id', $commit, \PDO::PARAM_STR);
+    $stmt->bindValue(':loggedUser', $loggedUser, \PDO::PARAM_STR);
+    if (!$stmt->execute()) {
+        //Request encoutered an error, aborting
+        PDO_error();
+    }
+    foreach ($stmt->fetchAll() as $partition) {
+        $partitions[] = (object) [
+            'name' => $partition['name'],
+            'content' => $partition['content'],
+        ];
+    }
+    return $partitions;
+}
+
 function fetchAll($author, $project, $branch, $commit, $loggedUser)
 {
     // Gérer cas projets privés et publics --Should be done
@@ -79,7 +114,7 @@ function fetchAll($author, $project, $branch, $commit, $loggedUser)
     if (!check_branch_exist($author, $project, $branch)) {
         branch_error();
     }
-    $sql = "SELECT DISTINCT ON(p.name) p.name, c.id, c.createdAt, p.content FROM partition p JOIN commit c
+    $sql = "SELECT DISTINCT ON(p.name) p.name, c.id, c.message, c.createdAt FROM partition p JOIN commit c
     ON p.commitID = c.id AND p.authorName = c.authorName AND p.branchName = c.branchName AND p.projectName = c.projectName
     JOIN project pp ON pp.name = p.projectName AND pp.authorName = p.authorName
     WHERE p.authorName = :authorName AND p.projectName = :projectName AND p.branchName = :branchName AND c.createdAt <= (SELECT cc.createdAt FROM commit cc WHERE cc.authorName = :authorName AND cc.projectName = :projectName AND cc.branchName = :branchName AND cc.id = :id)
@@ -102,8 +137,8 @@ function fetchAll($author, $project, $branch, $commit, $loggedUser)
         $partitions[] = (object) [
             'name' => $partition['name'],
             'id' => $partition['id'],
+            'message' => $partition['message'],
             'createdAt' => $partition['createdat'],
-            'content' => $partition['content'],
         ];
     }
     return $partitions;
@@ -155,4 +190,36 @@ function count($author, $project, $branch, $commit, $loggedUser)
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
     return $res['count'];
+}
+
+function getPartition($author, $project, $branch, $commit, $partition, $loggedUser)
+{
+    check_not_null($author, $project, $branch, $commit, $partition);
+
+    $sql = "SELECT p.name, p.content FROM partition p JOIN project pp
+    ON pp.name = p.projectName AND pp.authorName = p.authorName
+    WHERE p.name = :partition AND p.commitID = :commit AND p.branchName = :branch AND p.projectName = :project AND p.authorName = :author
+    AND ( pp.private = 'f' OR :loggedUser IN (SELECT ccc.contributorName FROM contributor ccc WHERE ccc.projectName = p.projectName AND ccc.authorName = p.authorName) OR p.authorName = :loggedUser OR :loggedUser = 'admin' )  ";
+
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    // ($first, $after, $author, $project, $commit, $loggedUser)
+    $stmt->bindValue(':project', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':partition', $partition, \PDO::PARAM_STR);
+    $stmt->bindValue(':author', $author, \PDO::PARAM_STR);
+    $stmt->bindValue(':branch', $branch, \PDO::PARAM_STR);
+    $stmt->bindValue(':commit', $commit, \PDO::PARAM_STR);
+    $stmt->bindValue(':loggedUser', $loggedUser, \PDO::PARAM_STR);
+    if (!$stmt->execute()) {
+        //Request encoutered an error, aborting
+        PDO_error();
+    }
+    $res = $stmt->fetch(\PDO::FETCH_ASSOC);
+    if ($stmt->rowCount() === 0) {
+        return null;
+    }
+    return (object) [
+        'name' => $res['name'],
+        'content' => $res['content'],
+    ];
 }

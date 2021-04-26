@@ -15,6 +15,16 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     echo json_encode(\Partition\count($_GET['user'], $_GET['project'], $_GET['branch'], $_GET['commit'], $user));
                     break;
 
+                case 'fetchAll':
+                    $user = auth();
+                    echo json_encode(\Partition\fetchAll($_GET['user'], $_GET['project'], $_GET['branch'], $_GET['commit'], $user));
+                    break;
+
+                case 'getPartition':
+                    $user = auth();
+                    echo json_encode(\Partition\getPartition($_GET['user'], $_GET['project'], $_GET['branch'], $_GET['commit'], $_GET['partition'], $user));
+                    break;
+
                 default:
                     query_error();
             }

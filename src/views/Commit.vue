@@ -56,9 +56,9 @@ export default defineComponent({
 
     async function init() {
       const result = await Commit.fetch(
-        props.userName,
-        props.projectName,
-        props.branchName,
+        props.userName!,
+        props.projectName!,
+        props.branchName!,
         props.commitID
       );
       if (result === null) return notFound();

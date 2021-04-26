@@ -333,7 +333,7 @@ function seek($first, $after, $project, $loggedUser)
         arg_error();
     }
 
-    $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private
+    $sql = "SELECT COUNT(*), name, updatedAt, createdAt, description, p.authorName, private
     FROM project p
     WHERE p.name LIKE :projectname
     AND ( p.private = 'f' OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName) OR p.authorName = :contributorname OR :contributorname = 'admin' )
@@ -350,7 +350,8 @@ function seek($first, $after, $project, $loggedUser)
         PDO_error();
     }
     $projects = [];
-    foreach ($stmt->fetchAll() as $project) {
+    $res = $stmt->fetchAll();
+    foreach ($res as $project) {
         $projects[] = (object) [
             'name' => $project['name'],
             'authorName' => $project['authorName'],
@@ -360,9 +361,11 @@ function seek($first, $after, $project, $loggedUser)
             'private' => $project['private'],
         ];
     }
-    return $projects;
 
-    // Gérer cas projets privés et publics
+    return (object) [
+        'results' => $projects,
+        'count' => $stmt->rowCount() > 0 ? $res[0]['count'] : 0,
+    ];
 }
 
 function find($user, $project, $loggedUser)
@@ -383,7 +386,7 @@ function find($user, $project, $loggedUser)
         PDO_error();
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
-    if ($res['name'] === null) {
+    if ($stmt->rowCount() === 0) {
         return null;
     }
     $proj = (object) [

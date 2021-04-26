@@ -1,5 +1,4 @@
 import sleep from "./sleep";
-import { Nil } from "./types"
 import * as User from "./user"
 import * as Branch from "./branch"
 import * as Request from "../utils/request"
@@ -73,6 +72,7 @@ export async function add(user: string, project: string, isPrivate: boolean, des
 
 export async function remove(user: string, project: string): Promise<void> {
   await sleep(500);
+  return;
   //
   const response = await Request.delete_("api/project.php", {
     user, project

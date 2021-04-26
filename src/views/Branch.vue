@@ -127,8 +127,8 @@ export default defineComponent({
 
     async function init() {
       const result = await Branch.fetch(
-        props.userName,
-        props.projectName,
+        props.userName!,
+        props.projectName!,
         props.branchName
       );
       if (result === null) return notFound();

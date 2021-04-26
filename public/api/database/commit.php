@@ -96,10 +96,35 @@ WHERE p.authorName = :authorName AND p.projectName = :projectName AND p.branchNa
 ORDER BY p.name ASC, c.createdAt DESC; */
 }
 
+function getLatest($author, $project, $branch, $loggedUser) {
+    check_not_null($author, $project, $branch);
+
+    $sql = "SELECT id FROM commit c JOIN project p 
+    ON p.name = c.projectName AND p.authorName = c.authorName
+    WHERE c.authorName = :authorName AND c.projectName = :projectName AND c.branchName = :branchName
+    AND (p.private = 'f' OR :loggedUser IN (SELECT cc.contributorName FROM contributor cc WHERE cc.projectName = c.projectName AND cc.authorName = c.authorName) OR c.authorName = :loggedUser OR :loggedUser = 'admin' )
+    ORDER BY c.createdAt DESC
+    LIMIT 1 OFFSET 0";
+
+    $bd = connect();
+    $stmt = $bd->prepare($sql);
+    // ($first, $after, $author, $project, $commit, $loggedUser)
+    $stmt->bindValue(':projectName', $project, \PDO::PARAM_STR);
+    $stmt->bindValue(':authorName', $author, \PDO::PARAM_STR);
+    $stmt->bindValue(':branchName', $branch, \PDO::PARAM_STR);
+    $stmt->bindValue(':loggedUser', $loggedUser, \PDO::PARAM_STR);
+    if (!$stmt->execute()) {
+        //Request encoutered an error, aborting
+        PDO_error();
+    }
+    $res = $stmt->fetch(\PDO::FETCH_ASSOC);
+    return $stmt->rowCount() == 0 ? null : $res['id'];
+}
+
 function getCommit($author, $project, $branch, $commit, $loggedUser)
 {
     $commitInfo = find($author, $project, $branch, $commit, $loggedUser);
-    $commitInfo->partitions = \Partition\fetchAll($author, $project, $branch, $commit, $loggedUser);
+    $commitInfo->files = \Partition\fetchAll($author, $project, $branch, $commit, $loggedUser);
     $commitInfo->publisher = \User\find($commitInfo->publisherName);
     return $commitInfo;
 }
@@ -155,7 +180,7 @@ function fetchAll($author, $project, $branch, $loggedUser)
             'id' => $commit['id'],
             'createdAt' => $commit['createdat'],
             'message' => $commit['message'],
-            'publisherName' => $commit['publishername'],
+            'publisher' => $commit['publishername'],
         ];
     }
     return $commits;
@@ -187,7 +212,7 @@ function find($author, $project, $branch, $commit, $loggedUser)
         PDO_error();
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
-    if ($res['id'] === null) {
+    if ($stmt->rowCount() === 0) {
         return null;
     }
     $c = (object) [

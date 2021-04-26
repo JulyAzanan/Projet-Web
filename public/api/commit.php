@@ -30,6 +30,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     echo json_encode(\Commit\getCommit($_GET['user'], $_GET['project'], $_GET['branch'], $_GET['commit'], $user));
                     break;
 
+                case 'download':
+                    $user = auth();
+                    echo json_encode(\Commit\download($_GET['user'], $_GET['project'], $_GET['branch'], $_GET['commit'], $user));
+                    break;
+
                 default:
                     query_error();
             }

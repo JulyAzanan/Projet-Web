@@ -177,7 +177,7 @@ function findByEmail($email)
         PDO_error();
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
-    if ($res['user'] === null) {
+    if ($stmt->rowCount() === 0) {
         return null;
     }
 
@@ -202,7 +202,7 @@ function find($user)
         PDO_error();
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
-    if ($res['name'] === null) {
+    if ($stmt->rowCount() === 0) {
         return null;
     }
     $user = (object) [
@@ -228,4 +228,38 @@ function auth($user, $password)
     }
     $passwordHash = $stmt->fetch()[0];
     return hash_equals($passwordHash, $hash);
+}
+
+function seek($user, $first, $after) {
+    check_not_null($user);
+
+    $stmt = $bd->prepare("SELECT COUNT(*), name, email, latestCommit, age, bio, picture, (SELECT COUNT(followingName) FROM friend WHERE followingName = name) AS followers 
+    FROM musician GROUP BY name WHERE name LIKE :name LIMIT :first OFFSET :after");
+    
+    $stmt->bindValue(':name', "%".$user."%", \PDO::PARAM_STR);
+    $stmt->bindValue(':first', $first, \PDO::PARAM_INT);
+    $stmt->bindValue(':after', $after, \PDO::PARAM_INT);
+    if (!$stmt->execute()) {
+        //failed to execute query
+        PDO_error();
+    }
+
+    $users = [];
+    $res = $stmt->fetchAll();
+    foreach ($res as $row) {
+        $users[] = (object) [
+            'name' => $row['name'],
+            'email' => $row['email'],
+            'latestCommit' => $row['latestcommit'],
+            'age' => $row['age'],
+            'bio' => $row['bio'],
+            'picture' => $row['picture'],
+            'followers' => $row['followers'],
+        ];
+    }
+
+    return (object) [
+        'results' => $users,
+        'count' => $stmt->rowCount() > 0 ? $res[0]['count'] : 0,
+    ];
 }

@@ -139,7 +139,6 @@ function fetchAll($authorName, $project, $loggedUser)
     if (!check_project_exist($authorName, $project)) {
         project_error();
     }
-    $sql = "";
 
     $sql = "SELECT m.name, m.email, m.latestCommit, m.age, m.bio, m.picture, FROM musician m JOIN contributor c
     ON m.name = c.contributorName

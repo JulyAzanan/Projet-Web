@@ -217,6 +217,45 @@ export async function all(page: number): Promise<AllResult[]> {
    });
 }
 
+export interface SearchResult {
+  results: AllResult[],
+  count: number
+}
+
+export async function search(user: string, project: string, page: number): Promise<SearchResult> {
+  await sleep(500);
+  return {
+    count: 42,
+    results: [{
+      name: "Annie",
+      followers: 36
+    }, {
+      name: "Elaim",
+      followers: 1
+    }, {
+      name: "G perdu",
+      followers: 36
+    }, {
+      name: "Salut",
+      followers: 365
+    }, {
+      name: "Toi",
+      followers: 315
+    }, {
+      name: "Keur",
+      followers: 3615
+    }]
+  };
+  //
+  return Request.json("api/user.php", {
+    q: "seek",
+    user,
+    project,
+    first: perPage,
+    after: perPage * page,
+  })
+}
+
 export async function count(): Promise<number> {
   await sleep(500);
   return 43;
