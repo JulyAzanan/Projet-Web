@@ -23,11 +23,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     break;
 
                 case 'findByEmail':
-                    echo json_encode(\User\findByEmail($_GET['email']));
+                    echo json_encode(\User\findByEmail($_GET['email']) !== null);
                     break;
 
                 case 'find':
-                    echo json_encode(\User\find($_GET['user']));
+                    echo json_encode(\User\find($_GET['user']) !== null);
                     break;
 
                 case 'getUser':

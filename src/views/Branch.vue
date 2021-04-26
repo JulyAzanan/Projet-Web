@@ -11,11 +11,11 @@
               >
                 <option disabled value="">Branche:</option>
                 <option
-                  v-for="name in project.branches"
-                  :key="name"
-                  :value="name"
+                  v-for="branch in project.branches"
+                  :key="branch.name"
+                  :value="branch.name"
                 >
-                  {{ name }}
+                  {{ branch.name }}
                 </option>
               </select>
               <span>
@@ -108,10 +108,10 @@ export default defineComponent({
     });
     const selectedBranch = ref(props.branchName);
     const branch = ref<Branch.FetchResult>({
+      name: "",
       lastCommit: null,
       commitsCount: 0,
       updatedAt: new Date(),
-      createdAt: new Date(),
     });
 
     watch(selectedBranch, async () => {

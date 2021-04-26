@@ -57,7 +57,7 @@ export default defineComponent({
   },
   setup(props) {
     const ready = ref(false);
-    const projects = ref<Project.AllResult[]>([]);
+    const projects = ref<Project.BaseResult[]>([]);
     const pages = ref(0);
 
     watch(() => props.page, load);
@@ -65,10 +65,7 @@ export default defineComponent({
     async function load() {
       ready.value = false;
       const page = parseInt(props.page!);
-      const result = await Project.all(
-        Project.projectPerPage,
-        Project.projectPerPage * page
-      );
+      const result = await Project.all(page);
       projects.value = result;
       if (result.length === 0 && page != 1) {
         router.replace({ query: { page: "1" } });
@@ -78,7 +75,7 @@ export default defineComponent({
 
     async function init() {
       const count = await Project.count();
-      pages.value = Math.ceil(count / Project.projectPerPage);
+      pages.value = Math.ceil(count / Project.perPage);
     }
 
     init().then(load);

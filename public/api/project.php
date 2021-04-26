@@ -30,9 +30,14 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     echo json_encode(\Project\countFromUser($_GET['user'], $user));
                     break;
 
+                case 'getProject':
+                    $user = auth();
+                    echo json_encode(\Project\getProject($_GET['user'], $_GET['project'], $user));
+                    break;
+
                 case 'find':
                     $user = auth();
-                    echo json_encode(\Project\find($_GET['user'], $_GET['project'], $user));
+                    echo json_encode(\Project\find($_GET['user'], $_GET['project'], $user) !== null);
                     break;
 
                 case 'seek':
@@ -69,7 +74,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case "PATCH":
         $data = get_JSON();
         $user = auth();
-        $ok = \Project\update($data->user, $data->project, $data->private, $data->description, $data->mainBranchName, $user);
+        $ok = \Project\update($data->user, $data->project, $data->private, $data->description, $data->mainBranch, $user);
         if (!$ok) {
             PDO_error();
         }

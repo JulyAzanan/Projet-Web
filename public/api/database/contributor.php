@@ -141,7 +141,7 @@ function fetchAll($authorName, $project, $loggedUser)
     }
     $sql = "";
 
-    $sql = "SELECT m.name, m.picture FROM musician m JOIN contributor c
+    $sql = "SELECT m.name, m.email, m.latestCommit, m.age, m.bio, m.picture, FROM musician m JOIN contributor c
     ON m.name = c.contributorName
     JOIN project p
     ON p.name = c.projectName AND p.authorName = c.authorName
@@ -160,6 +160,10 @@ function fetchAll($authorName, $project, $loggedUser)
     foreach ($stmt->fetchAll() as $contributor) {
         $contributors[] = (object) [
             'name' => $contributor['name'],
+            'email' => $contributor['email'],
+            'latestCommit' => $contributor['latestcommit'],
+            'age' => $contributor['age'],
+            'bio' => $contributor['bio'],
             'picture' => $contributor['picture'],
         ];
     }

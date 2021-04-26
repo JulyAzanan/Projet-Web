@@ -92,11 +92,7 @@ export default defineComponent({
         window.scrollTo(0, 0);
         projectsLoaded.value = false;
         const page = parseInt(props.page!);
-        const result = await Project.allOf(
-          props.userName,
-          User.projectPerPage,
-          User.projectPerPage * page
-        );
+        const result = await Project.allOf(props.userName!, page);
         if (result.length === 0 && page != 1) {
           router.replace({ query: { page: "1" } });
         } else {
@@ -108,13 +104,13 @@ export default defineComponent({
 
     async function init() {
       const page = parseInt(props.page!);
-      const result = await User.fetch(props.userName!, page);
+      const result = await User.fetch(props.userName, page);
       if (result === null) return notFound();
       user.value = result;
       if (result.projects.length === 0 && page != 1) {
         router.replace({ query: { page: "1" } });
       }
-      pages.value = Math.ceil(result.projectCount / User.projectPerPage);
+      pages.value = Math.ceil(result.projectCount / Project.perPage);
       projectsLoaded.value = true;
       ready.value = true;
     }

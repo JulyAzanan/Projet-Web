@@ -193,7 +193,7 @@ export default defineComponent({
       reader.readAsDataURL(file);
       reader.onloadend = async () => {
         const content = reader.result as string;
-        await User.update(store.state.user, {
+        await User.edit(store.state.user, {
           picture: content,
         });
         user.value.picture = content;
@@ -201,7 +201,7 @@ export default defineComponent({
     }
 
     async function update() {
-      return User.update(store.state.user, {
+      return User.edit(store.state.user, {
         email: user.value.email,
         age: user.value.age,
         bio: user.value.bio,

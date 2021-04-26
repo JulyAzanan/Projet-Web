@@ -56,6 +56,8 @@ export default defineComponent({
       valid: false,
     });
     const project = ref<Project.FetchResult>({
+      name: "",
+      author: "",
       private: false,
       contributors: [],
       branches: [],
@@ -66,7 +68,7 @@ export default defineComponent({
     });
 
     async function init() {
-      const result = await Project.fetch(props.userName, props.projectName);
+      const result = await Project.fetch(props.userName!, props.projectName);
       if (result === null) return notFound();
       project.value = result;
       if (router.currentRoute.value.name === "Branch-default") {

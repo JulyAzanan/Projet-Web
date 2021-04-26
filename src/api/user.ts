@@ -1,11 +1,9 @@
 import sleep from "./sleep";
-import { Nil, isNil } from "./types"
 import store from "../app/store";
 import * as Project from "./project"
 import * as Request from "../utils/request"
 
-export const projectPerPage = 6;
-export const userPerPage = 15;
+export const perPage = 15;
 
 export interface BaseResult {
   name: string,
@@ -20,25 +18,27 @@ export async function login(user: string, password: string): Promise<boolean> {
   await sleep(500);
   store.commit("login", [user, password]);
   return true;
-  /* store.commit("signIn", [user, password])
+  //
+  store.commit("signIn", [user, password])
   const response = await Request.get("api/user.php?q=login")
   if (response.status === 401) return false;
   if (response.ok) {
     store.commit("login", [user, password]);
     return true;
   }
-  return Request.exception(response); */
+  return Request.exception(response);
 }
 
 export function logout(): void {
   store.commit("logout");
 }
 
-export async function register(user: string, password: string, email: Nil<string>, age: Nil<number>): Promise<boolean> {
+export async function register(user: string, password: string, email: string | null, age: number | null): Promise<boolean> {
   await sleep(500);
   store.commit("login", [user, password]);
   return true;
-  /* const response = await Request.post("api/user.php", {
+  //
+  const response = await Request.post("api/user.php", {
     user, password, email, age
   });
   if (response.ok) {
@@ -46,18 +46,19 @@ export async function register(user: string, password: string, email: Nil<string
     return true;
   }
   if (response.status === 400) return false;
-  return Request.exception(response); */
+  return Request.exception(response);
 }
 
-export async function remove(user: string): Promise<boolean> {
+export async function remove(user: string): Promise<void> {
   await sleep(500);
-  return true;
-  /*   const response = await Request.delete_("api/user.php", { user });
+  return;
+  //
+    const response = await Request.delete_("api/user.php", { user });
     if (response.ok) {
       if (store.state.user === user) logout();
-      return true;
+      return;
     }
-    return Request.exception(response); */
+    return Request.exception(response);
 }
 
 export interface UpdateInput {
@@ -68,48 +69,42 @@ export interface UpdateInput {
   picture?: string | null,
 }
 
-export async function update(user: string, content: UpdateInput): Promise<boolean> {
+export async function edit(user: string, content: UpdateInput): Promise<boolean> {
   await sleep(500);
   return true;
-  /* const response = await Request.patch("api/user.php", {
+  //
+  const response = await Request.patch("api/user.php", {
     user,
+    password: null,
+    email: null,
+    age: null,
+    bio: null,
+    picture: null,
     ...content,
   });
-  if (response.status === 401) return false;
   if (response.ok) return true;
-  return Request.exception(response); */
+  if (response.status === 401) return false;
+  return Request.exception(response);
 }
 
-export async function find(user: Nil<string>): Promise<BaseResult | null> {
-  if (isNil(user)) return null;
-  // 
+export async function find(user: string): Promise<boolean> {
   await sleep(500);
-  return {
-    name: "Steel",
-    email: "turfu@pm.me",
-    age: 56,
-    bio: "Je suis une fleur",
-  }
-  /* return Request.json("api/user.php", {
+  return false;
+  //
+  return Request.json("api/user.php", {
     q: "find",
     user,
-  }) */
+  })
 }
 
-export async function findByEmail(email: Nil<string>): Promise<BaseResult | null> {
-  if (isNil(email)) return null;
-  // 
+export async function findByEmail(email: string): Promise<boolean> {
   await sleep(500);
-  return {
-    name: "Steel",
-    email: "turfu@pm.me",
-    age: 56,
-    bio: "Je suis une fleur",
-  }
-  /* return Request.json("api/user.php", {
+  return false;
+  //
+  return Request.json("api/user.php", {
     q: "findByEmail",
     email,
-  })  */
+  }) 
 }
 
 export interface ProfileResult extends BaseResult {
@@ -148,20 +143,18 @@ export async function profile(): Promise<ProfileResult | null> {
       followers: 3615
     }]
   }
-  /* return Request.json("api/user.php", {
-    q: "getProfile",
-    user,
-  })  */
+  //
+  return Request.json("api/user.php", { q: "getProfile"}) 
 }
 
 export interface FetchResult extends BaseResult {
   projectCount: number,
   followers: number,
-  projects: Project.AllOfResult[],
+  projects: Project.BaseResult[],
 }
 
-export async function fetch(user: Nil<string>, page: number): Promise<FetchResult | null> {
-  if (isNil(user)) return null;
+export async function fetch(user: string | undefined, page: number): Promise<FetchResult | null> {
+  if (user === undefined) return null;
   // 
   await sleep(500);
   return {
@@ -171,18 +164,18 @@ export async function fetch(user: Nil<string>, page: number): Promise<FetchResul
     followers: 4,
     bio: "Je suis une fleur",
     projectCount: 42,
-    projects: await Project.allOf(user, projectPerPage, page * projectPerPage),
+    projects: await Project.allOf(user, page),
   }
-  /* return Request.json("api/user.php", {
+  //
+  return Request.json("api/user.php", {
     q: "fetch",
     user,
     page,
-  }) */
+  })
 }
 
 export interface AllResult extends BaseResult {
   followers: number,
-  name: string,
 }
 
 export async function all(page: number): Promise<AllResult[]> {
@@ -216,15 +209,17 @@ export async function all(page: number): Promise<AllResult[]> {
     name: "Keur",
     followers: 3615
   }]
-  /*  return Request.json("api/user.php", {
+  //
+   return Request.json("api/user.php", {
      q: "fetchAll",
-     first: userPerPage,
-     after: userPerPage * page,
-   }); */
+     first: perPage,
+     after: perPage * page,
+   });
 }
 
 export async function count(): Promise<number> {
   await sleep(500);
   return 43;
-  // return Request.json("api/user.php", { q: "count" });
+  //
+  return Request.json("api/user.php", { q: "count" });
 }

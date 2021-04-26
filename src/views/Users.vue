@@ -71,7 +71,7 @@ export default defineComponent({
 
     async function init() {
       const count = await User.count();
-      pages.value = Math.ceil(count / User.projectPerPage);
+      pages.value = Math.ceil(count / User.perPage);
     }
 
     init().then(load);

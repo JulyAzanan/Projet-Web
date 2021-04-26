@@ -1,8 +1,8 @@
 import sleep from "./sleep";
 
-interface BaseResult {
+export interface BaseResult {
+  name: string,
   updatedAt: Date,
-  createdAt: Date,
 }
 
 export interface FetchResult extends BaseResult {
@@ -14,9 +14,9 @@ export async function fetch(user?: string, project?: string, branch?: string): P
   if (user == null || project == null || branch == null) return null;
   await sleep(500);
   return {
+    name: "foo",
     lastCommit: "8f5e91",
     commitsCount: 4,
     updatedAt: new Date(),
-    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
   }
 }
