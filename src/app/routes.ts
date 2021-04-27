@@ -110,6 +110,10 @@ const routes: RouteRecordRaw[] = [
     path: '/about', // page à propos
   },
   {
+    ...load("NewProject"),
+    path: '/new', // Nouveau projet
+  },
+  {
     ...load("NotFound"),
     path: "/:catchAll(.*)*",
   },

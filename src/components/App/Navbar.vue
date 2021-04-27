@@ -36,11 +36,11 @@
       <div v-if="logged" class="uk-navbar-item uk-visible@s">
         <ul class="uk-iconnav">
           <li>
-            <a
+            <router-link :to="{name: 'NewProject'}"
               href="#"
               uk-tooltip="title: Nouveau projet; pos: bottom; delay: 200"
               ><span uk-icon="icon: plus"></span>
-            </a>
+            </router-link>
           </li>
 
           <li>
