@@ -117,7 +117,7 @@ export const musicXML = btoa(`<?xml version="1.0" encoding="UTF-8"?>
         <type>quarter</type>
         <staff>1</staff>
         </note>
-      <note default-x="153.37" default-y="-5.00">
+      <note default-x="153.37" default-y="-5.00" color="#800080">
         <pitch>
           <step>E</step>
           <octave>5</octave>
@@ -146,7 +146,7 @@ export const musicXML = btoa(`<?xml version="1.0" encoding="UTF-8"?>
       <backup>
         <duration>24</duration>
         </backup>
-      <note default-x="103.21" default-y="-120.00">
+      <note default-x="103.21" default-y="-120.00" color="#808000">
         <pitch>
           <step>E</step>
           <octave>3</octave>

@@ -192,8 +192,7 @@ export default defineComponent({
       osmd.cursor.hide();
       osmd.cursor.reset();
       audioPlayer.stop();
-      audioPlayer.play();
-      play = true;
+      play = false;
     }
 
     function download() {
