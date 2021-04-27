@@ -15,7 +15,8 @@
     "uikit": "^3.6.18",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "vuex": "^4.0.0-0",
+    "webmscore": "^0.21.0"
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.4.0",

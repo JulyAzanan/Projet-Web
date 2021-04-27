@@ -14,7 +14,7 @@ export async function fetch(user: string, project: string, branch: string, commi
   if (partition == null) return null;
   await sleep(500);
   return {
-    name: "file5",
+    name: "file5.xml",
     content: musicXML
   };
   //

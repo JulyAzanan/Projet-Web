@@ -9326,6 +9326,11 @@ wcwidth@^1.0.1:
   dependencies:
     defaults "^1.0.3"
 
+webmscore@^0.21.0:
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/webmscore/-/webmscore-0.21.0.tgz#a311b73cb3cfc32d3f2c45058674940fd92e0bce"
+  integrity sha512-46IUT0c+PIFLmAmtLUG5KMc/FoLCmI/KMkSGtbE0ywWTVV4Qtdjx6RyZ3lZs//XDUpyiTpfoGBjTSSF7wPIJog==
+
 webpack-bundle-analyzer@^3.8.0:
   version "3.9.0"
   resolved "https://registry.yarnpkg.com/webpack-bundle-analyzer/-/webpack-bundle-analyzer-3.9.0.tgz#f6f94db108fb574e415ad313de41a2707d33ef3c"
