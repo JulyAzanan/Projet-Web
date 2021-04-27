@@ -5,18 +5,24 @@
         <div class="uk-width-1-3@s uk-margin-medium-right">
           <div v-if="ready">
             <div class="uk-text-center">
-              <div uk-form-custom>
-                <input
+               <div
+                  class="uk-inline-clip uk-transition-toggle uk-light"
+                  tabindex="0"
+                  uk-form-custom
+                >
+                 <input
                   @change="changePicture"
                   type="file"
                   accept="image/x-png,image/gif,image/jpeg"
                 />
-                <UserPicture :user="user" :size="15" />
-                <a
-                  class="uk-position-absolute uk-transform-center edit-marker"
-                  uk-marker
-                ></a>
-              </div>
+                  <UserPicture :user="user" :size="15" />
+                  <div class="uk-position-center">
+                    <span
+                      class="uk-transition-fade"
+                      uk-icon="icon: upload; ratio: 5"
+                    ></span>
+                  </div>
+                </div>
             </div>
             <h2 class="uk-text-center">
               {{ user.name }}

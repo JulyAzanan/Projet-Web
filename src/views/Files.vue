@@ -1,7 +1,7 @@
 <template>
   <table class="uk-table uk-table-divider uk-table-hover">
     <tbody>
-      <tr v-for="file in commit.files" :key="file.path">
+      <tr v-for="file in commit.files" :key="file.name">
         <td><input class="uk-checkbox" type="checkbox" /></td>
         <td class="uk-table-link">
           <router-link
@@ -12,11 +12,11 @@
                 projectName,
                 branchName,
                 commitID,
-                filePath: file.path,
+                filePath: file.name,
               },
             }"
           >
-            {{ file.path }}
+            {{ file.name }}
           </router-link>
         </td>
         <td>

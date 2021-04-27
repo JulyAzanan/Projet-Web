@@ -4,9 +4,9 @@
       <div v-if="page.ready" class="uk-child-width-auto" uk-grid>
         <div class="uk-width-expand">
           <router-link
-            :to="{ name: 'User', params: { userName: commit.author } }"
+            :to="{ name: 'User', params: { userName: commit.publisher.name } }"
             class="uk-margin-small-right"
-            :uk-tooltip="`title: ${commit.author}; pos: bottom`"
+            :uk-tooltip="`title: ${commit.publisher.name}; pos: bottom`"
           >
             <UserPicture :user="commit.publisher" :size="2" />
           </router-link>

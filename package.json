@@ -10,6 +10,8 @@
   "dependencies": {
     "canvas-confetti": "^1.4.0",
     "core-js": "^3.6.5",
+    "opensheetmusicdisplay": "^0.9.5",
+    "osmd-audio-player": "^0.6.4",
     "uikit": "^3.6.18",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",

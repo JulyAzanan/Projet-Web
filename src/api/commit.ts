@@ -1,7 +1,7 @@
 import sleep from "./sleep";
 import * as User from "./user"
 import * as Request from "../utils/request"
-import * as Partition from "./partition"
+import * as Score from "./score"
 
 interface BaseResult {
   id: string,
@@ -12,7 +12,7 @@ interface BaseResult {
 
 export interface FetchResult extends Omit<BaseResult, "publisher"> {
   publisher: User.BaseResult,
-  files: Partition.AllResult[],
+  files: Score.AllResult[],
 }
 
 export async function fetch(user: string, project: string, branch: string, commit?: string | null): Promise<FetchResult | null> {
@@ -141,7 +141,7 @@ export async function all(user: string, project: string, branch: string): Promis
   });
 }
 
-export async function download(user: string, project: string, branch: string, commit: string): Promise<Partition.DownloadResult[]> {
+export async function download(user: string, project: string, branch: string, commit: string): Promise<Score.DownloadResult[]> {
   await sleep(500);
   return [{
     name: "file1",

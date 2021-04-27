@@ -4,7 +4,7 @@
       <div uk-grid class="uk-margin-medium-bottom">
         <div class="uk-width-1-3@s uk-margin-large-top" uk-first-column>
           <div v-if="ready">
-            <div class="uk-text-center">
+            <div class="uk-text-center uk-margin-small-right">
               <UserPicture :user="user" :size="15" />
               <h2>
                 {{ userName }}
@@ -33,11 +33,10 @@
                 class="uk-button uk-button-default uk-margin-small-left"
                 @click="support"
               >
-                <span class="uk-margin-small-right" uk-icon="icon: star"></span>
                 Soutenir
               </button>
             </div>
-            <hr class="uk-divider-icon" />
+            <hr class="uk-divider-icon uk-margin-small-right" />
             <div>
               <span class="uk-margin-small-right" uk-icon="icon: star"></span>
               {{ user.followers }} abonnés

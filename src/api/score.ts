@@ -1,5 +1,6 @@
 import sleep from "./sleep";
 import * as Request from "../utils/request"
+import { musicXML } from "./xml";
 
 export interface BaseResult {
   name: string,
@@ -14,7 +15,7 @@ export async function fetch(user: string, project: string, branch: string, commi
   await sleep(500);
   return {
     name: "file5",
-    content: "dqefqerf"
+    content: musicXML
   };
   //
   return Request.json("api/partition.php", {
