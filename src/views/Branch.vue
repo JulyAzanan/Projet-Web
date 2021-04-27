@@ -71,7 +71,10 @@
           </h4>
           <ul class="uk-grid-small uk-flex-middle" uk-grid>
             <li v-for="user in project.contributors" :key="user.name">
-              <router-link :to="{ name: 'User', params: { userName: user.name } }" :uk-tooltip="`title: ${user.name}; pos: bottom`">
+              <router-link
+                :to="{ name: 'User', params: { userName: user.name } }"
+                :uk-tooltip="`title: ${user.name}; pos: bottom`"
+              >
                 <UserPicture :user="user" :size="3" />
               </router-link>
             </li>
@@ -84,12 +87,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, reactive } from "vue";
+import { defineComponent, ref, watch, reactive, WatchStopHandle } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import * as Project from "@/api/project";
 import * as Branch from "@/api/branch";
 import router, { notFound } from "@/app/routes";
-import UserPicture from "@/components/User/UserPicture.vue"
+import UserPicture from "@/components/User/UserPicture.vue";
 
 export default defineComponent({
   props: {
@@ -99,7 +102,7 @@ export default defineComponent({
     project: Object as () => Project.FetchResult,
   },
   components: {
-    UserPicture
+    UserPicture,
   },
   setup(props) {
     const page = reactive({
@@ -114,16 +117,7 @@ export default defineComponent({
       updatedAt: new Date(),
     });
 
-    watch(selectedBranch, async () => {
-      await router.replace({
-        name: "Commit-default",
-        params: {
-          userName: props.userName!,
-          projectName: props.projectName!,
-          branchName: selectedBranch.value!,
-        },
-      });
-    });
+    let stopBranchWatcher: WatchStopHandle = () => {};
 
     async function init() {
       const result = await Branch.fetch(
@@ -148,11 +142,27 @@ export default defineComponent({
           page.noCommitAvailable = true;
         }
       }
+      stopBranchWatcher();
+      selectedBranch.value = props.branchName;
+      stopBranchWatcher = watch(selectedBranch, async () => {
+        await router.replace({
+          name: "Commit-default",
+          params: {
+            userName: props.userName!,
+            projectName: props.projectName!,
+            branchName: selectedBranch.value!,
+          },
+        });
+      });
       page.ready = true;
     }
 
     onBeforeRouteUpdate((to) => {
-      if (to.name === "Branch" || to.name === "Commit-default") {
+      if (
+        to.name === "Branch" ||
+        to.name === "Commit-default" ||
+        to.params.branchName !== props.branchName
+      ) {
         page.ready = false;
         init();
       }

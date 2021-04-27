@@ -4,27 +4,35 @@
       <div class="uk-width-expand">
         <blockquote>{{ filePath }}</blockquote>
       </div>
-      <ul
-        v-if="ready && !unkownExtension"
-        class="uk-grid-small uk-flex-middle"
-        uk-grid
-      >
+      <ul v-if="ready" class="uk-grid-small uk-flex-middle" uk-grid>
         <li>
-          <a class="uk-icon-button" uk-icon="icon: play" @click="playPause"></a>
+          <a
+            v-if="!unkownExtension"
+            @click="playPause"
+            class="uk-icon-button"
+            uk-icon="icon: play"
+          ></a>
         </li>
         <li>
           <a
+            v-if="!unkownExtension"
+            @click="refresh"
             class="uk-icon-button"
             uk-icon="icon: refresh"
-            @click="refresh"
+          ></a>
+        </li>
+        <li>
+          <a
+            @click="download"
+            class="uk-icon-button"
+            uk-icon="icon: download"
           ></a>
         </li>
       </ul>
     </div>
 
-    <div v-if="!ready" uk-spinner></div>
     <div class="uk-placeholder uk-text-center">
-      <div ref="osmdContainer" />
+      <div v-show="ready" ref="osmdContainer" />
       <div v-if="unkownExtension">
         <span
           class="uk-margin-small-right uk-text-muted"
@@ -32,18 +40,22 @@
         ></span>
         Extension de fichier non supportée.
       </div>
+      <div v-if="!ready" uk-spinner></div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
+import { onBeforeRouteUpdate } from "vue-router";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 import AudioPlayer from "osmd-audio-player";
+import { PlaybackEvent } from "osmd-audio-player/dist/PlaybackEngine";
 import { notFound } from "@/app/routes";
 import * as Score from "@/api/score";
 import WebMscore from "webmscore";
 import { InputFileFormat } from "webmscore/schemas";
+import "@/utils/cursor";
 
 function base64ToUint8Array(data: string) {
   const binary = atob(data);
@@ -59,6 +71,23 @@ async function toXml(extension: InputFileFormat, data: string) {
   await WebMscore.ready;
   const webMscore = await WebMscore.load(extension, base64ToUint8Array(data));
   return webMscore.saveXml();
+}
+
+function downloadBase64(data: string, name: string) {
+  const link = document.createElement("a");
+
+  link.href = "data:application/octet-stream;base64," + data;
+  link.download = name;
+
+  document.body.appendChild(link);
+  link.dispatchEvent(
+    new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+    })
+  );
+  document.body.removeChild(link);
 }
 
 export default defineComponent({
@@ -118,11 +147,17 @@ export default defineComponent({
 
     const initialized = init();
     const audioPlayer = new AudioPlayer();
+    let osmd: OpenSheetMusicDisplay;
 
-    onMounted(async () => {
+    audioPlayer.on(PlaybackEvent.ITERATION, () => {
+      osmd.cursor.next();
+      console.log("hey");
+    });
+
+    async function loadScore() {
       await initialized;
       if (!unkownExtension.value) {
-        const osmd = new OpenSheetMusicDisplay(osmdContainer.value!, {
+        osmd = new OpenSheetMusicDisplay(osmdContainer.value!, {
           backend: "svg",
           drawTitle: true,
           drawCredits: true,
@@ -130,10 +165,12 @@ export default defineComponent({
 
         await osmd.load(xml);
         osmd.render();
+        osmd.cursor.show();
+        osmd.cursor.reset();
         // @ts-ignore
         await audioPlayer.loadScore(osmd);
       }
-    });
+    }
 
     let play = false;
 
@@ -147,10 +184,24 @@ export default defineComponent({
     }
 
     function refresh() {
+      osmd.cursor.reset();
       audioPlayer.stop();
       audioPlayer.play();
       play = true;
     }
+
+    function download() {
+      downloadBase64(score.value.content, score.value.name);
+    }
+
+    onMounted(loadScore);
+    onBeforeRouteUpdate(async (to) => {
+      if (to.params.filePath !== props.filePath) {
+        ready.value = false;
+        await init();
+        await loadScore();
+      }
+    });
 
     return {
       osmdContainer,
@@ -159,6 +210,7 @@ export default defineComponent({
       playPause,
       refresh,
       unkownExtension,
+      download,
     };
   },
 });
