@@ -147,11 +147,16 @@ export default defineComponent({
 
     const initialized = init();
     const audioPlayer = new AudioPlayer();
+    let atFileBeginning = true;
     let osmd: OpenSheetMusicDisplay;
 
     audioPlayer.on(PlaybackEvent.ITERATION, () => {
-      osmd.cursor.next();
-      console.log("hey");
+      if (atFileBeginning) {
+        osmd.cursor.show();
+        atFileBeginning = false;
+      } else {
+        osmd.cursor.next();
+      }
     });
 
     async function loadScore() {
@@ -165,7 +170,6 @@ export default defineComponent({
 
         await osmd.load(xml);
         osmd.render();
-        osmd.cursor.show();
         osmd.cursor.reset();
         // @ts-ignore
         await audioPlayer.loadScore(osmd);
@@ -184,6 +188,8 @@ export default defineComponent({
     }
 
     function refresh() {
+      atFileBeginning = true;
+      osmd.cursor.hide();
       osmd.cursor.reset();
       audioPlayer.stop();
       audioPlayer.play();
