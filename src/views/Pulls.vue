@@ -8,8 +8,8 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import score1 from "@/scores/E12_intermission.musicxml";
-import score2 from "@/scores/E12_intermission-1.musicxml";
+import score2 from "@/scores/E12_intermission.musicxml";
+import score1 from "@/scores/E12_intermission-1.musicxml";
 import { measureDiff } from "@/utils/diff";
 
 export default defineComponent({

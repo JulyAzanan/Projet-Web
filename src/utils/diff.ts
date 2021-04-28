@@ -1,15 +1,10 @@
 import format from "xml-formatter";
 
-interface RawNote {
+interface Note {
   pitch: string,
   duration: string,
   voice: string,
   type: string,
-}
-
-interface Note {
-  element: Element;
-  raw: RawNote;
 }
 
 const colors = {
@@ -19,13 +14,10 @@ const colors = {
 }
 
 const finalSequence: Note = {
-  element: document.createElement("lcs-end"),
-  raw: {
-    pitch: "",
-    duration: "",
-    voice: "",
-    type: "",
-  },
+  pitch: "",
+  duration: "",
+  voice: "",
+  type: "",
 };
 
 function removeAttributes(element: Element): Element {
@@ -37,14 +29,14 @@ function removeAttributes(element: Element): Element {
 
 function equals(a?: Note, b?: Note) {
   return a && b && (
-    a.raw.duration === b.raw.duration &&
-    a.raw.pitch === b.raw.pitch &&
-    a.raw.type === b.raw.type &&
-    a.raw.voice === b.raw.voice
+    a.duration === b.duration &&
+    a.pitch === b.pitch &&
+    a.type === b.type &&
+    a.voice === b.voice
   );
 }
 
-function toRaw(el: Element): RawNote {
+function toNote(el: Element): Note {
   const pitch = el.getElementsByTagName("pitch");
   const duration = el.getElementsByTagName("duration");
   const voice = el.getElementsByTagName("voice");
@@ -184,16 +176,10 @@ function noteDiff(notes_a: Element[], notes_b: Element[], notes: Element): void 
   const xml_a: Note[] = [];
   const xml_b: Note[] = [];
   for (const el of notes_a) {
-    xml_a.push({
-      element: el,
-      raw: toRaw(removeAttributes(el)),
-    });
+    xml_a.push(toNote(removeAttributes(el)));
   }
   for (const el of notes_b) {
-    xml_b.push({
-      element: el,
-      raw: toRaw(removeAttributes(el)),
-    });
+    xml_b.push(toNote(removeAttributes(el)));
   }
 
   const LCS = longestCommonSubsequence(xml_a, xml_b);
@@ -230,7 +216,7 @@ function noteDiff(notes_a: Element[], notes_b: Element[], notes: Element): void 
       actualIndex++;
     }
     if (LCS[i] !== undefined) {
-      notes.appendChild(LCS[i].element.cloneNode(true));
+      notes.appendChild(notes_a[actualIndex].cloneNode(true));
     }
     baseIndex++;
     actualIndex++;
