@@ -190,9 +190,9 @@
         <stem>down</stem>
         <staff>2</staff>
         </note>
-      <note default-x="193.50" default-y="-85.00">
+      <note default-x="193.50" default-y="-95.00">
         <pitch>
-          <step>E</step>
+          <step>C</step>
           <octave>4</octave>
           </pitch>
         <duration>6</duration>
