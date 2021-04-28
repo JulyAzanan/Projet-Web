@@ -14,22 +14,18 @@ const colors = {
   modified: "#FFAA00"
 }
 
-const finalSequence: Note = {
-  misc: [],
-  pitch: "",
-  duration: "",
-  voice: "",
-  type: "",
-};
+function removeAttributes_(el: Element): void {
+  while (el.attributes.length > 0)
+    el.removeAttribute(el.attributes[0].name);
+}
 
 function removeAttributes(element: Element): Element {
   const el = element.cloneNode(true) as Element;
-  while (el.attributes.length > 0)
-    el.removeAttribute(el.attributes[0].name);
+  removeAttributes_(el);
   return el;
 }
 
-function equals(a?: Note, b?: Note) {
+function noteEquals(a?: Note, b?: Note) {
   return a && b && (
     a.duration === b.duration &&
     a.pitch === b.pitch &&
@@ -54,10 +50,18 @@ function toNote(el: Element): Note {
   }
 }
 
-function longestCommonSubsequence(c: Note[], d: Note[]): Note[] {
+const finalNoteSequence: Note = {
+  misc: [],
+  pitch: "",
+  duration: "",
+  voice: "",
+  type: "",
+};
+
+function longestCommonNoteSubsequence(c: Note[], d: Note[]): Note[] {
   // common final sequence
-  c.push(finalSequence);
-  d.push(finalSequence);
+  c.push(finalNoteSequence);
+  d.push(finalNoteSequence);
 
   const matrix = Array.from(
     new Array(c.length + 1),
@@ -66,7 +70,7 @@ function longestCommonSubsequence(c: Note[], d: Note[]): Note[] {
 
   function backtrack(c: Note[], d: Note[], x: number, y: number): Note[] {
     if (x === 0 || y === 0) return [];
-    return equals(c[x - 1], d[y - 1])
+    return noteEquals(c[x - 1], d[y - 1])
       ? backtrack(c, d, x - 1, y - 1).concat(c[x - 1]) // x-1, y-1
       : matrix[x][y - 1] > matrix[x - 1][y]
         ? backtrack(c, d, x, y - 1)
@@ -81,7 +85,57 @@ function longestCommonSubsequence(c: Note[], d: Note[]): Note[] {
   }
   for (let i = 1; i <= c.length; i++) {
     for (let j = 1; j <= d.length; j++) {
-      matrix[i][j] = equals(c[i - 1], d[j - 1])
+      matrix[i][j] = noteEquals(c[i - 1], d[j - 1])
+        ? matrix[i - 1][j - 1] + 1 // i-1, j-1
+        : Math.max(matrix[i][j - 1], matrix[i - 1][j]);
+    }
+  }
+
+  const result = backtrack(c, d, c.length, d.length);
+  // remove final sequence
+  c.pop();
+  d.pop();
+  result.pop();
+  return result;
+}
+
+function measureToString(element: Element): string {
+  const el = element.cloneNode(true) as Element;
+  removeAttributes_(el);
+  for (const e of el.children) {
+    if (e.tagName === "note") removeAttributes_(e)
+  }
+  return format(el.outerHTML);
+}
+
+function longestCommonSubsequence(c: string[], d: string[]): string[] {
+  // common final sequence
+  c.push("");
+  d.push("");
+
+  const matrix = Array.from(
+    new Array(c.length + 1),
+    () => new Array(d.length + 1)
+  );
+
+  function backtrack(c: string[], d: string[], x: number, y: number): string[] {
+    if (x === 0 || y === 0) return [];
+    return c[x - 1] === d[y - 1]
+      ? backtrack(c, d, x - 1, y - 1).concat(c[x - 1]) // x-1, y-1
+      : matrix[x][y - 1] > matrix[x - 1][y]
+        ? backtrack(c, d, x, y - 1)
+        : backtrack(c, d, x - 1, y);
+  }
+
+  for (let i = 0; i < c.length; i++) {
+    matrix[i][0] = 0;
+  }
+  for (let j = 0; j < d.length; j++) {
+    matrix[0][j] = 0;
+  }
+  for (let i = 1; i <= c.length; i++) {
+    for (let j = 1; j <= d.length; j++) {
+      matrix[i][j] = c[i - 1] === d[j - 1]
         ? matrix[i - 1][j - 1] + 1 // i-1, j-1
         : Math.max(matrix[i][j - 1], matrix[i - 1][j]);
     }
@@ -104,7 +158,7 @@ type NoteArray = {
 }
 
 function splitMeasure(measure: Element): NoteArray[] {
-  if (measure.children.length === 0) return [];
+  if (measure === undefined || measure.children.length === 0) return [];
   const notes: NoteArray[] = [];
   let mode = "init";
   for (const element of measure.children) {
@@ -126,7 +180,7 @@ function splitMeasure(measure: Element): NoteArray[] {
   return notes;
 }
 
-function markNotesAdded(notes: Element[], diff: Element): void {
+function markNotesAdded(notes: Element[] | HTMLCollection, diff: Element): void {
   for (const element of notes) {
     if (element.tagName === "note") {
       const el = element.cloneNode(true) as Element;
@@ -136,13 +190,69 @@ function markNotesAdded(notes: Element[], diff: Element): void {
   }
 }
 
-function markNotesRemoved(notes: Element[], diff: Element): void {
+function markNotesRemoved(notes: Element[] | HTMLCollection, diff: Element): void {
   for (const element of notes) {
     if (element.tagName === "note") {
       const el = element.cloneNode(true) as Element;
       el.setAttribute("color", colors.removed);
       diff.appendChild(el);
     }
+  }
+}
+
+export function partDiff(part_a: HTMLCollectionOf<Element>, part_b: HTMLCollectionOf<Element>, diff: Element): void {
+  while (diff.firstChild) {
+    diff.firstChild.remove();
+  }
+
+  const measures_a: string[] = [];
+  const measures_b: string[] = [];
+  for (const el of part_a) {
+    measures_a.push(measureToString(el));
+  }
+  for (const el of part_b) {
+    measures_b.push(measureToString(el));
+  }
+
+  const LCS = longestCommonSubsequence(measures_a, measures_b);
+  let actualIndex = 0;
+  let baseIndex = 0;
+
+  for (let i = 0; i <= LCS.length; i++) {
+    while (
+      LCS[i] !== measures_b[baseIndex] &&
+      baseIndex < measures_b.length
+    ) {
+      if (
+        LCS[i] !== measures_a[actualIndex] &&
+        actualIndex < measures_a.length
+      ) {
+        const measure = part_a[actualIndex].cloneNode(true) as Element;
+        diff.appendChild(measure);
+        measureDiff(part_a[actualIndex], part_b[baseIndex], diff.lastChild as Element)
+        actualIndex++;
+      } else {
+        const measure = part_b[baseIndex].cloneNode(true) as Element;
+        diff.appendChild(measure);
+        markNotesRemoved(measure.children, diff.lastChild as Element)
+      }
+      baseIndex++;
+    }
+    while (
+      LCS[i] !== measures_a[actualIndex] &&
+      actualIndex < measures_a.length
+    ) {
+      const measure = part_a[actualIndex].cloneNode(true) as Element;
+      diff.appendChild(measure);
+      markNotesAdded(measure.children, diff.lastChild as Element)
+      actualIndex++;
+    }
+    if (LCS[i] !== undefined) {
+      const measure = part_b[baseIndex].cloneNode(true) as Element;
+      diff.appendChild(measure);
+    }
+    baseIndex++;
+    actualIndex++;
   }
 }
 
@@ -177,7 +287,7 @@ export function measureDiff(measure_a: Element, measure_b: Element, diff: Elemen
   }
 }
 
-function noteDiff(notes_a: Element[], notes_b: Element[], notes: Element): void {
+function noteDiff(notes_a: Element[], notes_b: Element[], diff: Element): void {
   const xml_a: Note[] = [];
   const xml_b: Note[] = [];
   for (const el of notes_a) {
@@ -187,43 +297,49 @@ function noteDiff(notes_a: Element[], notes_b: Element[], notes: Element): void 
     xml_b.push(toNote(removeAttributes(el)));
   }
 
-  const LCS = longestCommonSubsequence(xml_a, xml_b);
+  const LCS = longestCommonNoteSubsequence(xml_a, xml_b);
   let actualIndex = 0;
   let baseIndex = 0;
 
   for (let i = 0; i <= LCS.length; i++) {
     while (
-      !equals(LCS[i], xml_b[baseIndex]) &&
+      !noteEquals(LCS[i], xml_b[baseIndex]) &&
       baseIndex < notes_b.length
     ) {
       if (
-        !equals(LCS[i], xml_a[actualIndex]) &&
+        !noteEquals(LCS[i], xml_a[actualIndex]) &&
         actualIndex < notes_a.length
       ) {
         const note = notes_a[actualIndex].cloneNode(true) as Element;
         note.setAttribute("color", colors.modified);
-        notes.appendChild(note);
+        diff.appendChild(note);
         actualIndex++;
       } else {
         const note = notes_b[baseIndex].cloneNode(true) as Element;
         note.setAttribute("color", colors.removed);
-        notes.appendChild(note);
+        diff.appendChild(note);
       }
       baseIndex++;
     }
     while (
-      !equals(LCS[i], xml_a[actualIndex]) &&
+      !noteEquals(LCS[i], xml_a[actualIndex]) &&
       actualIndex < notes_a.length
     ) {
       const note = notes_a[actualIndex].cloneNode(true) as Element;
       note.setAttribute("color", colors.added);
-      notes.appendChild(note);
+      diff.appendChild(note);
       actualIndex++;
     }
     if (LCS[i] !== undefined) {
       const note = notes_b[baseIndex].cloneNode(true) as Element;
       note.append(...LCS[i].misc);
-      notes.appendChild(note);
+      diff.appendChild(note);
+      /* const note = notes_b[baseIndex].cloneNode(true) as Element;
+      const lastChild = diff.lastChild as Element | null;
+      if (lastChild && lastChild.getElementsByTagName("pitch").length > 0) {
+        note.append(...LCS[i].misc);
+      }
+      diff.appendChild(note); */
     }
     baseIndex++;
     actualIndex++;

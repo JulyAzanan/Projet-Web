@@ -8,9 +8,9 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import score2 from "@/scores/E12_intermission.musicxml";
-import score1 from "@/scores/E12_intermission-1.musicxml";
-import { measureDiff } from "@/utils/diff";
+import score1 from "@/scores/E12_intermission.musicxml";
+import score2 from "@/scores/E12_intermission-1.musicxml";
+import { measureDiff, partDiff } from "@/utils/diff";
 
 export default defineComponent({
   props: {
@@ -32,8 +32,10 @@ export default defineComponent({
       const measures_a = parts_a[i_p].getElementsByTagName("measure");
       const measures_b = parts_b[i_p].getElementsByTagName("measure");
       const measures_d = parts_d[i_p].getElementsByTagName("measure");
+      // partDiff(measures_a, measures_b, parts_d[i_p])
       for (let i_m = 0; i_m < /* measures_d.length */1; i_m++) {
         measureDiff(measures_a[i_m], measures_b[i_m], measures_d[i_m])
+        console.log(measures_d[i_m].outerHTML)
       }
     }
 
