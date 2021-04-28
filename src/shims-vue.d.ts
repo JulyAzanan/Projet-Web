@@ -4,3 +4,9 @@ declare module '*.vue' {
   const component: DefineComponent<{}, {}, any>
   export default component
 }
+
+/* eslint-disable */
+declare module '*.musicxml' {
+  const text: string
+  export default text
+}
