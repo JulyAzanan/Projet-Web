@@ -1,19 +1,31 @@
 import format from "xml-formatter";
 
+interface RawNote {
+  pitch: string,
+  duration: string,
+  voice: string,
+  type: string,
+}
+
 interface Note {
   element: Element;
-  raw: string;
+  raw: RawNote;
 }
 
 const colors = {
   added: "#00FF00",
   removed: "#FF0000",
-  modified: "#AAAA00"
+  modified: "#FFAA00"
 }
 
 const finalSequence: Note = {
   element: document.createElement("lcs-end"),
-  raw: "",
+  raw: {
+    pitch: "",
+    duration: "",
+    voice: "",
+    type: "",
+  },
 };
 
 function removeAttributes(element: Element): Element {
@@ -24,7 +36,25 @@ function removeAttributes(element: Element): Element {
 }
 
 function equals(a?: Note, b?: Note) {
-  return a && b && a.raw === b.raw;
+  return a && b && (
+    a.raw.duration === b.raw.duration &&
+    a.raw.pitch === b.raw.pitch &&
+    a.raw.type === b.raw.type &&
+    a.raw.voice === b.raw.voice
+  );
+}
+
+function toRaw(el: Element): RawNote {
+  const pitch = el.getElementsByTagName("pitch");
+  const duration = el.getElementsByTagName("duration");
+  const voice = el.getElementsByTagName("voice");
+  const type = el.getElementsByTagName("type");
+  return {
+    pitch: pitch.length > 0 ? format(pitch[0].outerHTML) : "",
+    duration: duration.length > 0 ? format(duration[0].outerHTML) : "",
+    voice: voice.length > 0 ? format(voice[0].outerHTML) : "",
+    type: type.length > 0 ? format(type[0].outerHTML) : "",
+  }
 }
 
 function longestCommonSubsequence(c: Note[], d: Note[]): Note[] {
@@ -127,18 +157,16 @@ export function measureDiff(measure_a: Element, measure_b: Element, diff: Elemen
   const split_a = splitMeasure(measure_a);
   const split_b = splitMeasure(measure_b);
 
-  console.log(split_a, split_b)
-
   let j = 0;
   for (let i = 0; i < split_a.length; i++) {
-    while(split_b[j] !== undefined && split_b[j].type !== "symbols") j++;
-    if(split_a[i].type === "properties") {
+    while (split_b[j] !== undefined && split_b[j].type !== "symbols") j++;
+    if (split_a[i].type === "properties") {
       diff.append(...split_a[i].elements);
     } else {
       if (split_b[j] !== undefined) {
         noteDiff(split_a[i].elements, split_b[j].elements, diff);
       } else {
-        markNotesAdded(split_a[i].elements, diff)
+        markNotesAdded(split_a[i].elements, diff);
       }
       j++;
     }
@@ -147,25 +175,25 @@ export function measureDiff(measure_a: Element, measure_b: Element, diff: Elemen
     if (split_b[i].type === "properties") {
       diff.append(...split_b[i].elements);
     } else {
-      markNotesRemoved(split_b[i].elements, diff)
+      markNotesRemoved(split_b[i].elements, diff);
     }
   }
 }
 
 function noteDiff(notes_a: Element[], notes_b: Element[], notes: Element): void {
-  const xml_a: Note[] = []
-  const xml_b: Note[] = []
+  const xml_a: Note[] = [];
+  const xml_b: Note[] = [];
   for (const el of notes_a) {
     xml_a.push({
       element: el,
-      raw: format(removeAttributes(el).outerHTML)
-    })
+      raw: toRaw(removeAttributes(el)),
+    });
   }
   for (const el of notes_b) {
     xml_b.push({
       element: el,
-      raw: format(removeAttributes(el).outerHTML)
-    })
+      raw: toRaw(removeAttributes(el)),
+    });
   }
 
   const LCS = longestCommonSubsequence(xml_a, xml_b);
