@@ -1,6 +1,7 @@
 import format from "xml-formatter";
 
 interface Note {
+  misc: Element[],
   pitch: string,
   duration: string,
   voice: string,
@@ -14,6 +15,7 @@ const colors = {
 }
 
 const finalSequence: Note = {
+  misc: [],
   pitch: "",
   duration: "",
   voice: "",
@@ -37,15 +39,18 @@ function equals(a?: Note, b?: Note) {
 }
 
 function toNote(el: Element): Note {
-  const pitch = el.getElementsByTagName("pitch");
-  const duration = el.getElementsByTagName("duration");
-  const voice = el.getElementsByTagName("voice");
-  const type = el.getElementsByTagName("type");
+  const pitch_ = el.getElementsByTagName("pitch");
+  const duration_ = el.getElementsByTagName("duration");
+  const voice_ = el.getElementsByTagName("voice");
+  const type_ = el.getElementsByTagName("type");
+  const pitch = pitch_.length > 0 ? format(pitch_[0].outerHTML) : "";
+  const duration = duration_.length > 0 ? format(duration_[0].outerHTML) : "";
+  const voice = voice_.length > 0 ? format(voice_[0].outerHTML) : "";
+  const type = type_.length > 0 ? format(type_[0].outerHTML) : "";
+  const tags = ["pitch", "duration", "voice", "type"]
+  const misc = [...el.children].filter((e) => !tags.includes(e.tagName));
   return {
-    pitch: pitch.length > 0 ? format(pitch[0].outerHTML) : "",
-    duration: duration.length > 0 ? format(duration[0].outerHTML) : "",
-    voice: voice.length > 0 ? format(voice[0].outerHTML) : "",
-    type: type.length > 0 ? format(type[0].outerHTML) : "",
+    pitch, duration, voice, type, misc,
   }
 }
 
@@ -216,7 +221,9 @@ function noteDiff(notes_a: Element[], notes_b: Element[], notes: Element): void 
       actualIndex++;
     }
     if (LCS[i] !== undefined) {
-      notes.appendChild(notes_a[actualIndex].cloneNode(true));
+      const note = notes_b[baseIndex].cloneNode(true) as Element;
+      note.append(...LCS[i].misc);
+      notes.appendChild(note);
     }
     baseIndex++;
     actualIndex++;
