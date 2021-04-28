@@ -33,9 +33,9 @@ export default defineComponent({
       const measures_b = parts_b[i_p].getElementsByTagName("measure");
       const measures_d = parts_d[i_p].getElementsByTagName("measure");
       // partDiff(measures_a, measures_b, parts_d[i_p])
-      for (let i_m = 0; i_m < /* measures_d.length */1; i_m++) {
+      for (let i_m = 0; i_m < measures_d.length; i_m++) {
         measureDiff(measures_a[i_m], measures_b[i_m], measures_d[i_m])
-        console.log(measures_d[i_m].outerHTML)
+        // console.log(measures_d[i_m].outerHTML)
       }
     }
 

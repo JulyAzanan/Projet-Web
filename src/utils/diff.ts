@@ -287,6 +287,25 @@ export function measureDiff(measure_a: Element, measure_b: Element, diff: Elemen
   }
 }
 
+function appendNote(original: Element, diff: Element): Element {
+  const note = original.cloneNode(true) as Element;
+  diff.appendChild(note);
+  return note;
+}
+
+function checkRest(diff: Element) {
+  const lastChild = diff.lastElementChild;
+  const preChild = diff.children.item(diff.children.length - 2)
+  if (lastChild && preChild) {
+    if (preChild.getElementsByTagName("rest").length > 0) {
+      const chords = lastChild.getElementsByTagName("chord");
+      for (const chord of chords) {
+        chord.remove();
+      }
+    }
+  }
+}
+
 function noteDiff(notes_a: Element[], notes_b: Element[], diff: Element): void {
   const xml_a: Note[] = [];
   const xml_b: Note[] = [];
@@ -310,36 +329,25 @@ function noteDiff(notes_a: Element[], notes_b: Element[], diff: Element): void {
         !noteEquals(LCS[i], xml_a[actualIndex]) &&
         actualIndex < notes_a.length
       ) {
-        const note = notes_a[actualIndex].cloneNode(true) as Element;
-        note.setAttribute("color", colors.modified);
-        diff.appendChild(note);
+        appendNote(notes_a[actualIndex], diff).setAttribute("color", colors.modified);
         actualIndex++;
       } else {
-        const note = notes_b[baseIndex].cloneNode(true) as Element;
-        note.setAttribute("color", colors.removed);
-        diff.appendChild(note);
+        appendNote(notes_b[baseIndex], diff).setAttribute("color", colors.removed);
       }
       baseIndex++;
+      checkRest(diff);
     }
     while (
       !noteEquals(LCS[i], xml_a[actualIndex]) &&
       actualIndex < notes_a.length
     ) {
-      const note = notes_a[actualIndex].cloneNode(true) as Element;
-      note.setAttribute("color", colors.added);
-      diff.appendChild(note);
+      appendNote(notes_a[actualIndex], diff).setAttribute("color", colors.added);
       actualIndex++;
+      checkRest(diff);
     }
     if (LCS[i] !== undefined) {
-      const note = notes_b[baseIndex].cloneNode(true) as Element;
-      note.append(...LCS[i].misc);
-      diff.appendChild(note);
-      /* const note = notes_b[baseIndex].cloneNode(true) as Element;
-      const lastChild = diff.lastChild as Element | null;
-      if (lastChild && lastChild.getElementsByTagName("pitch").length > 0) {
-        note.append(...LCS[i].misc);
-      }
-      diff.appendChild(note); */
+      appendNote(notes_b[baseIndex], diff).append(...LCS[i].misc);
+      checkRest(diff);
     }
     baseIndex++;
     actualIndex++;
