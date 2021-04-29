@@ -10,6 +10,6 @@ module.exports = {
         }
     },
     publicPath: process.env.NODE_ENV === 'production'
-    ? '/~mael.acier/musegit/'
-    : '/'
+        ? '/~mael.acier/musegit/'
+        : '/'
 }

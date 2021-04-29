@@ -1,9 +1,9 @@
 import { notifyError } from "./notification";
 import store from "@/app/store"
 
-const connection = process.env.NODE_ENV === 'development'
-  ? "http://localhost:8888/"
-  : "/"
+const connection = process.env.NODE_ENV === 'production'
+  ? "/~mael.acier/musegit/"
+  : "http://localhost:8888/"
 
 function getUser(): string {
   return localStorage.getItem("user") ?? ""
@@ -51,7 +51,7 @@ export const patch = createRequest("PATCH");
 
 // eslint-disable-next-line
 export async function json(url: string, params?: Record<string, any>): Promise<any> {
-  const response = await get(url + (params ? `?${new URLSearchParams(params)}`: "") );
+  const response = await get(url + (params ? `?${new URLSearchParams(params)}` : ""));
   if (response.ok) return response.json();
   return exception(response);
 }
