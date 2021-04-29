@@ -86,14 +86,7 @@ function add($author, $project, $branch, $message, $partitions, $loggedUser)
         return false;
     }
     return ($reussite);
-    /* <<<SQL
-SELECT DISTINCT ON(p.name) p.name, c.id, p.content FROM partition p JOIN commit c ON p.commitID = c.id AND p.authorName = c.authorName AND p.branchName = c.branchName AND p.projectName = c.projectName
-WHERE p.authorName = 'Steel' AND p.projectName = 'Daft' AND p.branchName = 'main' AND c.createdAt <= (SELECT cc.createdAt FROM commit cc WHERE cc.authorName = 'Steel' AND cc.projectName = 'Daft' AND cc.branchName = 'main' AND cc.id = '3615')
-ORDER BY p.name ASC, c.createdAt DESC;
-<<<SQL
-SELECT DISTINCT ON(p.name) p.name, c.id, p.content FROM partition p JOIN commit c ON p.commitID = c.id AND p.authorName = c.authorName AND p.branchName = c.branchName AND p.projectName = c.projectName
-WHERE p.authorName = :authorName AND p.projectName = :projectName AND p.branchName = :branchName AND c.createdAt <= (SELECT cc.createdAt FROM commit cc WHERE cc.authorName = :authorName AND cc.projectName = :projectName AND cc.branchName = :branchName AND cc.id = :id)
-ORDER BY p.name ASC, c.createdAt DESC; */
+
 }
 
 function getLatest($author, $project, $branch, $loggedUser) {

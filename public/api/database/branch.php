@@ -4,6 +4,7 @@ namespace Branch;
 
 include_once __DIR__ . "/config.php";
 include_once __DIR__ . "/commit.php";
+include_once __DIR__ . "/partition.php";
 include_once __DIR__ . "/../utils/args.php";
 include_once __DIR__ . "/../utils/updateAt.php";
 /**
@@ -27,6 +28,10 @@ function add($author, $project, $branch, $loggedUser)
     if (!admin_or_contributor($author, $project, $loggedUser)) {
         forbidden_error(); //We do not have the right --> FORBIDDEN
     }
+    if (check_branch_exist($author, $project, $branch)) {
+        //La brnahce voule existe 
+        branch_error();
+    }
     //We are an either an admin, the creator or a contributor. We can add a branch
 
     //Always executed
@@ -46,6 +51,24 @@ function add($author, $project, $branch, $loggedUser)
     //Will return true on succes and false on failure
 
 }
+
+function merge($author, $project, $source, $dest, $loggedUser) {
+    check_not_null($author, $project, $source, $dest, $loggedUser);
+    if (!check_project_exist($author, $project)) {
+        arg_error();
+    }
+    if (!admin_or_contributor($author, $project, $loggedUser)) {
+        forbidden_error(); //We do not have the right --> FORBIDDEN
+    }
+    if (!check_branch_exist($author, $project, $source) || !check_branch_exist($author, $project, $dest)) {
+        //La brnahce voule n'existe pas/le projet n'existe pas
+        branch_error();
+    }
+
+    $partitions = \Partition\download($author, $project, $source, \Commit\getLatest($author, $project, $source, $loggedUser), $loggedUser);
+    return \Commit\add($author, $project, $dest, "Merged from ".$source, $partitions, $loggedUser);
+}
+
 /**
  * Remove a branch from a project
  *
