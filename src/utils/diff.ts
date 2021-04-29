@@ -227,14 +227,12 @@ export function partDiff(part_a: HTMLCollectionOf<Element>, part_b: HTMLCollecti
         LCS[i] !== measures_a[actualIndex] &&
         actualIndex < measures_a.length
       ) {
-        const measure = part_a[actualIndex].cloneNode(true) as Element;
-        diff.appendChild(measure);
+        diff.appendChild(part_a[actualIndex].cloneNode(true));
         measureDiff(part_a[actualIndex], part_b[baseIndex], diff.lastChild as Element)
         actualIndex++;
       } else {
-        const measure = part_b[baseIndex].cloneNode(true) as Element;
-        diff.appendChild(measure);
-        markNotesRemoved(measure.children, diff.lastChild as Element)
+        diff.appendChild(part_b[baseIndex].cloneNode(true));
+        markNotesRemoved(part_b[baseIndex].children, diff.lastChild as Element)
       }
       baseIndex++;
     }
@@ -242,14 +240,12 @@ export function partDiff(part_a: HTMLCollectionOf<Element>, part_b: HTMLCollecti
       LCS[i] !== measures_a[actualIndex] &&
       actualIndex < measures_a.length
     ) {
-      const measure = part_a[actualIndex].cloneNode(true) as Element;
-      diff.appendChild(measure);
-      markNotesAdded(measure.children, diff.lastChild as Element)
+      diff.appendChild(part_a[actualIndex].cloneNode(true));
+      markNotesAdded(part_a[actualIndex].children, diff.lastChild as Element)
       actualIndex++;
     }
     if (LCS[i] !== undefined) {
-      const measure = part_b[baseIndex].cloneNode(true) as Element;
-      diff.appendChild(measure);
+      diff.appendChild(part_b[baseIndex].cloneNode(true));
     }
     baseIndex++;
     actualIndex++;
