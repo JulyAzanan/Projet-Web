@@ -27,8 +27,8 @@ jobs:
 
       - name: npm install, build
         run: |
-          npm ci
-          npm run build
+          yarn install
+          yarn build
 
       - name: Deploy to pedago
         run: |
