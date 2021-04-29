@@ -8,9 +8,9 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import score1 from "@/scores/E12_intermission.musicxml";
-import score2 from "@/scores/E12_intermission-1.musicxml";
-import { measureDiff, partDiff } from "@/utils/diff";
+import score2 from "@/scores/E12_intermission.musicxml";
+import score1 from "@/scores/E12_intermission-2.musicxml";
+import { scoreDiff } from "@/utils/diff";
 
 export default defineComponent({
   props: {
@@ -25,19 +25,9 @@ export default defineComponent({
     const base = parser.parseFromString(score1, "text/xml");
     const diff = parser.parseFromString(score2, "text/xml");
 
-    const parts_a = actual.getElementsByTagName("part");
-    const parts_b = base.getElementsByTagName("part");
-    const parts_d = diff.getElementsByTagName("part");
-    for (let i_p = 0; i_p < /* parts_d.length */ 1; i_p++) {
-      const measures_a = parts_a[i_p].getElementsByTagName("measure");
-      const measures_b = parts_b[i_p].getElementsByTagName("measure");
-      const measures_d = parts_d[i_p].getElementsByTagName("measure");
-      partDiff(measures_a, measures_b, parts_d[i_p])
-      /* for (let i_m = 0; i_m < measures_d.length; i_m++) {
-        measureDiff(measures_a[i_m], measures_b[i_m], measures_d[i_m])
-        // console.log(measures_d[i_m].outerHTML)
-      } */
-    }
+    scoreDiff(actual, base, diff.documentElement);
+    console.log(diff)
+    // console.log(new XMLSerializer().serializeToString(diff))
 
     async function loadScore() {
       const osmd = new OpenSheetMusicDisplay(osmdContainer.value!, {

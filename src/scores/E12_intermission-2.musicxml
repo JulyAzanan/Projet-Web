@@ -285,18 +285,6 @@
       <backup>
         <duration>24</duration>
         </backup>
-      <note default-x="13.80" default-y="-125.00">
-        <pitch>
-          <step>D</step>
-          <octave>3</octave>
-          </pitch>
-        <duration>3</duration>
-        <voice>5</voice>
-        <type>eighth</type>
-        <stem>down</stem>
-        <staff>2</staff>
-        <beam number="1">begin</beam>
-        </note>
       <note default-x="38.33" default-y="-115.00">
         <pitch>
           <step>F</step>

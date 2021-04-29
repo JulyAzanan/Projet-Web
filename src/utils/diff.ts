@@ -9,9 +9,9 @@ interface Note {
 }
 
 const colors = {
-  added: "#00FF00",
-  removed: "#FF0000",
-  modified: "#FFAA00"
+  added: "#69B32B",
+  removed: "#F94144",
+  modified: "#F9C74F"
 }
 
 function removeAttributes_(el: Element): void {
@@ -180,30 +180,142 @@ function splitMeasure(measure: Element): NoteArray[] {
   return notes;
 }
 
+function markMeasuresAdded(notes: Element[] | HTMLCollection, diff: Element): void {
+  for (const element of notes) {
+    const el = element.cloneNode(true) as Element;
+    diff.appendChild(removeChildren(el.cloneNode(true) as Element));
+    markNotesAdded(el.children, diff.lastChild as Element);
+  }
+}
+
 function markNotesAdded(notes: Element[] | HTMLCollection, diff: Element): void {
   for (const element of notes) {
+    const el = element.cloneNode(true) as Element;
     if (element.tagName === "note") {
-      const el = element.cloneNode(true) as Element;
       el.setAttribute("color", colors.added);
-      diff.appendChild(el);
     }
+    diff.appendChild(el);
+  }
+}
+
+function markMeasuresRemoved(notes: Element[] | HTMLCollection, diff: Element): void {
+  for (const element of notes) {
+    const el = element.cloneNode(true) as Element;
+    diff.appendChild(removeChildren(el.cloneNode(true) as Element));
+    markNotesRemoved(el.children, diff.lastChild as Element);
   }
 }
 
 function markNotesRemoved(notes: Element[] | HTMLCollection, diff: Element): void {
   for (const element of notes) {
+    const el = element.cloneNode(true) as Element;
     if (element.tagName === "note") {
-      const el = element.cloneNode(true) as Element;
       el.setAttribute("color", colors.removed);
-      diff.appendChild(el);
     }
+    diff.appendChild(el);
+  }
+}
+
+function removeChildren(el: Element): Element {
+  while (el.firstChild) {
+    el.firstChild.remove();
+  }
+  return el;
+}
+
+function setPartNumber(el: Element, n: number) {
+  if (el.hasAttribute("id")) {
+    el.setAttribute("id", el.getAttribute("id")!.replace(/P\d+/, `P${n}`))
+  }
+  for (const child of el.children) {
+    setPartNumber(child, n);
+  }
+}
+
+export function scoreDiff(score_a: Document, score_b: Document, diff: Element): void {
+  const diffPartList = diff.getElementsByTagName("part-list")[0];
+
+  while (diff.getElementsByTagName("part").length > 0) {
+    diff.getElementsByTagName("part")[0].remove();
+  }
+  while (diffPartList.children.length > 0) {
+    diffPartList.children[0].remove();
+  }
+  /* console.log(diff.getElementsByTagName("part"))
+  console.log(diff)
+  return; */
+
+  const scoreParts_a = score_a.getElementsByTagName("part-list")[0].getElementsByTagName("score-part");
+  const scoreParts_b = score_b.getElementsByTagName("part-list")[0].getElementsByTagName("score-part");
+  const parts_a = score_a.getElementsByTagName("part");
+  const parts_b = score_b.getElementsByTagName("part");
+  const partNames_a: string[] = [];
+  const partNames_b: string[] = [];
+
+  for (const el of scoreParts_a) {
+    partNames_a.push(el.getElementsByTagName("part-name")[0].firstChild!.textContent!);
+  }
+  for (const el of scoreParts_b) {
+    partNames_b.push(el.getElementsByTagName("part-name")[0].firstChild!.textContent!);
+  }
+
+  const LCS = longestCommonSubsequence(partNames_a, partNames_b);
+  let actualIndex = 0;
+  let baseIndex = 0;
+
+  let partNumber = 1;
+  for (let i = 0; i <= LCS.length; i++) {
+    while (
+      LCS[i] !== partNames_b[baseIndex] &&
+      baseIndex < partNames_b.length
+    ) {
+      if (
+        LCS[i] !== partNames_a[actualIndex] &&
+        actualIndex < partNames_a.length
+      ) {
+        const scorePart = diffPartList.appendChild(scoreParts_a[actualIndex].cloneNode(true)) as Element;
+        setPartNumber(scorePart, partNumber);
+        const part = diff.appendChild(parts_a[actualIndex].cloneNode(true)) as Element;
+        partDiff(parts_a[actualIndex].children, parts_b[baseIndex].children, diff.lastChild as Element);
+        part.setAttribute("id", `P${partNumber}`);
+        actualIndex++;
+      } else {
+        const scorePart = diffPartList.appendChild(scoreParts_b[baseIndex].cloneNode(true)) as Element;
+        setPartNumber(scorePart, partNumber);
+        const part = diff.appendChild(removeChildren(parts_b[baseIndex].cloneNode(true) as Element));
+        markMeasuresRemoved(parts_b[baseIndex].children, diff.lastChild as Element);
+        part.setAttribute("id", `P${partNumber}`);
+      }
+      baseIndex++;
+      partNumber++;
+    }
+    while (
+      LCS[i] !== partNames_a[actualIndex] &&
+      actualIndex < partNames_a.length
+    ) {
+      const scorePart = diffPartList.appendChild(scoreParts_a[actualIndex].cloneNode(true)) as Element;
+      setPartNumber(scorePart, partNumber);
+      const part = diff.appendChild(parts_a[actualIndex].cloneNode(true)) as Element;
+      markMeasuresAdded(parts_a[actualIndex].children, diff.lastChild as Element);
+      part.setAttribute("id", `P${partNumber}`);
+      actualIndex++;
+      partNumber++;
+    }
+    if (LCS[i] !== undefined) {
+      const scorePart = diffPartList.appendChild(scoreParts_a[actualIndex].cloneNode(true)) as Element;
+      setPartNumber(scorePart, partNumber);
+      const part = diff.appendChild(parts_a[actualIndex].cloneNode(true)) as Element;
+      partDiff(parts_a[actualIndex].children, parts_b[baseIndex].children, diff.lastChild as Element);
+      part.setAttribute("id", `P${partNumber}`);
+    }
+    baseIndex++;
+    actualIndex++;
+    partNumber++;
   }
 }
 
 export function partDiff(part_a: HTMLCollectionOf<Element>, part_b: HTMLCollectionOf<Element>, diff: Element): void {
-  while (diff.firstChild) {
-    diff.firstChild.remove();
-  }
+  removeChildren(diff);
 
   const measures_a: string[] = [];
   const measures_b: string[] = [];
@@ -218,6 +330,7 @@ export function partDiff(part_a: HTMLCollectionOf<Element>, part_b: HTMLCollecti
   let actualIndex = 0;
   let baseIndex = 0;
 
+  let measureNumber = 1;
   for (let i = 0; i <= LCS.length; i++) {
     while (
       LCS[i] !== measures_b[baseIndex] &&
@@ -227,32 +340,40 @@ export function partDiff(part_a: HTMLCollectionOf<Element>, part_b: HTMLCollecti
         LCS[i] !== measures_a[actualIndex] &&
         actualIndex < measures_a.length
       ) {
-        diff.appendChild(part_a[actualIndex].cloneNode(true));
-        measureDiff(part_a[actualIndex], part_b[baseIndex], diff.lastChild as Element)
+        const measure = diff.appendChild(removeChildren(part_a[actualIndex].cloneNode(true) as Element));
+        measureDiff(part_a[actualIndex], part_b[baseIndex], diff.lastChild as Element);
+        measure.setAttribute("number", `${measureNumber}`)
         actualIndex++;
       } else {
-        diff.appendChild(part_b[baseIndex].cloneNode(true));
-        markNotesRemoved(part_b[baseIndex].children, diff.lastChild as Element)
+        const measure = diff.appendChild(removeChildren(part_b[baseIndex].cloneNode(true) as Element));
+        markNotesRemoved(part_b[baseIndex].children, diff.lastChild as Element);
+        measure.setAttribute("number", `${measureNumber}`)
       }
       baseIndex++;
+      measureNumber++;
     }
     while (
       LCS[i] !== measures_a[actualIndex] &&
       actualIndex < measures_a.length
     ) {
-      diff.appendChild(part_a[actualIndex].cloneNode(true));
-      markNotesAdded(part_a[actualIndex].children, diff.lastChild as Element)
+      const measure = diff.appendChild(removeChildren(part_a[actualIndex].cloneNode(true) as Element));
+      markNotesAdded(part_a[actualIndex].children, diff.lastChild as Element);
+      measure.setAttribute("number", `${measureNumber}`)
       actualIndex++;
+      measureNumber++;
     }
     if (LCS[i] !== undefined) {
       diff.appendChild(part_b[baseIndex].cloneNode(true));
+      const measure = diff.lastChild as Element;
+      measure.setAttribute("number", `${measureNumber}`)
     }
     baseIndex++;
     actualIndex++;
+    measureNumber++;
   }
 }
 
-export function measureDiff(measure_a: Element, measure_b: Element, diff: Element): void {
+function measureDiff(measure_a: Element, measure_b: Element, diff: Element): void {
   while (diff.firstChild) {
     diff.firstChild.remove();
   }
