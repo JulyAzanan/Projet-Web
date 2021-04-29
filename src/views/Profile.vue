@@ -5,24 +5,24 @@
         <div class="uk-width-1-3@s uk-margin-medium-right">
           <div v-if="ready">
             <div class="uk-text-center">
-               <div
-                  class="uk-inline-clip uk-transition-toggle uk-light"
-                  tabindex="0"
-                  uk-form-custom
-                >
-                 <input
+              <div
+                class="uk-inline-clip uk-transition-toggle uk-light"
+                tabindex="0"
+                uk-form-custom
+              >
+                <input
                   @change="changePicture"
                   type="file"
                   accept="image/x-png,image/gif,image/jpeg"
                 />
-                  <UserPicture :user="user" :size="15" />
-                  <div class="uk-position-center">
-                    <span
-                      class="uk-transition-fade"
-                      uk-icon="icon: upload; ratio: 5"
-                    ></span>
-                  </div>
+                <UserPicture :user="user" :size="15" />
+                <div class="uk-position-center">
+                  <span
+                    class="uk-transition-fade"
+                    uk-icon="icon: upload; ratio: 5"
+                  ></span>
                 </div>
+              </div>
             </div>
             <h2 class="uk-text-center">
               {{ user.name }}
@@ -90,6 +90,7 @@
                 <div class="uk-margin">
                   <div class="uk-form-controls">
                     <button
+                      type="button"
                       @click="updateAccount"
                       class="uk-button uk-button-primary uk-width-1-1"
                       :disabled="invalidEmail"
@@ -141,8 +142,8 @@
         <button class="uk-modal-close-default" type="button" uk-close></button>
         <h2 class="uk-modal-title">Attention</h2>
         <p>
-          Vous êtes sur le point de supprimer votre compte.
-          Cette action est irréversible, êtes vous sûr de vouloir poursuivre ?
+          Vous êtes sur le point de supprimer votre compte. Cette action est
+          irréversible, êtes vous sûr de vouloir poursuivre ?
         </p>
         <p class="uk-text-right">
           <button
@@ -151,11 +152,14 @@
           >
             Annuler
           </button>
-          <button class="uk-button uk-button-danger uk-modal-close" type="button" @click="deleteAccount">
+          <button
+            class="uk-button uk-button-danger uk-modal-close"
+            type="button"
+            @click="deleteAccount"
+          >
             Supprimer le compte
           </button>
         </p>
-
       </div>
     </div>
   </div>
@@ -171,6 +175,7 @@ import UserCard from "@/components/User/UserCard.vue";
 import store from "@/app/store";
 import router, { notFound } from "@/app/routes";
 import debounce from "@/utils/debounce";
+import { notifySuccess, notifyWarning } from "@/utils/notification";
 
 export default defineComponent({
   props: {
@@ -216,7 +221,7 @@ export default defineComponent({
 
     watch(
       () => store.state.loggedIn,
-      () => router.replace({ name: "Login" })
+      (loggedIn) => loggedIn || router.replace({ name: "Login" })
     );
 
     async function init() {
@@ -245,17 +250,21 @@ export default defineComponent({
           picture: content,
         });
         user.value.picture = content;
+        notifySuccess("Image de profil mise à jour");
       };
     }
 
     async function updateAccount() {
-      return User.edit(store.state.user, {
+      const success = User.edit(store.state.user, {
         email: user.value.email,
         age: user.value.age,
         bio: user.value.bio,
         password: newPassword.value === "" ? null : newPassword.value,
       });
+      if (success) notifySuccess("Profil mis à jour");
+      else notifyWarning("Erreur lors de la mise à jour du profil");
     }
+
     async function deleteAccount() {
       await User.remove(store.state.user);
       store.commit("logout");

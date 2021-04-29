@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="uk-container">
+    <div class="uk-container uk-container-large">
       <div class="uk-grid-divider" uk-grid>
         <div class="uk-width-2-3@s">
           <div class="uk-child-width-auto" uk-grid>
@@ -30,7 +30,16 @@
               </span>
               <span v-else uk-spinner></span>
             </div>
-            <div>
+            <div class="uk-button-group">
+              <a
+                v-if="isContributor"
+                class="uk-button uk-button-default"
+                href="#new-commit"
+                uk-toggle
+              >
+                Commit
+                <span class="uk-margin-small-left" uk-icon="icon: push"></span>
+              </a>
               <button class="uk-button uk-button-primary">
                 Télécharger
                 <span
@@ -82,7 +91,12 @@
         </div>
       </div>
     </div>
-    <br />
+    <NewCommit
+      v-if="isContributor"
+      :userName="userName"
+      :projectName="projectName"
+      :branchName="branchName"
+    />
   </div>
 </template>
 
@@ -91,8 +105,10 @@ import { defineComponent, ref, watch, reactive, WatchStopHandle } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import * as Project from "@/api/project";
 import * as Branch from "@/api/branch";
+import store from "@/app/store";
 import router, { notFound } from "@/app/routes";
 import UserPicture from "@/components/User/UserPicture.vue";
+import NewCommit from "@/components/Branch/NewCommit.vue";
 
 export default defineComponent({
   props: {
@@ -103,6 +119,7 @@ export default defineComponent({
   },
   components: {
     UserPicture,
+    NewCommit,
   },
   setup(props) {
     const page = reactive({
@@ -168,8 +185,13 @@ export default defineComponent({
       }
     });
 
+    const isContributor =
+      true || // temp
+      (store.state.loggedIn &&
+        props.project?.contributors.some((c) => c.name === store.state.user));
+
     init();
-    return { page, branch, selectedBranch };
+    return { page, branch, selectedBranch, isContributor };
   },
 });
 </script>

@@ -15,12 +15,13 @@ function getPassword(): string {
 
 function getHeaders(): Headers {
   const headers = new Headers();
-  if (localStorage.getItem("loggedUser")) headers.set('Authorization', 'Basic ' + btoa(`${getUser()}:${getPassword()}`));
+  if (store.state.loggedIn) headers.set('Authorization', 'Basic ' + btoa(`${getUser()}:${getPassword()}`));
   return headers;
 }
 
 function createRequest(method: string) {
-  return async (url: string, body: any) => {
+  // eslint-disable-next-line
+  return async (url: string, body: any): Promise<Response> => {
     const headers = getHeaders();
     headers.set('Content-Type', "application/json");
     return fetch(connection + url, {
@@ -37,7 +38,7 @@ export async function exception(response: Response): Promise<never> {
   throw new Error(`${response.statusText}: ${text}`)
 }
 
-export async function get(url: string) {
+export async function get(url: string): Promise<Response> {
   return fetch(connection + url, {
     method: "GET",
     headers: getHeaders(),
@@ -48,6 +49,7 @@ export const post = createRequest("POST");
 export const delete_ = createRequest("DELETE");
 export const patch = createRequest("PATCH");
 
+// eslint-disable-next-line
 export async function json(url: string, params?: Record<string, any>): Promise<any> {
   const response = await get(url + params ? `?${new URLSearchParams(params)}`: "" );
   if (response.ok) return response.json();

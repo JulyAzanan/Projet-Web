@@ -62,12 +62,14 @@ export async function fetch(user: string, project: string, branch: string, commi
   })
 }
 
+export interface ScoreInput {
+  name: string,
+  content: string,
+}
+
 export interface ContentInput {
   message: string,
-  partitions: {
-    name: string,
-    content: string,
-  }[]
+  scores: ScoreInput[]
 }
 
 export async function add(user: string, project: string, branch: string, content: ContentInput): Promise<void> {

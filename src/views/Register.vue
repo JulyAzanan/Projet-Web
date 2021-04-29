@@ -11,7 +11,7 @@
               class="uk-input"
               :class="{ 'uk-form-danger': invalidUser }"
               type="text"
-              placeholder="Nom d'utilisateur"
+              placeholder="Nom d'utilisateur*"
               required
               autofocus
               @input="checkUser"
@@ -26,7 +26,7 @@
               v-model="password"
               class="uk-input"
               type="password"
-              placeholder="Mot de passe"
+              placeholder="Mot de passe*"
               required
             />
           </div>
@@ -62,6 +62,7 @@
 
         <div class="uk-width-auto">
           <button
+            type="submit"
             @click="register"
             class="uk-button uk-button-primary uk-width-1-1"
             :disabled="invalidUser || invalidEmail"
@@ -94,8 +95,9 @@ export default defineComponent({
     const invalidUser = ref(false);
     const invalidEmail = ref(false);
 
-    async function register() {
+    async function register(event: Event) {
       if (userName.value === "" || password.value === "") return;
+      event.preventDefault();
       const success = await User.register(
         userName.value,
         password.value,
