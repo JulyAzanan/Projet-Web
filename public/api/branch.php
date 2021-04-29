@@ -29,6 +29,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     $user = auth();
                     echo json_encode(\Branch\getBranch($_GET['user'], $_GET['project'], $_GET['branch'], $user));
                     break;
+                
+                case 'merge':
+                    $user = auth();
+                    echo json_encode(\Branch\merge($_GET['user'], $_GET['project'], $_GET['source'], $_GET['dest'], $user));
 
                 default:
                     query_error();
