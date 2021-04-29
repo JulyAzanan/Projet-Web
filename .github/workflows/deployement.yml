@@ -32,5 +32,4 @@ jobs:
 
       - name: Deploy to pedago
         run: |
-          rm -rf .git* .vscode diff ts*
           scp -r -i ~/.ssh/id_rsa ./dist/* mael.acier@pedago-etu.ensiie.fr:~/public_html/musegit/
