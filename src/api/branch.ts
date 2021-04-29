@@ -13,13 +13,13 @@ export interface FetchResult extends BaseResult {
 
 export async function fetch(user: string, project: string, branch?: string | null): Promise<FetchResult | null> {
   if (branch == null) return null;
-  await sleep(500);
+  /* await sleep(500);
   return {
     name: "foo",
     lastCommit: "8f5e91",
     commitsCount: 4,
     updatedAt: new Date(),
-  }
+  } */
   //
   return Request.json("api/branch.php", {
     q: "getBranch",
@@ -30,8 +30,8 @@ export async function fetch(user: string, project: string, branch?: string | nul
 }
 
 export async function add(user: string, project: string, branch: string): Promise<boolean> {
-  await sleep(500);
-  return true;
+  /* await sleep(500);
+  return true; */
   //
   const response = await Request.post("api/branch.php", {
     user,
@@ -40,12 +40,13 @@ export async function add(user: string, project: string, branch: string): Promis
   });
   if (response.ok) return true;
   if (response.status === 400) return false;
-  return Request.exception(response);
+  Request.exception(response);
+  return false;
 }
 
 export async function remove(user: string, project: string, branch: string): Promise<void> {
-  await sleep(500);
-  return;
+  /* await sleep(500);
+  return; */
   //
   const response = await Request.delete_("api/branch.php", {
     user, project, branch,
@@ -55,8 +56,8 @@ export async function remove(user: string, project: string, branch: string): Pro
 }
 
 export async function rename(user: string, project: string, branch: string, new_name: string): Promise<boolean> {
-  await sleep(500);
-  return true;
+  /* await sleep(500);
+  return true; */
   //
   const response = await Request.patch("api/branch.php", {
     user,
@@ -66,11 +67,12 @@ export async function rename(user: string, project: string, branch: string, new_
   });
   if (response.ok) return true;
   if (response.status === 401) return false;
-  return Request.exception(response);
+  Request.exception(response);
+  return false;
 }
 
 export async function all(user: string, project: string): Promise<BaseResult[]> {
-  await sleep(500);
+  /* await sleep(500);
   return [{
     name: "foo",
     updatedAt: new Date()
@@ -83,7 +85,7 @@ export async function all(user: string, project: string): Promise<BaseResult[]> 
   }, {
     name: "dev",
     updatedAt: new Date()
-  }]
+  }] */
   //
   return Request.json("api/project.php", {
     q: "fetchAll",
@@ -93,8 +95,8 @@ export async function all(user: string, project: string): Promise<BaseResult[]> 
 }
 
 export async function find(user: string, project: string, branch: string): Promise<boolean> {
-  await sleep(500);
-  return false;
+  /* await sleep(500);
+  return false; */
   //
   return Request.json("api/branch.php", {
     q: "find",
@@ -105,8 +107,8 @@ export async function find(user: string, project: string, branch: string): Promi
 }
 
 export async function count(user: string, project: string): Promise<number> {
-  await sleep(500);
-  return 52;
+  /* await sleep(500);
+  return 52; */
   // 
   return Request.json("api/branch.php", {
     q: "count",

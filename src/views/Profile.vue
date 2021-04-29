@@ -129,6 +129,7 @@
                 v-for="friend in user.following"
                 :key="friend.name"
                 :user="friend"
+                class="uk-width-auto"
               />
             </div>
             <Pagination :page="parseInt(page)" :pages="pages" />
@@ -226,7 +227,7 @@ export default defineComponent({
 
     async function init() {
       const page = parseInt(props.page!);
-      const result = await User.profile();
+      const result = await User.profile(page);
       if (result === null) return notFound();
       user.value = result;
       if (result.following.length === 0 && page != 1) {

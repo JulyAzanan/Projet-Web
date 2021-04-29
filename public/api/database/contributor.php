@@ -140,7 +140,7 @@ function fetchAll($authorName, $project, $loggedUser)
         project_error();
     }
 
-    $sql = "SELECT m.name, m.email, m.latestCommit, m.age, m.bio, m.picture, FROM musician m JOIN contributor c
+    $sql = "SELECT m.name, m.email, m.latestCommit, m.age, m.bio, m.picture FROM musician m JOIN contributor c
     ON m.name = c.contributorName
     JOIN project p
     ON p.name = c.projectName AND p.authorName = c.authorName

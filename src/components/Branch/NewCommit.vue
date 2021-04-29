@@ -159,7 +159,6 @@ export default defineComponent({
         props.branchName!,
         content
       );
-      console.log(closeButton);
       closeButton.value?.click();
       showProgress.value = false;
       files.value.splice(0, files.value.length);

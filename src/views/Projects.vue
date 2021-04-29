@@ -25,7 +25,7 @@
                   :key="project.name"
                   :isPrivate="project.private"
                   :projectName="project.name"
-                  :userName="project.author"
+                  :userName="project.authorName"
                   :updatedAt="project.updatedAt"
                   showAuthor
                 />

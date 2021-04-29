@@ -143,7 +143,6 @@ function remove($author, $project, $loggedUser)
 function getProject($user, $project, $loggedUser)
 {
     check_not_null($user, $project);
-
     $projectInfo = find($user, $project, $loggedUser);
     $projectInfo->contributors = \Contributor\fetchAll($user, $project, $loggedUser);
     $projectInfo->branches = \Branch\fetchAll($user, $project, $loggedUser);
@@ -212,7 +211,6 @@ function fetchAllFromUser($first, $after, $user, $order, $loggedUser)
     $stmt = $bd->prepare($sql);
     $stmt->bindValue(':pauthorname', $user, \PDO::PARAM_STR);
     $stmt->bindValue(':contributorname', $loggedUser, \PDO::PARAM_STR);
-    $stmt->bindValue(':order', $real_order, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $first, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', $after, \PDO::PARAM_INT);
     if (!$stmt->execute()) {
@@ -372,7 +370,7 @@ function find($user, $project, $loggedUser)
 {
     check_not_null($user, $project);
 
-    $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private
+    $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private, mainBranchName
     FROM project p
     WHERE p.name = :projectname
     AND ( p.private = 'f' OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName) OR p.authorName = :contributorname OR :contributorname = 'admin' )";
@@ -396,6 +394,7 @@ function find($user, $project, $loggedUser)
         'createdAt' => $res['createdat'],
         'description' => $res['description'],
         'private' => $res['private'],
+        'mainBranch' => $res['mainbranchname'],
     ];
     return $proj;
 

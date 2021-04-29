@@ -13,16 +13,16 @@ function getPassword(): string {
   return localStorage.getItem("password") ?? ""
 }
 
-function getHeaders(): Headers {
+function getHeaders(url: string): Headers {
   const headers = new Headers();
-  if (store.state.loggedIn) headers.set('Authorization', 'Basic ' + btoa(`${getUser()}:${getPassword()}`));
+  if (store.state.loggedIn || url.split("?").pop() === "q=login") headers.set('Authorization', 'Basic ' + btoa(`${getUser()}:${getPassword()}`));
   return headers;
 }
 
 function createRequest(method: string) {
   // eslint-disable-next-line
   return async (url: string, body: any): Promise<Response> => {
-    const headers = getHeaders();
+    const headers = getHeaders(url);
     headers.set('Content-Type', "application/json");
     return fetch(connection + url, {
       method,
@@ -41,7 +41,7 @@ export async function exception(response: Response): Promise<never> {
 export async function get(url: string): Promise<Response> {
   return fetch(connection + url, {
     method: "GET",
-    headers: getHeaders(),
+    headers: getHeaders(url),
   });
 }
 
@@ -51,7 +51,7 @@ export const patch = createRequest("PATCH");
 
 // eslint-disable-next-line
 export async function json(url: string, params?: Record<string, any>): Promise<any> {
-  const response = await get(url + params ? `?${new URLSearchParams(params)}`: "" );
+  const response = await get(url + (params ? `?${new URLSearchParams(params)}`: "") );
   if (response.ok) return response.json();
   return exception(response);
 }

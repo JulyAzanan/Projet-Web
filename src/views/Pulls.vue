@@ -26,7 +26,7 @@ export default defineComponent({
     const diff = parser.parseFromString(score2, "text/xml");
 
     scoreDiff(actual, base, diff.documentElement);
-    console.log(diff)
+    // console.log(diff)
     // console.log(new XMLSerializer().serializeToString(diff))
 
     async function loadScore() {

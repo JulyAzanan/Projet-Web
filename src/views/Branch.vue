@@ -187,7 +187,7 @@ export default defineComponent({
 
     const isContributor =
       true || // temp
-      (store.state.loggedIn &&
+      (store.state.loggedIn && props.project?.author === store.state.user ||
         props.project?.contributors.some((c) => c.name === store.state.user));
 
     init();

@@ -44,7 +44,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case "POST":
         $data = get_JSON();
         $user = auth();
-        $ok = \Commit\add($data->user, $data->project, $data->branch, $data->message, $data->partitions, $user);
+        $ok = \Commit\add($data->user, $data->project, $data->branch, $data->message, $data->scores, $user);
         if (!$ok) {
             PDO_error();
         }
