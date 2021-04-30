@@ -13,7 +13,21 @@
           <strong>{{ commit.author }}</strong> {{ commit.message }}
         </div>
         <div>
-          <code> {{ commitID }} </code>
+          <div uk-form-custom>
+            <select
+              class="uk-select uk-form-width-small uk-margin-small-right"
+              v-model="selectedCommit"
+            >
+              <option
+                v-for="commit in branch.commits"
+                :key="commit.id"
+                :value="commit.id"
+              >
+                {{ commit.id }}
+              </option>
+            </select>
+            <code> {{ commitID }} </code>
+          </div>
           {{ commit.createdAt.toLocaleString() }}
         </div>
       </div>
@@ -23,12 +37,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from "vue";
+import { defineComponent, ref, reactive, WatchStopHandle, watch } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import UserPicture from "@/components/User/UserPicture.vue";
 import * as Branch from "@/api/branch";
 import * as Commit from "@/api/commit";
-import { notFound } from "@/app/routes";
+import router, { notFound } from "@/app/routes";
 
 export default defineComponent({
   props: {
@@ -42,6 +56,7 @@ export default defineComponent({
     UserPicture,
   },
   setup(props) {
+    const selectedCommit = ref(props.commitID);
     const page = reactive({
       ready: false,
     });
@@ -55,6 +70,8 @@ export default defineComponent({
       files: [],
     });
 
+    let stopCommitWatcher: WatchStopHandle = () => {};
+
     async function init(commitID?: string) {
       const result = await Commit.fetch(
         props.userName!,
@@ -64,6 +81,19 @@ export default defineComponent({
       );
       if (result === null) return notFound();
       commit.value = result;
+      stopCommitWatcher();
+      selectedCommit.value = props.commitID;
+      stopCommitWatcher = watch(selectedCommit, async () => {
+        await router.replace({
+          name: "Files",
+          params: {
+            userName: props.userName!,
+            projectName: props.projectName!,
+            branchName: props.branchName!,
+            commitID: selectedCommit.value!,
+          },
+        });
+      });
       page.ready = true;
     }
 
@@ -79,7 +109,7 @@ export default defineComponent({
     });
 
     init();
-    return { page, commit };
+    return { page, commit, selectedCommit };
   },
 });
 </script>

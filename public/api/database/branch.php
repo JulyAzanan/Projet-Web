@@ -267,6 +267,7 @@ function getBranch($author, $project, $branch, $loggedUser) {
     $branchInfo = find($author, $project, $branch, $loggedUser);
     $branchInfo->commitsCount = \Commit\count($author, $project, $branch, $loggedUser);
     $branchInfo->lastCommit = \Commit\getLatest($author, $project, $branch, $loggedUser);
+    $branchInfo->commits = \Commit\fetchAll($author, $project, $branch, $loggedUser);
     return $branchInfo;
 }
 /**

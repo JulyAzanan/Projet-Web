@@ -30,21 +30,25 @@
               >Changements
             </router-link>
           </li>
-          <li>
+          <li v-if="isContributor">
             <router-link
               :to="{ name: 'Contributors', params: { userName, projectName } }"
               >Contributeurs
             </router-link>
           </li>
-          <li>
+          <li v-if="isContributor">
             <router-link
-              :to="{ name: 'ProjectSettings', params: { userName, projectName } }"
+              :to="{
+                name: 'ProjectSettings',
+                params: { userName, projectName },
+              }"
               >Paramètres
             </router-link>
           </li>
         </ul>
 
-        <router-view v-if="page.ready" :project="project" :refresh="refresh"> </router-view>
+        <router-view v-if="page.ready" :project="project">
+        </router-view>
         <div v-else uk-spinner></div>
       </div>
     </div>
@@ -56,7 +60,7 @@ import { defineComponent, ref, reactive, watch, computed } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import router, { notFound } from "@/app/routes";
 import * as Project from "@/api/project";
-import store from "@/app/store";
+import { isContributor } from "@/utils/contributor";
 
 export default defineComponent({
   props: {
@@ -64,14 +68,13 @@ export default defineComponent({
     projectName: String,
   },
   setup(props) {
-    const refresh = ref(false);
     const page = reactive({
       ready: false,
       valid: false,
     });
     const project = ref<Project.FetchResult>({
       name: "",
-      author: "",
+      authorName: "",
       private: false,
       contributors: [],
       branches: [],
@@ -84,6 +87,7 @@ export default defineComponent({
     async function init() {
       const result = await Project.fetch(props.userName!, props.projectName);
       if (result === null) return notFound();
+      console.log(result)
       project.value = result;
       if (router.currentRoute.value.name === "Branch-default") {
         await router.replace({
@@ -107,7 +111,7 @@ export default defineComponent({
     });
 
     init();
-    return { page, project };
+    return { page, project, isContributor: isContributor(() => project.value) };
   },
 });
 </script>

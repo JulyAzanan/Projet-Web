@@ -1,5 +1,6 @@
 import sleep from "./sleep";
 import * as Request from "../utils/request"
+import * as Commit from "./commit"
 
 export interface BaseResult {
   name: string,
@@ -8,6 +9,7 @@ export interface BaseResult {
 
 export interface FetchResult extends BaseResult {
   commitsCount: number,
+  commits: Commit.BaseResult[],
   lastCommit: string | null,
 }
 

@@ -106,7 +106,7 @@ import { defineComponent, ref, watch, reactive, WatchStopHandle } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import * as Project from "@/api/project";
 import * as Branch from "@/api/branch";
-import store from "@/app/store";
+import { isContributor } from "@/utils/contributor";
 import router, { notFound } from "@/app/routes";
 import UserPicture from "@/components/User/UserPicture.vue";
 import NewCommit from "@/components/Branch/NewCommit.vue";
@@ -130,6 +130,7 @@ export default defineComponent({
     const selectedBranch = ref(props.branchName);
     const branch = ref<Branch.FetchResult>({
       name: "",
+      commits: [],
       lastCommit: null,
       commitsCount: 0,
       updatedAt: new Date(),
@@ -186,13 +187,8 @@ export default defineComponent({
       }
     });
 
-    const isContributor =
-      true || // temp
-      (store.state.loggedIn && props.project?.author === store.state.user ||
-        props.project?.contributors.some((c) => c.name === store.state.user));
-
     init();
-    return { page, branch, selectedBranch, isContributor, init };
+    return { page, branch, selectedBranch, isContributor: isContributor(() => props.project), init };
   },
 });
 </script>

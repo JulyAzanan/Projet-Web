@@ -3,7 +3,7 @@ import * as User from "./user"
 import * as Request from "../utils/request"
 import * as Score from "./score"
 
-interface BaseResult {
+export interface BaseResult {
   id: string,
   message: string,
   createdAt: Date,

@@ -7,7 +7,7 @@ export const perPage = 15;
 
 export interface BaseResult {
   name: string,
-  author: string
+  authorName: string
   private: boolean,
   updatedAt: Date,
   createdAt: Date,
