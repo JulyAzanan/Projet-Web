@@ -5,7 +5,6 @@ require_once __DIR__ . "/error.php";
 
 function auth()
 {
-    var_dump($_SERVER);
     if (isset($_SERVER["PHP_AUTH_USER"]) && isset($_SERVER["PHP_AUTH_PW"])) {
         if (\User\auth($_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"])) {
             return $user;
