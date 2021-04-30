@@ -87,7 +87,7 @@ const routes: RouteRecordRaw[] = [
       {
         ...load("Contributors"),
         path: "contributors", // Contributors
-        props: true,
+        props: route => ({ page: route.query.page ?? "1", ...route.params }),
       },
       {
         ...load("ProjectSettings"),

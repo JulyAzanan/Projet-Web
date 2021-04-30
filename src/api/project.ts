@@ -83,9 +83,9 @@ export async function remove(user: string, project: string): Promise<void> {
 }
 
 export interface UpdateInput {
-  private: boolean
+  private: boolean | null
   description?: string | null
-  mainBranch: string
+  mainBranch: string | null
 }
 
 export async function edit(user: string, project: string, content: UpdateInput): Promise<boolean> {
@@ -96,6 +96,8 @@ export async function edit(user: string, project: string, content: UpdateInput):
     user,
     project,
     description: null,
+    mainBranch: null,
+    private: false,
     ...content,
   });
   if (response.ok) return true;

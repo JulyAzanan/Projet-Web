@@ -38,7 +38,6 @@
                       @input="checkEmail"
                       :class="{ 'uk-form-danger': invalidEmail }"
                       class="uk-input uk-form-width-large"
-                      id="form-h-text"
                       type="email"
                       autofocus
                       placeholder="email@example.com"
@@ -52,7 +51,6 @@
                     <input
                       v-model="user.age"
                       class="uk-input uk-form-width-large"
-                      id="form-h-text"
                       type="number"
                       placeholder="42"
                     />
@@ -65,7 +63,6 @@
                     <textarea
                       v-model="user.bio"
                       class="uk-textarea uk-form-width-large"
-                      id="form-h-textarea"
                       rows="5"
                       placeholder="Quelques mots..."
                     ></textarea>
@@ -80,7 +77,6 @@
                     <input
                       v-model="newPassword"
                       class="uk-input uk-form-width-large"
-                      id="form-h-text"
                       type="password"
                       placeholder="Nouveau mot de passe"
                     />
