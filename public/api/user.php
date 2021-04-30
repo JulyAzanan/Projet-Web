@@ -12,8 +12,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             switch ($_GET['q']) {
                 case 'login':
                     if (auth() !== null) return;
-                    header("HTTP/1.1 401 Unauthorized");
-                    echo "<h1> 401 Incorrect Credentials </h1>";
+                    unauthorized_error();
                     break;
 
                 case 'fetchAll':

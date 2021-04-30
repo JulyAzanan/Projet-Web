@@ -47,3 +47,8 @@ function forbidden_error()
     echo "<h1> 403 Forbidden </h1>";
     die;
 }
+function unauthorized_error() {
+    header("HTTP/1.1 401 Unauthorized");
+        echo "<h1> 401 Incorrect Credentials </h1>";
+        die;
+}
