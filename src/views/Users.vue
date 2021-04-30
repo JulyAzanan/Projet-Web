@@ -24,6 +24,7 @@
                   v-for="user in users"
                   :key="user.name"
                   :user="user"
+                  class="uk-width-auto"
                 />
               </div>
               <Pagination :page="parseInt(page)" :pages="pages" />

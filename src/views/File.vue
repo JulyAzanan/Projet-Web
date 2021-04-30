@@ -40,7 +40,10 @@
         ></span>
         Extension de fichier non supportée.
       </div>
-      <div v-if="!ready" uk-spinner></div>
+      <div v-if="!ready">
+        <span uk-spinner class="uk-margin-small-right uk-text-muted"></span>
+        Conversion en cours
+      </div>
     </div>
   </div>
 </template>
@@ -53,25 +56,8 @@ import AudioPlayer from "osmd-audio-player";
 import { PlaybackEvent } from "osmd-audio-player/dist/PlaybackEngine";
 import { notFound } from "@/app/routes";
 import * as Score from "@/api/score";
-import WebMscore from "webmscore";
-import { InputFileFormat } from "webmscore/schemas";
+import { parseScore } from "@/utils/musicXML";
 import "@/utils/cursor";
-
-function base64ToUint8Array(data: string) {
-  const binary = atob(data);
-  const array = new Uint8Array(new ArrayBuffer(binary.length));
-
-  for (let i = 0; i < binary.length; i++) {
-    array[i] = binary.charCodeAt(i);
-  }
-  return array;
-}
-
-async function toXml(extension: InputFileFormat, data: string) {
-  await WebMscore.ready;
-  const webMscore = await WebMscore.load(extension, base64ToUint8Array(data));
-  return webMscore.saveXml();
-}
 
 function downloadBase64(data: string, name: string) {
   const link = document.createElement("a");
@@ -106,7 +92,7 @@ export default defineComponent({
       content: "",
     });
     const unkownExtension = ref(false);
-    let xml = "";
+    let xml: Document;
 
     async function init() {
       const result = await Score.fetch(
@@ -118,30 +104,12 @@ export default defineComponent({
       );
       if (result === null) return notFound();
       score.value = result;
-      const extension = score.value.name.split(".").pop();
-      switch (extension) {
-        case "musicxml":
-        case "xml":
-          xml = atob(score.value.content);
-          break;
-
-        case "ptb":
-        case "gp":
-        case "gpx":
-        case "gp5":
-        case "gp4":
-        case "gp3":
-        case "gtp":
-        case "kar":
-        case "midi":
-        case "mscx":
-        case "mscz":
-          xml = await toXml(extension, score.value.content);
-          break;
-        default:
-          unkownExtension.value = true;
-          break;
-      }
+      const doc = await parseScore(
+        score.value.name.split(".").pop(),
+        score.value.content
+      );
+      if (doc !== null) xml = doc;
+      else unkownExtension.value = true;
       ready.value = true;
     }
 
@@ -162,11 +130,7 @@ export default defineComponent({
     async function loadScore() {
       await initialized;
       if (!unkownExtension.value) {
-        osmd = new OpenSheetMusicDisplay(osmdContainer.value!, {
-          backend: "svg",
-          drawTitle: true,
-          drawCredits: true,
-        });
+        osmd = new OpenSheetMusicDisplay(osmdContainer.value!);
 
         await osmd.load(xml);
         osmd.render();

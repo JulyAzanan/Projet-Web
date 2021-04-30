@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup ssh
+        run: |
+          mkdir ~/.ssh
+          echo "${{ secrets.ID_RSA }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H pedago-etu.ensiie.fr >> ~/.ssh/known_hosts
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: npm install, build
+        run: |
+          yarn install
+          yarn build
+
+      - name: Deploy to pedago
+        run: |
+          scp -r -i ~/.ssh/id_rsa ./dist/* mael.acier@pedago-etu.ensiie.fr:~/public_html/musegit/

@@ -17,7 +17,7 @@ export interface FetchResult extends Omit<BaseResult, "publisher"> {
 
 export async function fetch(user: string, project: string, branch: string, commit?: string | null): Promise<FetchResult | null> {
   if (commit == null) return null;
-  await sleep(500);
+  /* await sleep(500);
   return {
     id: "bar",
     createdAt: new Date(),
@@ -51,7 +51,7 @@ export async function fetch(user: string, project: string, branch: string, commi
       message: "La dem est triv'!",
       createdAt: new Date(new Date().getTime() - 34 * 60 * 10151),
     }],
-  };
+  }; */
   //
   return Request.json("api/commit.php", {
     q: "getCommit",
@@ -62,18 +62,26 @@ export async function fetch(user: string, project: string, branch: string, commi
   })
 }
 
+export interface ScoreInput {
+  name: string,
+  content: string,
+}
+
 export interface ContentInput {
   message: string,
-  partitions: {
-    name: string,
-    content: string,
-  }[]
+  scores: ScoreInput[]
 }
 
 export async function add(user: string, project: string, branch: string, content: ContentInput): Promise<void> {
-  await sleep(500);
-  return;
+  /* await sleep(500);
+  return; */
   //
+  console.log({
+    user,
+    project,
+    branch,
+    ...content
+  })
   const response = await Request.post("api/commit.php", {
     user,
     project,
@@ -85,8 +93,8 @@ export async function add(user: string, project: string, branch: string, content
 }
 
 export async function count(user: string, project: string, branch: string): Promise<number> {
-  await sleep(500);
-  return 52;
+  /* await sleep(500);
+  return 52; */
   // 
   return Request.json("api/commit.php", {
     q: "count",
@@ -97,8 +105,8 @@ export async function count(user: string, project: string, branch: string): Prom
 }
 
 export async function find(user: string, project: string, branch: string, commit: string): Promise<boolean> {
-  await sleep(500);
-  return false;
+  /* await sleep(500);
+  return false; */
   //
   return Request.json("api/commit.php", {
     q: "find",
@@ -110,7 +118,7 @@ export async function find(user: string, project: string, branch: string, commit
 }
 
 export async function all(user: string, project: string, branch: string): Promise<BaseResult[]> {
-  await sleep(500);
+  /* await sleep(500);
   return [{
     id: "dqzdeq",
     createdAt: new Date(),
@@ -131,7 +139,7 @@ export async function all(user: string, project: string, branch: string): Promis
     createdAt: new Date(),
     message: "Pour tout n dans la vie",
     publisher: "Steel",
-  }]
+  }] */
   //
   return Request.json("api/commit.php", {
     q: "fetchAll",
@@ -142,7 +150,7 @@ export async function all(user: string, project: string, branch: string): Promis
 }
 
 export async function download(user: string, project: string, branch: string, commit: string): Promise<Score.DownloadResult[]> {
-  await sleep(500);
+  /* await sleep(500);
   return [{
     name: "file1",
     content: "dqsqsfgfdrg"
@@ -155,7 +163,7 @@ export async function download(user: string, project: string, branch: string, co
   },{
     name: "file4",
     content: "dqsgfzerterttttttttttttdrg"
-  },]
+  },] */
   //
   return Request.json("api/commit.php", {
     q: "download",

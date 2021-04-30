@@ -11,7 +11,9 @@ switch ($_SERVER['REQUEST_METHOD']) {
         if (isset($_GET['q'])) {
             switch ($_GET['q']) {
                 case 'login':
-                    auth();
+                    if (auth() !== null) return;
+                    header("HTTP/1.1 401 Unauthorized");
+                    echo "<h1> 401 Incorrect Credentials </h1>";
                     break;
 
                 case 'fetchAll':
@@ -37,7 +39,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
                 case 'getProfile':
                     $user = auth();
-                    echo json_encode(\User\getProfile($user));
+                    echo json_encode(\User\getProfile($_GET['first'], $_GET['after'],$user));
                     break;
 
                 default:

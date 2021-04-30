@@ -13,6 +13,7 @@
     "darkreader": "^4.9.32",
     "opensheetmusicdisplay": "^0.9.5",
     "osmd-audio-player": "^0.6.4",
+    "pretty-bytes": "^5.6.0",
     "uikit": "^3.6.18",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",

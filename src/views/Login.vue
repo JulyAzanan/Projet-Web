@@ -44,6 +44,7 @@
 
         <div class="uk-width-auto">
           <button
+          type="submit"
             @click="login"
             class="uk-button uk-button-default uk-width-1-1"
           >
@@ -77,8 +78,9 @@ export default defineComponent({
     const password = ref("");
     const from = ref({ name: "Home" });
 
-    async function login() {
+    async function login(event: Event) {
       if (userName.value === "" || password.value === "") return;
+      event.preventDefault();
       const success = await User.login(userName.value, password.value);
       if (success) {
         store.commit("login", [userName.value, password.value]);

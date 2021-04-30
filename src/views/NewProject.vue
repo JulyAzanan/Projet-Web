@@ -19,7 +19,7 @@
                 <input
                   class="uk-input"
                   type="text"
-                  :value="userName"
+                  v-model="userName"
                   disabled
                   required
                 />
@@ -33,13 +33,20 @@
               </div>
               <div class="uk-width-expand">
                 <label class="uk-form-label">Projet*</label>
-                <input class="uk-input" type="text" required />
+                <input
+                  class="uk-input"
+                  type="text"
+                  v-model="project"
+                  @input="checkProject"
+                  :class="{ 'uk-form-danger': invalidProject }"
+                  required
+                />
               </div>
             </div>
           </div>
           <div>
             <label class="uk-form-label">Description (Optionnel)</label>
-            <input class="uk-input" type="text" />
+            <input class="uk-input" type="text" v-model="description" />
           </div>
           <hr />
           <div>
@@ -47,7 +54,8 @@
               class="uk-radio"
               type="radio"
               name="public/private"
-              checked
+              v-model="isPrivate"
+              :value="false"
             />
             <span class="uk-icon" uk-icon="ratio:2; icon: users"> </span>
             <label class="uk-text-bold">Public : </label>
@@ -56,7 +64,13 @@
             </label>
           </div>
           <div>
-            <input class="uk-radio" type="radio" name="public/private" />
+            <input
+              class="uk-radio"
+              type="radio"
+              name="public/private"
+              v-model="isPrivate"
+              :value="true"
+            />
             <span class="uk-icon" uk-icon="ratio:2; icon: lock"> </span>
             <label class="uk-text-bold">Privé : </label>
             <label>
@@ -69,11 +83,16 @@
             Le projet sera initialisé avec une branche principale "main". Il
             sera possible de la changer à tout moment.
           </p>
-          <input
-            class="uk-button uk-button-primary"
-            type="submit"
-            value="Créer le projet"
-          />
+          <div class="uk-width-auto">
+            <button
+              type="submit"
+              class="uk-button uk-button-primary"
+              :disabled="invalidProject"
+              @click="createProject"
+            >
+              Créer le projet
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -81,14 +100,63 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
+import { defineComponent, watch, ref } from "vue";
 import store from "@/app/store";
+import router from "@/app/routes";
+import debounce from "@/utils/debounce";
+import { notifyWarning } from "@/utils/notification";
+import * as Project from "@/api/project";
 
 export default defineComponent({
+  beforeRouteEnter(to, _from, next) {
+    if (store.state.loggedIn) next();
+    else next({ name: "Login", query: { redirect: to.fullPath } });
+  },
   setup() {
+    const userName = ref(store.state.user);
+    const project = ref("");
+    const description = ref("");
+    const isPrivate = ref(false);
+    const invalidProject = ref(false);
+
+    watch(
+      () => store.state.loggedIn,
+      (loggedIn) => loggedIn || router.replace({ name: "Login" })
+    );
+
+    async function createProject(event: Event) {
+      if (userName.value === "" || project.value === "") return;
+      event.preventDefault();
+      const success = await Project.add(
+        userName.value,
+        project.value,
+        isPrivate.value,
+        description.value
+      );
+      if (success) {
+        return router.push({
+          name: "Branch-default",
+          params: { userName: userName.value, projectName: project.value },
+        });
+      }
+      project.value = "";
+      notifyWarning("Nom de projet indisponible.");
+    }
+
+    async function projectExists() {
+      invalidProject.value = await Project.find(userName.value, project.value);
+    }
+
+    const checkProject = debounce(projectExists, 500);
+
     return {
-      logged: computed(() => store.state.loggedIn),
-      userName: computed(() => store.state.user),
+      userName,
+      project,
+      description,
+      isPrivate,
+      checkProject,
+      invalidProject,
+      createProject,
     };
   },
 });

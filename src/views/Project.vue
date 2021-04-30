@@ -1,6 +1,6 @@
 <template>
   <div class="uk-section uk-section-default uk-section-small">
-    <div class="uk-container">
+    <div class="uk-container uk-container-large">
       <h3 v-if="page.valid">
         <router-link :to="{ name: 'User', params: { userName } }">
           {{ userName }}
@@ -77,6 +77,7 @@ export default defineComponent({
       const result = await Project.fetch(props.userName!, props.projectName);
       if (result === null) return notFound();
       project.value = result;
+      console.log(result)
       if (router.currentRoute.value.name === "Branch-default") {
         await router.replace({
           name: "Commit-default",

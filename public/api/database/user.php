@@ -226,6 +226,7 @@ function auth($user, $password)
         //failed to execute query
         PDO_error();
     }
+    if ($stmt->rowCount() === 0) return false;
     $passwordHash = $stmt->fetch()[0];
     return hash_equals($passwordHash, $hash);
 }

@@ -22,7 +22,7 @@ export interface FetchResult extends BaseResult {
 
 export async function fetch(user: string, project?: string | null): Promise<FetchResult | null> {
   if (project == null) return null;
-  await sleep(500); // TODO
+  /* await sleep(500); // TODO
   return {
     name: "foo",
     author: "July",
@@ -46,7 +46,7 @@ export async function fetch(user: string, project?: string | null): Promise<Fetc
     updatedAt: new Date(),
     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam pellentesque turpis eu libero elementum, mattis egestas nisi scelerisque. Nulla facilisi. Pellentesque lacinia felis non leo scelerisque tristique. Suspendisse bibendum quam quis ullamcorper lacinia. Ut nec semper enim, vitae efficitur felis. Curabitur scelerisque dignissim metus, at sagittis tortor scelerisque sit amet. Donec eu tincidunt justo.",
-  };
+  }; */
   //
   return Request.json("api/project.php", {
     q: "getProject",
@@ -56,8 +56,8 @@ export async function fetch(user: string, project?: string | null): Promise<Fetc
 }
 
 export async function add(user: string, project: string, isPrivate: boolean, description: string | null): Promise<boolean> {
-  await sleep(500);
-  return true;
+  /* await sleep(500);
+  return true; */
   //
   const response = await Request.post("api/project.php", {
     user,
@@ -67,12 +67,13 @@ export async function add(user: string, project: string, isPrivate: boolean, des
   });
   if (response.ok) return true;
   if (response.status === 400) return false;
-  return Request.exception(response);
+  Request.exception(response);
+  return false;
 }
 
 export async function remove(user: string, project: string): Promise<void> {
-  await sleep(500);
-  return;
+  /* await sleep(500);
+  return; */
   //
   const response = await Request.delete_("api/project.php", {
     user, project
@@ -88,8 +89,8 @@ export interface UpdateInput {
 }
 
 export async function edit(user: string, project: string, content: UpdateInput): Promise<boolean> {
-  await sleep(500);
-  return true;
+  /* await sleep(500);
+  return true; */
   //
   const response = await Request.patch("api/project.php", {
     user,
@@ -99,11 +100,12 @@ export async function edit(user: string, project: string, content: UpdateInput):
   });
   if (response.ok) return true;
   if (response.status === 401) return false;
-  return Request.exception(response);
+  Request.exception(response);
+  return false;
 }
 
 export async function allOf(user: string, page: number): Promise<BaseResult[]> {
-  await sleep(500);
+  /* await sleep(500);
   return [{
     author: "July",
     mainBranch: "main",
@@ -144,7 +146,7 @@ export async function allOf(user: string, page: number): Promise<BaseResult[]> {
     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
     name: "Daft Punk",
     description: "Lorem ipsum dolor sit amet."
-  }]
+  }] */
   //
   return Request.json("api/project.php", {
     q: "fetchAllFromUser",
@@ -155,7 +157,7 @@ export async function allOf(user: string, page: number): Promise<BaseResult[]> {
 }
 
 export async function all(page: number): Promise<BaseResult[]> {
-  await sleep(500);
+ /*  await sleep(500);
   return [{
     mainBranch: "main",
     author: "July",
@@ -196,18 +198,18 @@ export async function all(page: number): Promise<BaseResult[]> {
     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
     name: "Daft Punk",
     description: "Lorem ipsum dolor sit amet."
-  }]
+  }] */
   //
   return Request.json("api/project.php", {
     q: "fetchAll",
     first: perPage,
-    after: perPage * page,
+    after: perPage * (page - 1),
   });
 }
 
 export async function find(user: string, project: string): Promise<boolean> {
-  await sleep(500);
-  return false;
+  /* await sleep(500);
+  return false; */
   //
   return Request.json("api/project.php", {
     q: "find",
@@ -222,7 +224,7 @@ export interface SearchResult {
 }
 
 export async function search(user: string, project: string, page: number): Promise<SearchResult> {
-  await sleep(500);
+  /* await sleep(500);
   return {
     count: 42,
     results: [{
@@ -266,7 +268,7 @@ export async function search(user: string, project: string, page: number): Promi
       name: "Daft Punk",
       description: "Lorem ipsum dolor sit amet."
     }]
-  };
+  }; */
   //
   return Request.json("api/project.php", {
     q: "seek",
@@ -278,15 +280,15 @@ export async function search(user: string, project: string, page: number): Promi
 }
 
 export async function count(): Promise<number> {
-  await sleep(500);
-  return 52;
+  /* await sleep(500);
+  return 52; */
   // 
   return Request.json("api/project.php", { q: "count" });
 }
 
 export async function countOf(user: string): Promise<number> {
-  await sleep(500);
-  return 5;
+  /* await sleep(500);
+  return 5; */
   // 
   return Request.json("api/project.php", { q: "countFromUser" });
 }
