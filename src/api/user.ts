@@ -87,7 +87,8 @@ export async function edit(user: string, content: UpdateInput): Promise<boolean>
   });
   if (response.ok) return true;
   if (response.status === 401) return false;
-  return Request.exception(response);
+  Request.exception(response);
+  return false;
 }
 
 export async function find(user: string): Promise<boolean> {

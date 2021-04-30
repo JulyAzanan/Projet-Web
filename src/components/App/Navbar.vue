@@ -52,7 +52,6 @@
               </ul>
             </div>
           </li>
-          <Notifications />
         </ul>
       </div>
       <ul class="uk-navbar-nav uk-visible@s">
@@ -91,7 +90,6 @@ import Links from "./Links.vue";
 import Usernav from "./Usernav.vue";
 import Login from "./Login.vue";
 import RecentProjects from "./Recent-Projects.vue";
-import Notifications from "./Notifications.vue";
 import Search from "./Search.vue"
 
 export default defineComponent({
@@ -101,7 +99,6 @@ export default defineComponent({
     Usernav,
     Login,
     RecentProjects,
-    Notifications,
     Search,
   },
   setup() {

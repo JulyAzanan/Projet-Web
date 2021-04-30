@@ -25,7 +25,6 @@
             <RecentProjects />
           </ul>
         </li>
-        <Notifications v-if="logged"> Notifications </Notifications>
         <li v-if="logged" class="uk-nav-header username">{{ userName }}</li>
         <Usernav v-if="logged" />
         <Login v-else />
@@ -41,7 +40,6 @@ import Links from "./Links.vue";
 import Usernav from "./Usernav.vue";
 import Login from "./Login.vue";
 import RecentProjects from "./Recent-Projects.vue";
-import Notifications from "./Notifications.vue";
 import Search from "./Search.vue"
 
 export default defineComponent({
@@ -50,7 +48,6 @@ export default defineComponent({
     Usernav,
     Login,
     RecentProjects,
-    Notifications,
     Search,
   },
   setup() {

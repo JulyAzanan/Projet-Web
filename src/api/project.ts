@@ -63,7 +63,7 @@ export async function add(user: string, project: string, isPrivate: boolean, des
     user,
     project,
     private:isPrivate,
-    description: description ? null : description
+    description: description || null,
   });
   if (response.ok) return true;
   if (response.status === 400) return false;
@@ -152,7 +152,7 @@ export async function allOf(user: string, page: number): Promise<BaseResult[]> {
     q: "fetchAllFromUser",
     user,
     first: perPage,
-    after: perPage * page,
+    after: perPage * (page - 1),
   });
 }
 

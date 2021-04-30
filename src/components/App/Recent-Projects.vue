@@ -1,39 +1,47 @@
 <template>
-  <li v-for="name in publicProjects" :key="name">
-    <a href="#">
-      <span class="uk-margin-small-right" uk-icon="icon: folder"></span>
-      {{ name }}
-    </a>
+  <li v-for="project in projects" :key="project.name">
+    <router-link
+      :to="{
+        name: 'Branch-default',
+        params: { userName, projectName: project.name },
+      }"
+      uk-margin
+    >
+      <span
+        v-if="project.private"
+        class="uk-margin-small-right"
+        uk-icon="icon: lock"
+      ></span>
+      <span v-else class="uk-margin-small-right" uk-icon="icon: folder"></span>
+      {{ project.name }}
+    </router-link>
   </li>
-
-  <li
-    v-if="publicProjects.length > 0 && privateProjects.length > 0"
-    class="uk-nav-divider"
-  ></li>
-
-  <li v-for="name in privateProjects" :key="name">
-    <a href="#">
-      <span class="uk-margin-small-right" uk-icon="icon: lock"></span>
-      {{ name }}
-    </a>
+  <li v-if="projects.length">
+    Pas encore de projets !
   </li>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
+import * as Project from "@/api/project";
+import store from "@/app/store";
 
 export default defineComponent({
   setup() {
-    // TODO
-    const publicProjects: string[] = [
-      "Projet 3615",
-      "Nier: Automata",
-      "Daft Punk",
-    ];
-    const privateProjects: string[] = ["Foo", "Bar"];
+    const projects = ref<Project.BaseResult[]>([]);
+
+    async function init() {
+      const result = await Project.allOf(store.state.user, 1);
+      console.log(result);
+      projects.value = result;
+    }
+
+    watch(() => store.state.user, init);
+
+    init();
     return {
-      publicProjects,
-      privateProjects,
+      projects,
+      userName: computed(() => store.state.user),
     };
   },
 });
