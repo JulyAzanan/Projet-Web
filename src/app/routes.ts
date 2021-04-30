@@ -89,6 +89,11 @@ const routes: RouteRecordRaw[] = [
         path: "contributors", // Contributors
         props: true,
       },
+      {
+        ...load("ProjectSettings"),
+        path: "settings", // Paramètres du projet
+        props: true,
+      },
     ]
   },
   {

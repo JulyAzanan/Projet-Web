@@ -72,7 +72,7 @@ export interface ContentInput {
   scores: ScoreInput[]
 }
 
-export async function add(user: string, project: string, branch: string, content: ContentInput): Promise<void> {
+export async function add(user: string, project: string, branch: string, content: ContentInput): Promise<{id: string} | null> {
   /* await sleep(500);
   return; */
   //
@@ -82,8 +82,9 @@ export async function add(user: string, project: string, branch: string, content
     branch,
     ...content
   });
-  if (response.ok) return;
-  return Request.exception(response);
+  if (response.ok) return response.json();
+  Request.exception(response);
+  return null;
 }
 
 export async function count(user: string, project: string, branch: string): Promise<number> {

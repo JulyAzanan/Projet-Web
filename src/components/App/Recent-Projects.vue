@@ -16,7 +16,7 @@
       {{ project.name }}
     </router-link>
   </li>
-  <li v-if="projects.length">
+  <li v-if="projects.length === 0">
     Pas encore de projets !
   </li>
 </template>
@@ -32,7 +32,6 @@ export default defineComponent({
 
     async function init() {
       const result = await Project.allOf(store.state.user, 1);
-      console.log(result);
       projects.value = result;
     }
 

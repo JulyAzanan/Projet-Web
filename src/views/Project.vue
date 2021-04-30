@@ -36,9 +36,15 @@
               >Contributeurs
             </router-link>
           </li>
+          <li>
+            <router-link
+              :to="{ name: 'ProjectSettings', params: { userName, projectName } }"
+              >Paramètres
+            </router-link>
+          </li>
         </ul>
 
-        <router-view v-if="page.ready" :project="project"> </router-view>
+        <router-view v-if="page.ready" :project="project" :refresh="refresh"> </router-view>
         <div v-else uk-spinner></div>
       </div>
     </div>
@@ -46,10 +52,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from "vue";
+import { defineComponent, ref, reactive, watch, computed } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import router, { notFound } from "@/app/routes";
 import * as Project from "@/api/project";
+import store from "@/app/store";
 
 export default defineComponent({
   props: {
@@ -57,6 +64,7 @@ export default defineComponent({
     projectName: String,
   },
   setup(props) {
+    const refresh = ref(false);
     const page = reactive({
       ready: false,
       valid: false,

@@ -96,6 +96,7 @@
       :userName="userName"
       :projectName="projectName"
       :branchName="branchName"
+      v-on:refresh="init"
     />
   </div>
 </template>
@@ -191,7 +192,7 @@ export default defineComponent({
         props.project?.contributors.some((c) => c.name === store.state.user));
 
     init();
-    return { page, branch, selectedBranch, isContributor };
+    return { page, branch, selectedBranch, isContributor, init };
   },
 });
 </script>

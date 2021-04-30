@@ -45,9 +45,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $data = get_JSON();
         $user = auth();
         $ok = \Commit\add($data->user, $data->project, $data->branch, $data->message, $data->scores, $user);
-        if (!$ok) {
+        if ($ok === null) {
             PDO_error();
         }
+        echo json_encode($ok);
         break;
 
     case "OPTIONS":

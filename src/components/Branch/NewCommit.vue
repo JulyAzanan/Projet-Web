@@ -81,6 +81,9 @@
 import { defineComponent, ref } from "vue";
 import prettyBytes from "pretty-bytes";
 import * as Commit from "@/api/commit";
+import router from "@/app/routes";
+import store from "@/app/store";
+import { notifyWarning } from "@/utils/notification";
 
 export default defineComponent({
   props: {
@@ -88,7 +91,8 @@ export default defineComponent({
     projectName: String,
     branchName: String,
   },
-  setup(props) {
+  emits: ['refresh'],
+  setup(props, {emit}) {
     const files = ref<File[]>([]);
     const message = ref("");
     const progress = ref(0);
@@ -153,15 +157,30 @@ export default defineComponent({
       content.scores.push(
         ...(scores.filter((s) => s !== null) as Commit.ScoreInput[])
       );
-      await Commit.add(
+      const commit = await Commit.add(
         props.userName!,
         props.projectName!,
         props.branchName!,
         content
       );
+      if (commit === null) {
+        notifyWarning("Erreur lors de la création du commit")
+        return;
+      }
       closeButton.value?.click();
       showProgress.value = false;
+      message.value = "";
       files.value.splice(0, files.value.length);
+      await router.push({
+        name: "Files",
+        params: {
+          userName: props.userName!,
+          projectName: props.projectName!,
+          branchName: props.branchName!,
+          commitID: commit.id,
+        },
+      });
+      emit("refresh");
     }
 
     return {

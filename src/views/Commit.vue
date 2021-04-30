@@ -25,7 +25,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
-import UserPicture from "@/components/User/UserPicture.vue"
+import UserPicture from "@/components/User/UserPicture.vue";
 import * as Branch from "@/api/branch";
 import * as Commit from "@/api/commit";
 import { notFound } from "@/app/routes";
@@ -39,7 +39,7 @@ export default defineComponent({
     branch: Object as () => Branch.FetchResult,
   },
   components: {
-    UserPicture
+    UserPicture,
   },
   setup(props) {
     const page = reactive({
@@ -49,28 +49,32 @@ export default defineComponent({
       id: "",
       createdAt: new Date(),
       publisher: {
-        name: ""
+        name: "",
       },
       message: "",
       files: [],
     });
 
-    async function init() {
+    async function init(commitID?: string) {
       const result = await Commit.fetch(
         props.userName!,
         props.projectName!,
         props.branchName!,
-        props.commitID
+        commitID ?? props.commitID
       );
       if (result === null) return notFound();
       commit.value = result;
       page.ready = true;
     }
 
-     onBeforeRouteUpdate((to) => {
-      if (to.name === "Commit" || to.name === "Files") {
+    onBeforeRouteUpdate((to) => {
+      if (
+        to.name === "Commit" ||
+        to.name === "Files" ||
+        to.params.commitID !== props.commitID
+      ) {
         page.ready = false;
-        init();
+        init(to.params.commitID as string);
       }
     });
 

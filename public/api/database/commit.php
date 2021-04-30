@@ -83,10 +83,9 @@ function add($author, $project, $branch, $message, $partitions, $loggedUser)
     }
 
     if (!change_updatedAt_branch($project, $author, $branch)) {
-        return false;
+        return null;
     }
-    return ($reussite);
-
+    return $reussite ? (object) ['id' => $commit] : null;
 }
 
 function getLatest($author, $project, $branch, $loggedUser) {
