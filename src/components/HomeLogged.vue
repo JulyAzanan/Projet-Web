@@ -50,6 +50,7 @@
                 :userName="project.author"
                 :updatedAt="project.updatedAt"
                 showAuthor
+                class="uk-width-auto"
               />
             </div>
           </div>

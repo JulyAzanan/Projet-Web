@@ -28,6 +28,7 @@
                   :userName="project.authorName"
                   :updatedAt="project.updatedAt"
                   showAuthor
+                  class="uk-width-auto"
                 />
               </div>
               <Pagination :page="parseInt(page)" :pages="pages" />
