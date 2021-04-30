@@ -15,8 +15,9 @@ function getPassword(): string {
 
 function getHeaders(url: string): Headers {
   const headers = new Headers();
-  console.log(url.split("?"), url.split("?").pop())
+  console.log(`${getUser()}:${getPassword()}`)
   if (store.state.loggedIn || url.split("?").pop() === "q=login") headers.set('Authorization', 'Basic ' + btoa(`${getUser()}:${getPassword()}`));
+  console.log(headers)
   return headers;
 }
 
