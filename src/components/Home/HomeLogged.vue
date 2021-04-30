@@ -34,7 +34,6 @@
       </div>
       <hr class="uk-tab" />
       <div>
-        <!-- Insérer des projets qui contiennent une lettre prise aléatoirement -->
         <h3>Projets pouvant vous intéresser</h3>
         <div class="uk-container uk-margin-large-top uk-inline" uk-grid>
           <div v-if="ready">
@@ -47,7 +46,7 @@
                 :key="project.name"
                 :isPrivate="project.private"
                 :projectName="project.name"
-                :userName="project.author"
+                :userName="project.authorName"
                 :updatedAt="project.updatedAt"
                 showAuthor
                 class="uk-width-auto"
@@ -78,12 +77,8 @@ export default defineComponent({
 
     async function load() {
       ready.value = false;
-      const page = 1;
-      const result = await Project.all(page);
+      const result = await Project.all(1);
       projects.value = result;
-      if (result.length === 0 && page != 1) {
-        router.replace({ query: { page: "1" } });
-      }
       ready.value = true;
     }
 

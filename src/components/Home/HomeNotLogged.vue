@@ -30,40 +30,39 @@
         >
           <div class="uk-first-column uk-child-width-1-2 uk-grid-small" uk-grid>
             <div class="uk-first-column uk-width-auto">
-              <span
-                class="uk-icon"
-                uk-icon="ratio:2; icon: users"
-              ></span>
+              <span class="uk-icon" uk-icon="ratio:2; icon: users"></span>
             </div>
             <div class="uk-width-expand">
               <p>
-                +3615
+                <span v-if="count.user > 0">{{count.user}}</span>
+                <span v-else>...</span>
                 <br />
                 <span class="uk-text-meta"> Compositeurs </span>
               </p>
             </div>
           </div>
-          <div class="uk-child-width-1-2 uk-grid-small uk-margin-remove-top" uk-grid>
+          <div
+            class="uk-child-width-1-2 uk-grid-small uk-margin-remove-top"
+            uk-grid
+          >
             <div class="uk-first-column uk-width-auto">
-              <span
-                class="uk-icon"
-                uk-icon="ratio:2; icon: folder"
-              ></span>
+              <span class="uk-icon" uk-icon="ratio:2; icon: folder"></span>
             </div>
             <div class="uk-width-expand">
               <p>
-                +4269
+                <span v-if="count.project > 0">{{count.project}}</span>
+                <span v-else>...</span>
                 <br />
                 <span class="uk-text-meta"> Projets </span>
               </p>
             </div>
           </div>
-          <div class="uk-child-width-1-2 uk-grid-small uk-margin-remove-top" uk-grid>
+          <div
+            class="uk-child-width-1-2 uk-grid-small uk-margin-remove-top"
+            uk-grid
+          >
             <div class="uk-first-column uk-width-auto">
-              <span
-                class="uk-icon"
-                uk-icon="ratio:2; icon: code"
-              ></span>
+              <span class="uk-icon" uk-icon="ratio:2; icon: code"></span>
             </div>
             <div class="uk-width-expand">
               <p>
@@ -80,8 +79,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, reactive } from "vue";
+import * as User from "@/api/user";
+import * as Project from "@/api/project";
 
 export default defineComponent({
+  setup() {
+    const count = reactive({
+      user: 0,
+      project: 0,
+    });
+
+    async function init() {
+      const result = await Promise.all([User.count(), Project.count()]);
+      count.user = result[0];
+      count.project = result[1];
+    }
+
+    init();
+    return { count };
+  },
 });
 </script>

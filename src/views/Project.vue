@@ -77,7 +77,6 @@ export default defineComponent({
       const result = await Project.fetch(props.userName!, props.projectName);
       if (result === null) return notFound();
       project.value = result;
-      console.log(result)
       if (router.currentRoute.value.name === "Branch-default") {
         await router.replace({
           name: "Commit-default",
