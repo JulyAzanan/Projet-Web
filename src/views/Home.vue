@@ -8,8 +8,8 @@
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
 import store from "@/app/store";
-import HomeNotLogged from '@/components/HomeNotLogged.vue'; // @ is an alias to /src
-import HomeLogged from '@/components/HomeLogged.vue';
+import HomeNotLogged from '@/components/Home/HomeNotLogged.vue'; // @ is an alias to /src
+import HomeLogged from '@/components/Home/HomeLogged.vue';
 
 export default defineComponent({
   components: {
@@ -19,7 +19,6 @@ export default defineComponent({
   setup() {
     return {
       logged: computed(() => store.state.loggedIn),
-      userName: computed(() => store.state.user),
     };
   },
 });

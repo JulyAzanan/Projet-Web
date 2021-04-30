@@ -76,12 +76,6 @@ export async function add(user: string, project: string, branch: string, content
   /* await sleep(500);
   return; */
   //
-  console.log({
-    user,
-    project,
-    branch,
-    ...content
-  })
   const response = await Request.post("api/commit.php", {
     user,
     project,
