@@ -8,6 +8,8 @@
             <div class="uk-inline">
               <button class="uk-form-icon" uk-icon="icon: search"></button>
               <input
+                v-model="projectQuery"
+                @input="searchProject"
                 class="uk-input uk-form-width-large"
                 type="text"
                 placeholder="Rechercher un projet..."
@@ -47,6 +49,7 @@ import ProjectCard from "@/components/User/ProjectCard.vue";
 import Pagination from "@/components/Pagination.vue";
 import * as Project from "@/api/project";
 import router from "@/app/routes";
+import debounce from "@/utils/debounce";
 
 export default defineComponent({
   props: {
@@ -60,27 +63,32 @@ export default defineComponent({
     const ready = ref(false);
     const projects = ref<Project.BaseResult[]>([]);
     const pages = ref(0);
+    const projectQuery = ref("");
 
-    watch(() => props.page, load);
+    watch(() => props.page, search);
 
-    async function load() {
+    async function search() {
       ready.value = false;
       const page = parseInt(props.page!);
-      const result = await Project.all(page);
-      projects.value = result;
-      if (result.length === 0 && page != 1) {
+      const result = await Project.search(projectQuery.value, page);
+      projects.value = result.results;
+      console.log(result)
+      pages.value = Math.ceil(result.count / Project.perPage);
+      if (result.results.length === 0 && page != 1) {
         router.replace({ query: { page: "1" } });
       }
       ready.value = true;
     }
+
+    const searchProject = debounce(search, 500);
 
     async function init() {
       const count = await Project.count();
       pages.value = Math.ceil(count / Project.perPage);
     }
 
-    init().then(load);
-    return { ready, projects, pages };
+    init().then(search);
+    return { ready, projects, pages, projectQuery, searchProject };
   },
 });
 </script>

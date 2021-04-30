@@ -3,7 +3,7 @@ import * as User from "./user"
 import * as Branch from "./branch"
 import * as Request from "../utils/request"
 
-export const perPage = 15;
+export const perPage = 7;
 
 export interface BaseResult {
   name: string,
@@ -62,7 +62,7 @@ export async function add(user: string, project: string, isPrivate: boolean, des
   const response = await Request.post("api/project.php", {
     user,
     project,
-    private:isPrivate,
+    private: isPrivate,
     description: description || null,
   });
   if (response.ok) return true;
@@ -159,48 +159,48 @@ export async function allOf(user: string, page: number): Promise<BaseResult[]> {
 }
 
 export async function all(page: number): Promise<BaseResult[]> {
- /*  await sleep(500);
-  return [{
-    mainBranch: "main",
-    author: "July",
-    private: true,
-    updatedAt: new Date(),
-    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
-    name: "Nier: Automata",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-  }, {
-    mainBranch: "main",
-    author: "Steel",
-    private: false,
-    updatedAt: new Date(),
-    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
-    name: "Daft Punk",
-    description: "Lorem ipsum dolor sit amet."
-  }, {
-    mainBranch: "main",
-    author: "Michel",
-    private: false,
-    updatedAt: new Date(),
-    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
-    name: "Daft Punk",
-    description: "Lorem ipsum dolor sit amet."
-  }, {
-    mainBranch: "main",
-    author: "Annie",
-    private: false,
-    updatedAt: new Date(),
-    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
-    name: "Daft Punk",
-    description: "Lorem ipsum dolor sit amet."
-  }, {
-    mainBranch: "main",
-    author: "Bernard",
-    private: false,
-    updatedAt: new Date(),
-    createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
-    name: "Daft Punk",
-    description: "Lorem ipsum dolor sit amet."
-  }] */
+  /*  await sleep(500);
+   return [{
+     mainBranch: "main",
+     author: "July",
+     private: true,
+     updatedAt: new Date(),
+     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+     name: "Nier: Automata",
+     description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+   }, {
+     mainBranch: "main",
+     author: "Steel",
+     private: false,
+     updatedAt: new Date(),
+     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+     name: "Daft Punk",
+     description: "Lorem ipsum dolor sit amet."
+   }, {
+     mainBranch: "main",
+     author: "Michel",
+     private: false,
+     updatedAt: new Date(),
+     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+     name: "Daft Punk",
+     description: "Lorem ipsum dolor sit amet."
+   }, {
+     mainBranch: "main",
+     author: "Annie",
+     private: false,
+     updatedAt: new Date(),
+     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+     name: "Daft Punk",
+     description: "Lorem ipsum dolor sit amet."
+   }, {
+     mainBranch: "main",
+     author: "Bernard",
+     private: false,
+     updatedAt: new Date(),
+     createdAt: new Date(new Date().getTime() - 34 * 24 * 60 * 60 * 1011),
+     name: "Daft Punk",
+     description: "Lorem ipsum dolor sit amet."
+   }] */
   //
   return Request.json("api/project.php", {
     q: "fetchAll",
@@ -225,7 +225,7 @@ export interface SearchResult {
   count: number
 }
 
-export async function search(user: string, project: string, page: number): Promise<SearchResult> {
+export async function search(project: string, page: number): Promise<SearchResult> {
   /* await sleep(500);
   return {
     count: 42,
@@ -274,10 +274,9 @@ export async function search(user: string, project: string, page: number): Promi
   //
   return Request.json("api/project.php", {
     q: "seek",
-    user,
     project,
     first: perPage,
-    after: perPage * page,
+    after: perPage * (page - 1),
   })
 }
 
@@ -292,5 +291,8 @@ export async function countOf(user: string): Promise<number> {
   /* await sleep(500);
   return 5; */
   // 
-  return Request.json("api/project.php", { q: "countFromUser" });
+  return Request.json("api/project.php", {
+    q: "countFromUser",
+    user,
+  });
 }

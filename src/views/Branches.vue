@@ -45,7 +45,6 @@
 import { defineComponent, ref } from "vue";
 import * as Branch from "@/api/branch";
 import * as Project from "@/api/project";
-import router from "@/app/routes";
 import { notifySuccess, notifyWarning } from "@/utils/notification";
 import debounce from "@/utils/debounce";
 

@@ -65,7 +65,6 @@ import { defineComponent, computed, ref } from "vue";
 import store from "@/app/store";
 import ProjectCard from "@/components/User/ProjectCard.vue";
 import * as Project from "@/api/project";
-import router from "@/app/routes";
 
 export default defineComponent({
   components: {

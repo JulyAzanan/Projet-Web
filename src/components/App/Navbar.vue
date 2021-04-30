@@ -22,16 +22,6 @@
         uk-toggle="target: #sidenav"
         uk-navbar-toggle-icon
       ></a>
-      <!-- Recherche -->
-      <ul class="uk-navbar-nav uk-visible@s">
-        <li class="uk-active">
-          <a
-            class="uk-navbar-toggle"
-            uk-search-icon
-            uk-toggle="target: .search-overlay; animation: uk-animation-fade"
-          ></a>
-        </li>
-      </ul>
       <!-- Actions rapide -->
       <div v-if="logged" class="uk-navbar-item uk-visible@s">
         <ul class="uk-iconnav">
@@ -67,17 +57,6 @@
         <Login v-else />
       </ul>
     </div>
-    <!-- Overlay de recherche -->
-    <div class="uk-navbar-left uk-flex-1 search-overlay" hidden>
-      <div class="uk-navbar-item uk-width-expand">
-        <Search/>
-      </div>
-      <a
-        class="uk-navbar-toggle"
-        uk-close
-        uk-toggle="target: .search-overlay; animation: uk-animation-fade"
-      ></a>
-    </div>
   </nav>
   <Sidenav />
 </template>
@@ -90,7 +69,6 @@ import Links from "./Links.vue";
 import Usernav from "./Usernav.vue";
 import Login from "./Login.vue";
 import RecentProjects from "./Recent-Projects.vue";
-import Search from "./Search.vue"
 
 export default defineComponent({
   components: {
@@ -99,7 +77,6 @@ export default defineComponent({
     Usernav,
     Login,
     RecentProjects,
-    Search,
   },
   setup() {
     return {

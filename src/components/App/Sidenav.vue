@@ -3,7 +3,6 @@
     <div class="uk-offcanvas-bar">
       <button class="uk-offcanvas-close" type="button" uk-close></button>
       <ul class="uk-nav-default uk-nav-parent-icon" uk-nav>
-        <Search/>
         <li class="uk-nav-header">Naviguation</li>
         <Links />
         <li v-if="logged" class="uk-nav-header">Actions rapides</li>
@@ -40,7 +39,6 @@ import Links from "./Links.vue";
 import Usernav from "./Usernav.vue";
 import Login from "./Login.vue";
 import RecentProjects from "./Recent-Projects.vue";
-import Search from "./Search.vue"
 
 export default defineComponent({
   components: {
@@ -48,7 +46,6 @@ export default defineComponent({
     Usernav,
     Login,
     RecentProjects,
-    Search,
   },
   setup() {
     return {

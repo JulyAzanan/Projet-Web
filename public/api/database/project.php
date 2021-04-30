@@ -332,10 +332,11 @@ function seek($first, $after, $project, $loggedUser)
         arg_error();
     }
 
-    $sql = "SELECT COUNT(*), name, updatedAt, createdAt, description, p.authorName, private
+    $sql = "SELECT name, updatedAt, createdAt, description, p.authorName, private
     FROM project p
     WHERE p.name LIKE :projectname
     AND ( p.private = 'f' OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName) OR p.authorName = :contributorname OR :contributorname = 'admin' )
+    ORDER BY updatedAt DESC
     LIMIT :number_to_show OFFSET :offset ";
 
     $bd = connect();
@@ -350,20 +351,32 @@ function seek($first, $after, $project, $loggedUser)
     }
     $projects = [];
     $res = $stmt->fetchAll();
-    foreach ($res as $project) {
+    foreach ($res as $row) {
         $projects[] = (object) [
-            'name' => $project['name'],
-            'authorName' => $project['authorName'],
-            'updatedAt' => $project['updatedat'],
-            'createdAt' => $project['createdat'],
-            'description' => $project['description'],
-            'private' => $project['private'],
+            'name' => $row['name'],
+            'authorName' => $row['authorname'],
+            'updatedAt' => $row['updatedat'],
+            'createdAt' => $row['createdat'],
+            'description' => $row['description'],
+            'private' => $row['private'],
         ];
     }
+    $sql = "SELECT COUNT(*)
+    FROM project p
+    WHERE p.name LIKE :projectname
+    AND ( p.private = 'f' OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName) OR p.authorName = :contributorname OR :contributorname = 'admin' )";
+    $stmt = $bd->prepare($sql);
+    $stmt->bindValue(':projectname', "%" . $project . "%", \PDO::PARAM_STR);
+    $stmt->bindValue(':contributorname', $loggedUser, \PDO::PARAM_STR);
+    if (!$stmt->execute()) {
+        //failed to execute query
+        PDO_error();
+    }
+    $res = $stmt->fetch(\PDO::FETCH_ASSOC);
 
     return (object) [
         'results' => $projects,
-        'count' => $stmt->rowCount() > 0 ? $res[0]['count'] : 0,
+        'count' => $stmt->rowCount() > 0 ? $res['count'] : 0,
     ];
 }
 

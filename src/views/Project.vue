@@ -61,7 +61,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, watch, computed } from "vue";
+import { defineComponent, ref, reactive } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import router, { notFound } from "@/app/routes";
 import * as Project from "@/api/project";

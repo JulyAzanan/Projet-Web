@@ -36,6 +36,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     echo json_encode(\User\getUser($_GET['user'], $_GET['first'], $_GET['after'], $user));
                     break;
 
+                case 'seek':
+                    $user = auth();
+                    echo json_encode(\User\seek($_GET['user'], $_GET['first'], $_GET['after'], $user));
+                    break;
+
                 case 'getProfile':
                     $user = auth();
                     echo json_encode(\User\getProfile($_GET['first'], $_GET['after'],$user));

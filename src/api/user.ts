@@ -230,7 +230,7 @@ export interface SearchResult {
   count: number
 }
 
-export async function search(user: string, project: string, page: number): Promise<SearchResult> {
+export async function search(user: string, page: number): Promise<SearchResult> {
   /* await sleep(500);
   return {
     count: 42,
@@ -258,7 +258,6 @@ export async function search(user: string, project: string, page: number): Promi
   return Request.json("api/user.php", {
     q: "seek",
     user,
-    project,
     first: perPage,
     after: perPage * (page - 1),
   })

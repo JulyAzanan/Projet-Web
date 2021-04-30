@@ -234,8 +234,9 @@ function auth($user, $password)
 function seek($user, $first, $after) {
     check_not_null($user);
 
-    $stmt = $bd->prepare("SELECT COUNT(*), name, email, latestCommit, age, bio, picture, (SELECT COUNT(followingName) FROM friend WHERE followingName = name) AS followers 
-    FROM musician GROUP BY name WHERE name LIKE :name LIMIT :first OFFSET :after");
+    $bd = connect();
+    $stmt = $bd->prepare("SELECT name, email, latestCommit, age, bio, picture, (SELECT COUNT(followingName) FROM friend WHERE followingName = name) AS followers 
+    FROM musician WHERE name LIKE :name GROUP BY name LIMIT :first OFFSET :after");
     
     $stmt->bindValue(':name', "%".$user."%", \PDO::PARAM_STR);
     $stmt->bindValue(':first', $first, \PDO::PARAM_INT);
@@ -259,8 +260,16 @@ function seek($user, $first, $after) {
         ];
     }
 
+    $stmt = $bd->prepare("SELECT COUNT(*) FROM musician WHERE name LIKE :name");
+    $stmt->bindValue(':name', "%".$user."%", \PDO::PARAM_STR);
+    if (!$stmt->execute()) {
+        //failed to execute query
+        PDO_error();
+    }
+    $res = $stmt->fetch(\PDO::FETCH_ASSOC);
+
     return (object) [
         'results' => $users,
-        'count' => $stmt->rowCount() > 0 ? $res[0]['count'] : 0,
+        'count' => $stmt->rowCount() > 0 ? $res['count'] : 0,
     ];
 }

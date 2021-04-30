@@ -8,6 +8,8 @@
             <div class="uk-inline">
               <button class="uk-form-icon" uk-icon="icon: search"></button>
               <input
+                v-model="userQuery"
+                @input="searchUser"
                 class="uk-input uk-form-width-large"
                 type="text"
                 placeholder="Rechercher un utilisateur..."
@@ -43,6 +45,7 @@ import UserCard from "@/components/User/UserCard.vue";
 import Pagination from "@/components/Pagination.vue";
 import * as User from "@/api/user";
 import router from "@/app/routes";
+import debounce from "@/utils/debounce";
 
 export default defineComponent({
   props: {
@@ -56,27 +59,31 @@ export default defineComponent({
     const ready = ref(false);
     const users = ref<User.AllResult[]>([]);
     const pages = ref(0);
+    const userQuery = ref("");
 
-    watch(() => props.page, load);
+    watch(() => props.page, search);
 
-    async function load() {
+    async function search() {
       ready.value = false;
       const page = parseInt(props.page!);
-      const result = await User.all(page);
-      users.value = result;
-      if (result.length === 0 && page != 1) {
+      const result = await User.search(userQuery.value, page);
+      users.value = result.results;
+      pages.value = Math.ceil(result.count / User.perPage);
+      if (result.results.length === 0 && page != 1) {
         router.replace({ query: { page: "1" } });
       }
       ready.value = true;
     }
+
+    const searchUser = debounce(search, 500);
 
     async function init() {
       const count = await User.count();
       pages.value = Math.ceil(count / User.perPage);
     }
 
-    init().then(load);
-    return { ready, users, pages };
+    init().then(search);
+    return { ready, users, pages, userQuery, searchUser };
   },
 });
 </script>
