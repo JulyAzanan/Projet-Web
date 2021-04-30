@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 function load(name: string, prefix?: string) {
   return {
     name: name + (prefix ? `-${prefix}` : ""),
-    component: () => import(/* webpackChunkName: "[request]" */ `@/views/${name}.vue`),
+    component: () => import(/* webpackChunkName: "[request]" */ `@/views/${name}`),
   }
 }
 
