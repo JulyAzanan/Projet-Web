@@ -138,11 +138,13 @@ export default defineComponent({
 
     let stopBranchWatcher: WatchStopHandle = () => {};
 
-    async function init() {
+    async function init(bName?: string, pName?: string) {
+      const branchName = bName ?? props.branchName;
+      const projectName = pName ?? props.projectName;
       const result = await Branch.fetch(
         props.userName!,
-        props.projectName!,
-        props.branchName
+        projectName!,
+        branchName,
       );
       if (result === null) return notFound();
       branch.value = result;
@@ -152,23 +154,24 @@ export default defineComponent({
             name: "Files",
             params: {
               userName: props.userName!,
-              projectName: props.projectName!,
-              branchName: props.branchName!,
+              projectName: projectName!,
+              branchName: branchName!,
               commitID: branch.value.lastCommit,
             },
           });
+          page.noCommitAvailable = false;
         } else {
           page.noCommitAvailable = true;
         }
       }
       stopBranchWatcher();
-      selectedBranch.value = props.branchName;
+      selectedBranch.value = branchName;
       stopBranchWatcher = watch(selectedBranch, async () => {
         await router.replace({
           name: "Commit-default",
           params: {
             userName: props.userName!,
-            projectName: props.projectName!,
+            projectName: projectName!,
             branchName: selectedBranch.value!,
           },
         });
@@ -180,10 +183,11 @@ export default defineComponent({
       if (
         to.name === "Branch" ||
         to.name === "Commit-default" ||
-        to.params.branchName !== props.branchName
+        to.params.branchName !== props.branchName ||
+        to.params.projectName !== props.projectName
       ) {
         page.ready = false;
-        init();
+        init(to.params.branchName as string, to.params.projectName as string);
       }
     });
 

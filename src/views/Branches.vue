@@ -79,7 +79,7 @@ export default defineComponent({
       const success = Branch.remove(
         props.userName!,
         props.projectName!,
-        branchName.value
+        branch,
       );
       if (success) {
         for (let i = 0; i < branches.value.length; i++) {

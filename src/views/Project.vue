@@ -53,8 +53,7 @@
           </li>
         </ul>
 
-        <router-view v-if="page.ready" :project="project">
-        </router-view>
+        <router-view v-if="page.ready" :project="project"> </router-view>
         <div v-else uk-spinner></div>
       </div>
     </div>
@@ -90,16 +89,18 @@ export default defineComponent({
       createdAt: new Date(),
     });
 
-    async function init() {
-      const result = await Project.fetch(props.userName!, props.projectName);
+    async function init(uName?: string, pName?: string) {
+      const userName = uName ?? props.userName;
+      const projectName = pName ?? props.projectName;
+      const result = await Project.fetch(userName!, projectName);
       if (result === null) return notFound();
       project.value = result;
       if (router.currentRoute.value.name === "Branch-default") {
         await router.replace({
           name: "Commit-default",
           params: {
-            userName: props.userName!,
-            projectName: props.projectName!,
+            userName: userName!,
+            projectName: projectName!,
             branchName: project.value.mainBranch,
           },
         });
@@ -109,9 +110,14 @@ export default defineComponent({
     }
 
     onBeforeRouteUpdate((to) => {
-      if (to.name === "Project" || to.name === "Branch-default") {
+      if (
+        to.name === "Project" ||
+        to.name === "Branch-default" ||
+        to.params.projectName !== props.projectName ||
+        to.params.userName !== props.userName
+      ) {
         page.ready = false;
-        init();
+        init(to.params.userName as string, to.params.projectName as string);
       }
     });
 
