@@ -73,6 +73,7 @@
                 :projectName="project.name"
                 :updatedAt="project.updatedAt"
                 :userName="userName"
+                class="uk-width-auto"
               />
             </div>
             <Pagination :page="parseInt(page)" :pages="pages" />

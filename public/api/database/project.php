@@ -164,6 +164,7 @@ function fetchAll($first, $after, $order, $loggedUser)
         WHERE p.private = 'f'
         OR :contributorname IN (SELECT c.contributorName FROM contributor c WHERE c.projectName = name AND c.authorName = p.authorName)
         OR :contributorname = 'admin'
+        OR :contributorname = p.authorName
         ORDER BY " . $real_order . "
         LIMIT :number_to_show OFFSET :offset ";
 
