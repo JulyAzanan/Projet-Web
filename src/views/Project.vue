@@ -32,6 +32,12 @@
           </li>
           <li v-if="isContributor">
             <router-link
+              :to="{ name: 'Branches', params: { userName, projectName } }"
+              >Branches
+            </router-link>
+          </li>
+          <li v-if="isContributor">
+            <router-link
               :to="{ name: 'Contributors', params: { userName, projectName } }"
               >Contributeurs
             </router-link>
@@ -87,7 +93,6 @@ export default defineComponent({
     async function init() {
       const result = await Project.fetch(props.userName!, props.projectName);
       if (result === null) return notFound();
-      console.log(result)
       project.value = result;
       if (router.currentRoute.value.name === "Branch-default") {
         await router.replace({

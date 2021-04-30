@@ -76,12 +76,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         ...load("Pulls"),
-        path: "pulls", // pull request
-        props: true,
-      },
-      {
-        ...load("Pull"),
-        path: "pulls/:pull", // pull request
+        path: "pull", // pull request
         props: true,
       },
       {
@@ -92,6 +87,11 @@ const routes: RouteRecordRaw[] = [
       {
         ...load("ProjectSettings"),
         path: "settings", // Paramètres du projet
+        props: true,
+      },
+      {
+        ...load("Branches"),
+        path: "branches", // Branches du projet
         props: true,
       },
     ]

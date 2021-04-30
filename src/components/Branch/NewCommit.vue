@@ -57,7 +57,6 @@
               <input
                 v-model="message"
                 class="uk-input"
-                id="form-h-text"
                 type="text"
                 placeholder="Message de commit"
                 required
