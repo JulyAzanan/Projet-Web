@@ -7,7 +7,7 @@ function auth()
 {
     if (isset($_SERVER["PHP_AUTH_USER"]) && isset($_SERVER["PHP_AUTH_PW"])) {
         if (\User\auth($_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"])) {
-            return $user;
+            return $_SERVER["PHP_AUTH_USER"];
         }
         unauthorized_error();
     }
