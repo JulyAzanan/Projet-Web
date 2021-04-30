@@ -11,7 +11,7 @@
                 userName,
                 projectName,
                 branchName,
-                commitID,
+                commitID: file.id,
                 filePath: file.name,
               },
             }"
@@ -51,9 +51,6 @@ export default defineComponent({
     branchName: String,
     commitID: String,
     commit: Object as () => Commit.FetchResult,
-  },
-  setup() {
-    //
   },
 });
 </script>

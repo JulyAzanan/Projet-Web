@@ -114,7 +114,7 @@ function fetchAll($author, $project, $branch, $commit, $loggedUser)
     if (!check_branch_exist($author, $project, $branch)) {
         branch_error();
     }
-    $sql = "SELECT DISTINCT ON(p.name) p.name, c.id, c.message, c.createdAt FROM partition p JOIN commit c
+    $sql = "SELECT DISTINCT ON(p.name) p.name, p.commitID, c.message, c.createdAt FROM partition p JOIN commit c
     ON p.commitID = c.id AND p.authorName = c.authorName AND p.branchName = c.branchName AND p.projectName = c.projectName
     JOIN project pp ON pp.name = p.projectName AND pp.authorName = p.authorName
     WHERE p.authorName = :authorName AND p.projectName = :projectName AND p.branchName = :branchName AND c.createdAt <= (SELECT cc.createdAt FROM commit cc WHERE cc.authorName = :authorName AND cc.projectName = :projectName AND cc.branchName = :branchName AND cc.id = :id)
@@ -136,7 +136,7 @@ function fetchAll($author, $project, $branch, $commit, $loggedUser)
     foreach ($stmt->fetchAll() as $partition) {
         $partitions[] = (object) [
             'name' => $partition['name'],
-            'id' => $partition['id'],
+            'id' => $partition['commitid'],
             'message' => $partition['message'],
             'createdAt' => $partition['createdat'],
         ];
