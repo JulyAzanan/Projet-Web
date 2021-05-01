@@ -8,8 +8,8 @@ export interface BaseResult {
   name: string,
   authorName: string
   private: boolean,
-  updatedAt: Date,
-  createdAt: Date,
+  updatedAt: string,
+  createdAt: string,
   description: string,
   mainBranch: string,
 }

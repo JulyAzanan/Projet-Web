@@ -133,6 +133,7 @@ function fetchAll($author, $project, $branch, $commit, $loggedUser)
         //Request encoutered an error, aborting
         PDO_error();
     }
+    $partitions = [];
     foreach ($stmt->fetchAll() as $partition) {
         $partitions[] = (object) [
             'name' => $partition['name'],

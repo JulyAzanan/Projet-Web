@@ -2,6 +2,7 @@ export default function debounce<F extends () => unknown>(fn: F, wait: number): 
   let timer: number;
   return () => {
     clearTimeout(timer);
+    // @ts-ignore
     timer = setTimeout(fn, wait);
   }
 }

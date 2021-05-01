@@ -3,7 +3,7 @@ import * as Commit from "./commit"
 
 export interface BaseResult {
   name: string,
-  updatedAt: Date,
+  updatedAt: string,
 }
 
 export interface FetchResult extends BaseResult {

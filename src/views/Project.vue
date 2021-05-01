@@ -69,7 +69,7 @@ import { onBeforeRouteUpdate } from "vue-router";
 import router, { notFound } from "@/app/routes";
 import store from "@/app/store";
 import * as Project from "@/api/project";
-import { isContributor2, isContributor } from "@/utils/contributor";
+import { isContributor } from "@/utils/contributor";
 
 export default defineComponent({
   props: {
@@ -89,19 +89,15 @@ export default defineComponent({
       branches: [],
       mainBranch: "",
       description: "",
-      updatedAt: new Date(),
-      createdAt: new Date(),
+      updatedAt: "",
+      createdAt: "",
     });
 
     async function init(uName?: string, pName?: string) {
       const userName = uName ?? props.userName;
       const projectName = pName ?? props.projectName;
       const result = await Project.fetch(userName!, projectName);
-      if (
-        result === null ||
-        (result.private && store.state.loggedIn && !isContributor2(result))
-      )
-        return notFound();
+      if (result === null) return notFound();
       project.value = result;
       if (router.currentRoute.value.name === "Branch-default") {
         await router.replace({

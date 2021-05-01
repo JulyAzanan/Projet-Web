@@ -5,7 +5,7 @@ import * as Score from "./score"
 export interface BaseResult {
   id: string,
   message: string,
-  createdAt: Date,
+  createdAt: string,
   publisher: string,
 }
 

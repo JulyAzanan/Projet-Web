@@ -34,7 +34,7 @@
             {{ file.message }}
           </router-link>
         </td>
-        <td class="uk-text-nowrap">{{ file.createdAt.toLocaleString() }}</td>
+        <td class="uk-text-nowrap">{{ file.createdAt }}</td>
       </tr>
     </tbody>
   </table>

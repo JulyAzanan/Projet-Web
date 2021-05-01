@@ -10,7 +10,8 @@
           >
             <UserPicture :user="commit.publisher" :size="2" />
           </router-link>
-          <strong>{{ commit.author }}</strong> {{ commit.message }}
+          {{ commit.message }}
+          <small>({{ commit.createdAt }})</small>
         </div>
         <div>
           <div uk-form-custom>
@@ -26,9 +27,9 @@
                 {{ commit.id }}
               </option>
             </select>
-            <code> {{ commitID }} </code>
+            <code> {{ commitID.substring(0, 6) }} </code>
           </div>
-          {{ commit.createdAt.toLocaleString() }}
+          <a class="uk-icon" uk-icon="icon: download" @click="download"></a>
         </div>
       </div>
     </div>
@@ -42,7 +43,10 @@ import { onBeforeRouteUpdate } from "vue-router";
 import UserPicture from "@/components/User/UserPicture.vue";
 import * as Branch from "@/api/branch";
 import * as Commit from "@/api/commit";
+import * as Score from "@/api/score";
 import router, { notFound } from "@/app/routes";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 export default defineComponent({
   props: {
@@ -62,7 +66,7 @@ export default defineComponent({
     });
     const commit = ref<Commit.FetchResult>({
       id: "",
-      createdAt: new Date(),
+      createdAt: "",
       publisher: {
         name: "",
       },
@@ -108,8 +112,23 @@ export default defineComponent({
       }
     });
 
+    async function download() {
+      const scores = await Score.download(
+        props.userName!,
+        props.projectName!,
+        props.branchName!,
+        props.commitID!
+      );
+      const zip = new JSZip();
+      for (const score of scores) {
+        zip.file(score.name, score.content, { base64: true });
+      }
+      const file = await zip.generateAsync({ type: "blob" });
+      saveAs(file, `${props.userName}_${props.projectName}_${props.commitID}.zip`);
+    }
+
     init();
-    return { page, commit, selectedCommit };
+    return { page, commit, selectedCommit, download };
   },
 });
 </script>

@@ -26,7 +26,7 @@
           >
             Voir le projet
           </router-link>
-          <p>Dernière mise à jour le : {{ updatedAt.toLocaleString() }}</p>
+          <p>Dernière mise à jour le : {{ updatedAt }}</p>
           <p v-if="showAuthor">Créé par : {{ userName }}</p>
         </div>
       </div>
@@ -40,7 +40,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   props: {
     isPrivate: Boolean,
-    updatedAt: Date,
+    updatedAt: String,
     userName: String,
     projectName: String,
     showAuthor: Boolean,

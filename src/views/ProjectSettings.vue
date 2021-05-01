@@ -124,6 +124,7 @@ import { defineComponent, ref } from "vue";
 import * as Project from "@/api/project";
 import router from "@/app/routes";
 import { notifySuccess, notifyWarning } from "@/utils/notification";
+import store from "@/app/store";
 
 export default defineComponent({
   props: {
@@ -138,6 +139,7 @@ export default defineComponent({
 
     async function deleteProject() {
       await Project.remove(props.userName!, props.projectName!);
+      store.commit("updateProjects")
       await router.push({ name: "Home" });
     }
 

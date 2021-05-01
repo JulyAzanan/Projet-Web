@@ -68,7 +68,7 @@ export default defineComponent({
         branchName.value
       );
       if (success) {
-        branches.value.push({ name: branchName.value, updatedAt: new Date() });
+        branches.value.unshift({ name: branchName.value, updatedAt: new Date().toString() });
         branchName.value = "";
         notifySuccess("Branche ajoutée");
       } else notifyWarning("Erreur lors de l'ajout de la branche");

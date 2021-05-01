@@ -16,13 +16,11 @@
       {{ project.name }}
     </router-link>
   </li>
-  <li v-if="projects.length === 0">
-    Pas encore de projets !
-  </li>
+  <li v-if="projects.length === 0">Pas encore de projets !</li>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import * as Project from "@/api/project";
 import store from "@/app/store";
 
@@ -35,7 +33,9 @@ export default defineComponent({
       projects.value = result;
     }
 
-    watch(() => store.state.user, init);
+    store.subscribe((mutation) => {
+      if (mutation.type === "updateProjects") init();
+    });
 
     init();
     return {

@@ -153,6 +153,7 @@ function getProject($user, $project, $loggedUser)
 {
     check_not_null($user, $project);
     $projectInfo = find($user, $project, $loggedUser);
+    if ($projectInfo === null) return null; 
     $projectInfo->contributors = \Contributor\fetchAll($user, $project, $loggedUser);
     $projectInfo->branches = \Branch\fetchAll($user, $project, $loggedUser);
     return $projectInfo;

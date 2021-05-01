@@ -17,7 +17,9 @@
                   class="uk-input"
                   type="text"
                   v-model="userName"
-                  disabled
+                  :disabled="user !== 'admin'"
+                  @input="checkUser"
+                  :class="{ 'uk-form-danger': invalidUser }"
                   required
                 />
               </div>
@@ -80,7 +82,7 @@
             <button
               type="submit"
               class="uk-button uk-button-primary"
-              :disabled="invalidProject"
+              :disabled="invalidProject || invalidUser"
               @click="createProject"
             >
               Créer le projet
@@ -93,12 +95,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, ref } from "vue";
+import { defineComponent, watch, ref, computed } from "vue";
 import store from "@/app/store";
 import router from "@/app/routes";
 import debounce from "@/utils/debounce";
 import { notifyWarning } from "@/utils/notification";
 import * as Project from "@/api/project";
+import * as User from "@/api/user";
 
 export default defineComponent({
   beforeRouteEnter(to, _from, next) {
@@ -111,6 +114,7 @@ export default defineComponent({
     const description = ref("");
     const isPrivate = ref(false);
     const invalidProject = ref(false);
+    const invalidUser = ref(false);
 
     watch(
       () => store.state.loggedIn,
@@ -142,14 +146,23 @@ export default defineComponent({
 
     const checkProject = debounce(projectExists, 500);
 
+    async function userExists() {
+      invalidUser.value = !(await User.find(userName.value));
+    }
+
+    const checkUser = debounce(userExists, 500);
+
     return {
+      user: computed(() => store.state.user),
       userName,
       project,
       description,
       isPrivate,
       checkProject,
       invalidProject,
+      invalidUser,
       createProject,
+      checkUser,
     };
   },
 });

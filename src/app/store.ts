@@ -24,6 +24,7 @@ export default createStore({
       state.loggedIn = false;
       state.user = "";
       localStorage.clear();
-    }
+    },
+    updateProjects() {},
   },
 })

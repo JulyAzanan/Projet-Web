@@ -265,6 +265,7 @@ function fetchAll($author, $project, $loggedUser)
 function getBranch($author, $project, $branch, $loggedUser) {
     check_not_null($author, $project, $branch);
     $branchInfo = find($author, $project, $branch, $loggedUser);
+    if ($branchInfo === null) return null; 
     $branchInfo->commitsCount = \Commit\count($author, $project, $branch, $loggedUser);
     $branchInfo->lastCommit = \Commit\getLatest($author, $project, $branch, $loggedUser);
     $branchInfo->commits = \Commit\fetchAll($author, $project, $branch, $loggedUser);

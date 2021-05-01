@@ -34,7 +34,7 @@ export async function count(user: string, project: string, branch: string, parti
 export interface AllResult extends BaseResult {
   id: string,
   message: string,
-  createdAt: Date,
+  createdAt: string,
 }
 
 export async function all(user: string, project: string, branch: string, commit: string): Promise<AllResult[]> {

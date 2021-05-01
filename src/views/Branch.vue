@@ -33,20 +33,13 @@
             <div class="uk-button-group">
               <a
                 v-if="isContributor"
-                class="uk-button uk-button-default"
+                class="uk-button uk-button-primary"
                 href="#new-commit"
                 uk-toggle
               >
                 Commit
                 <span class="uk-margin-small-left" uk-icon="icon: push"></span>
               </a>
-              <button class="uk-button uk-button-primary">
-                Télécharger
-                <span
-                  class="uk-margin-small-left"
-                  uk-icon="icon: download"
-                ></span>
-              </button>
             </div>
           </div>
           <div class="uk-margin" v-if="page.ready">
@@ -62,8 +55,8 @@
           <div v-else uk-spinner></div>
         </div>
         <div class="uk-width-1-3@s">
-          <cite> Créé le {{ project.createdAt.toLocaleString() }} </cite><br />
-          <cite> Mis à jour le {{ project.updatedAt.toLocaleString() }} </cite>
+          <cite> Créé le {{ project.createdAt }} </cite><br />
+          <cite> Mis à jour le {{ project.updatedAt }} </cite>
           <h4>
             <span class="uk-margin-small-right" uk-icon="icon: info"></span>
             À propos
@@ -133,7 +126,7 @@ export default defineComponent({
       commits: [],
       lastCommit: null,
       commitsCount: 0,
-      updatedAt: new Date(),
+      updatedAt: "",
     });
 
     let stopBranchWatcher: WatchStopHandle = () => {};
@@ -144,10 +137,13 @@ export default defineComponent({
       const result = await Branch.fetch(
         props.userName!,
         projectName!,
-        branchName,
+        branchName
       );
       if (result === null) return notFound();
       branch.value = result;
+      if (router.currentRoute.value.name === "Files") {
+        page.noCommitAvailable = false;
+      }
       if (router.currentRoute.value.name === "Commit-default") {
         if (branch.value.lastCommit) {
           await router.replace({
@@ -192,7 +188,13 @@ export default defineComponent({
     });
 
     init();
-    return { page, branch, selectedBranch, isContributor: isContributor(() => props.project), init };
+    return {
+      page,
+      branch,
+      selectedBranch,
+      isContributor: isContributor(() => props.project),
+      init,
+    };
   },
 });
 </script>

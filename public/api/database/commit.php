@@ -116,6 +116,7 @@ function getLatest($author, $project, $branch, $loggedUser) {
 function getCommit($author, $project, $branch, $commit, $loggedUser)
 {
     $commitInfo = find($author, $project, $branch, $commit, $loggedUser);
+    if ($commitInfo === null) return null; 
     $commitInfo->files = \Partition\fetchAll($author, $project, $branch, $commit, $loggedUser);
     $commitInfo->publisher = \User\find($commitInfo->publisherName);
     return $commitInfo;
@@ -264,6 +265,6 @@ function count($author, $project, $branch, $loggedUser)
         PDO_error();
     }
     $res = $stmt->fetch(\PDO::FETCH_ASSOC);
-    return $res['count'];
+    return $stmt->rowCount() > 0 ? $res['count'] : 0;
 
 }
