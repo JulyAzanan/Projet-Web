@@ -38,6 +38,7 @@ export async function exception(response: Response): Promise<never> {
   throw new Error(`${response.statusText}: ${text}`)
 }
 
+// eslint-disable-next-line
 export async function get(url: string, params?: Record<string, any>): Promise<Response> {
   return fetch(connection + url + (params ? `?${new URLSearchParams(params)}` : ""), {
     method: "GET",

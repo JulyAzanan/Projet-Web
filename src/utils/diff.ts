@@ -3,7 +3,6 @@ import format from "xml-formatter";
 interface Note {
   misc: Element[],
   pitch: string,
-  duration: string,
   voice: string,
   type: string,
 }
@@ -27,7 +26,6 @@ function removeAttributes(element: Element): Element {
 
 function noteEquals(a?: Note, b?: Note) {
   return a && b && (
-    a.duration === b.duration &&
     a.pitch === b.pitch &&
     a.type === b.type &&
     a.voice === b.voice
@@ -36,24 +34,21 @@ function noteEquals(a?: Note, b?: Note) {
 
 function toNote(el: Element): Note {
   const pitch_ = el.getElementsByTagName("pitch");
-  const duration_ = el.getElementsByTagName("duration");
   const voice_ = el.getElementsByTagName("voice");
   const type_ = el.getElementsByTagName("type");
   const pitch = pitch_.length > 0 ? format(pitch_[0].outerHTML) : "";
-  const duration = duration_.length > 0 ? format(duration_[0].outerHTML) : "";
   const voice = voice_.length > 0 ? format(voice_[0].outerHTML) : "";
   const type = type_.length > 0 ? format(type_[0].outerHTML) : "";
   const tags = ["pitch", "duration", "voice", "type"]
   const misc = [...el.children].filter((e) => !tags.includes(e.tagName));
   return {
-    pitch, duration, voice, type, misc,
+    pitch, voice, type, misc,
   }
 }
 
 const finalNoteSequence: Note = {
   misc: [],
   pitch: "",
-  duration: "",
   voice: "",
   type: "",
 };

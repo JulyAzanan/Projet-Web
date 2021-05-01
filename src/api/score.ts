@@ -1,6 +1,5 @@
-import sleep from "./sleep";
 import * as Request from "../utils/request"
-import musicXML from "../scores/score1";
+import * as Score from "./score"
 
 export interface BaseResult {
   name: string,
@@ -12,12 +11,6 @@ export interface DownloadResult extends BaseResult {
 
 export async function fetch(user: string, project: string, branch: string, commit: string, partition?: string | null): Promise<DownloadResult | null> {
   if (partition == null) return null;
-  /* await sleep(500);
-  return {
-    name: "file5.xml",
-    content: btoa(musicXML)
-  }; */
-  //
   return Request.json("api/partition.php", {
     q: "getPartition",
     user,
@@ -29,9 +22,6 @@ export async function fetch(user: string, project: string, branch: string, commi
 }
 
 export async function count(user: string, project: string, branch: string, partition: string): Promise<number> {
-  /* await sleep(500);
-  return 52; */
-  // 
   return Request.json("api/partition.php", {
     q: "count",
     user,
@@ -48,24 +38,6 @@ export interface AllResult extends BaseResult {
 }
 
 export async function all(user: string, project: string, branch: string, commit: string): Promise<AllResult[]> {
-  /* await sleep(500);
-  return [{
-    name: "foo",
-    id: "dqzdeq",
-    createdAt: new Date(),
-    message: "Pour tout n dans la vie",
-  }, {
-    name: "bar",
-    id: "dqzdeq",
-    createdAt: new Date(),
-    message: "Pour tout n dans la vie",
-  }, {
-    name: "foo52",
-    id: "dqzdeq",
-    createdAt: new Date(),
-    message: "Pour tout n dans la vie",
-  }] */
-  //
   return Request.json("api/partition.php", {
     q: "fetchAll",
     user,
@@ -74,3 +46,14 @@ export async function all(user: string, project: string, branch: string, commit:
     commit,
   });
 }
+
+export async function download(user: string, project: string, branch: string, commit: string): Promise<Score.DownloadResult[]> {
+  return Request.json("api/partition.php", {
+    q: "download",
+    user,
+    project,
+    branch,
+    commit,
+  });
+}
+

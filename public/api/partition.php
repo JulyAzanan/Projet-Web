@@ -25,6 +25,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     echo json_encode(\Partition\getPartition($_GET['user'], $_GET['project'], $_GET['branch'], $_GET['commit'], $_GET['partition'], $user));
                     break;
 
+                case 'download':
+                    $user = auth();
+                    echo json_encode(\Partition\download($_GET['user'], $_GET['project'], $_GET['branch'], $_GET['commit'], $user));
+                    break;
+    
+
                 default:
                     query_error();
             }

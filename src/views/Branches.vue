@@ -19,7 +19,7 @@
             type="submit"
             @click="createBranch"
           >
-            Ajouter un branche
+            Ajouter une branche
           </button>
         </div>
       </form>

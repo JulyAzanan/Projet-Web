@@ -66,17 +66,20 @@ function update($author, $project, $private, $description, $mainBranchName, $log
         forbidden_error();
     }
     $bd = connect();
-    if ($private != null) {
+    if ($private !== null) {
         $sql = "UPDATE project SET private = :private WHERE name = :project AND authorName = :author";
         $stmt = $bd->prepare($sql);
+        $p = $private ? 't' : 'f';
+        var_dump($private);
+        var_dump($p);
         $stmt->bindValue(':author', $author, \PDO::PARAM_STR);
         $stmt->bindValue(':project', $project, \PDO::PARAM_STR);
-        $stmt->bindValue(':private', $private, \PDO::PARAM_BOOL);
+        $stmt->bindValue(':private', $p, \PDO::PARAM_STR);
         if (!$stmt->execute()) {
             return false;
         }
     }
-    if ($description != null) {
+    if ($description !== null) {
         $sql = "UPDATE project SET description = :description WHERE name = :project AND authorName = :author";
         $stmt = $bd->prepare($sql);
         $stmt->bindValue(':author', $author, \PDO::PARAM_STR);
@@ -86,7 +89,7 @@ function update($author, $project, $private, $description, $mainBranchName, $log
             return false;
         }
     }
-    if ($mainBranchName != null) {
+    if ($mainBranchName !== null) {
         // TODO: find branch
         $sql = "UPDATE project SET mainBranchName = :mainBranchName WHERE name = :project AND authorName = :author";
         $stmt = $bd->prepare($sql);
@@ -228,7 +231,7 @@ function fetchAllFromUser($first, $after, $user, $order, $loggedUser)
     foreach ($stmt->fetchAll() as $project) {
         $projects[] = (object) [
             'name' => $project['name'],
-            'authorName' => $project['authorName'],
+            'authorName' => $project['authorname'],
             'updatedAt' => $project['updatedat'],
             'createdAt' => $project['createdat'],
             'description' => $project['description'],

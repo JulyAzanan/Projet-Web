@@ -258,6 +258,7 @@ export default defineComponent({
         bio: user.value.bio,
         password: newPassword.value === "" ? null : newPassword.value,
       });
+      if (newPassword.value) localStorage.setItem("password", newPassword.value);
       if (success) notifySuccess("Profil mis à jour");
       else notifyWarning("Erreur lors de la mise à jour du profil");
     }

@@ -11,6 +11,9 @@
         >
           {{ projectName }}
         </router-link>
+        <span v-if="project.private" class="uk-label uk-margin-small-left"
+          >Privé</span
+        >
       </h3>
       <div v-else uk-spinner></div>
       <div>
@@ -61,11 +64,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from "vue";
+import { defineComponent, ref, reactive, watch } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import router, { notFound } from "@/app/routes";
+import store from "@/app/store";
 import * as Project from "@/api/project";
-import { isContributor } from "@/utils/contributor";
+import { isContributor2, isContributor } from "@/utils/contributor";
 
 export default defineComponent({
   props: {
@@ -93,7 +97,11 @@ export default defineComponent({
       const userName = uName ?? props.userName;
       const projectName = pName ?? props.projectName;
       const result = await Project.fetch(userName!, projectName);
-      if (result === null) return notFound();
+      if (
+        result === null ||
+        (result.private && store.state.loggedIn && !isContributor2(result))
+      )
+        return notFound();
       project.value = result;
       if (router.currentRoute.value.name === "Branch-default") {
         await router.replace({
@@ -120,6 +128,11 @@ export default defineComponent({
         init(to.params.userName as string, to.params.projectName as string);
       }
     });
+
+    watch(
+      () => store.state.user,
+      () => init()
+    );
 
     init();
     return { page, project, isContributor: isContributor(() => project.value) };

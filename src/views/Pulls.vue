@@ -51,14 +51,18 @@
         <strong> La branche cible n'a pas de commit! </strong>
       </div>
       <ul v-if="state.ready" uk-accordion="multiple: true">
-        <li v-for="pair in differences" :key="pair[0].name" class="uk-open">
-          <a class="uk-accordion-title">{{ pair[0].name }}</a>
+        <li
+          v-for="pair in differences"
+          :key="(pair[0] ?? pair[1]).name"
+          class="uk-open"
+        >
+          <a class="uk-accordion-title">{{ (pair[0] ?? pair[1]).name }}</a>
           <div class="uk-accordion-content">
             <Diff :base="pair[0]" :target="pair[1]" />
           </div>
         </li>
       </ul>
-      <div v-if="state.ready" class="uk-child-width-auto" uk-grid>
+      <div v-if="state.ready && isContributor" class="uk-child-width-auto" uk-grid>
         <div class="uk-width-expand" />
         <button
           type="button"
@@ -77,10 +81,10 @@ import { defineComponent, reactive, ref, watch } from "vue";
 import * as Project from "@/api/project";
 import * as Score from "@/api/score";
 import * as Branch from "@/api/branch";
-import * as Commit from "@/api/commit";
 import router from "@/app/routes";
 import Diff from "@/components/Pull/Diff.vue";
 import { notifySuccess, notifyWarning } from "@/utils/notification";
+import { isContributor } from "@/utils/contributor";
 
 export default defineComponent({
   props: {
@@ -102,9 +106,10 @@ export default defineComponent({
     });
     const differences = ref<
       [Score.DownloadResult | null, Score.DownloadResult | null][]
-    >();
+    >([]);
 
     async function compareBranches() {
+      differences.value.splice(0, differences.value.length);
       state.ready = false;
       state.same = false;
       state.emptyBase = false;
@@ -127,13 +132,13 @@ export default defineComponent({
         return;
       }
       const scores = await Promise.all([
-        Commit.download(
+        Score.download(
           props.userName!,
           props.projectName!,
           baseBranch.value,
           branches[0]!.lastCommit
         ),
-        Commit.download(
+        Score.download(
           props.userName!,
           props.projectName!,
           targetBranch.value,
@@ -147,7 +152,7 @@ export default defineComponent({
         ]);
       }
       for (const targetScore of scores[1]) {
-        if (scores[0].some((s) => s.name === targetScore.name)) return;
+        if (scores[0].some((s) => s.name === targetScore.name)) continue;
         differences.value?.push([null, targetScore]);
       }
       state.ready = true;
@@ -163,7 +168,7 @@ export default defineComponent({
       if (success) {
         notifySuccess("Branches fusionnées avec succès");
         await router.push({
-          name: "Commit-Default",
+          name: "Commit-default",
           params: {
             userName: props.userName!,
             projectName: props.projectName!,
@@ -181,6 +186,7 @@ export default defineComponent({
       state,
       differences,
       merge,
+      isContributor: isContributor(() => props.project)
     };
   },
 });

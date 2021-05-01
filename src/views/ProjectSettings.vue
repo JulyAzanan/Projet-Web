@@ -147,6 +147,10 @@ export default defineComponent({
         description: description.value,
         mainBranch: mainBranch.value ?? null,
       });
+      const project = props.project;
+      if (project) {
+        project.private = isPrivate.value ?? false;
+      }
       if (success) notifySuccess("Projet mis à jour");
       else notifyWarning("Erreur lors de la mise à jour du projet");
     }

@@ -72,7 +72,6 @@ export default defineComponent({
       const page = parseInt(props.page!);
       const result = await Project.search(projectQuery.value, page);
       projects.value = result.results;
-      console.log(result)
       pages.value = Math.ceil(result.count / Project.perPage);
       if (result.results.length === 0 && page != 1) {
         router.replace({ query: { page: "1" } });
