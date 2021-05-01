@@ -129,7 +129,6 @@ export default defineComponent({
   props: {
     userName: String,
     projectName: String,
-    branchName: String,
     project: Object as () => Project.FetchResult,
   },
   setup(props) {

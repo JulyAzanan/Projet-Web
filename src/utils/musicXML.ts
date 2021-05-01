@@ -19,7 +19,8 @@ async function toXml(extension: InputFileFormat, data: string) {
   return webMscore.saveXml();
 }
 
-export async function parseScore(extension: string | undefined, data: string): Promise<Document | null> {
+export async function parseScore(extension: string | undefined, data?: string): Promise<Document | null> {
+  if (data === undefined || data === "") return null;
   let xml = "";
 
   switch (extension) {

@@ -106,8 +106,8 @@ function fetchAll($first, $after, $user)
     check_not_null($user);
     $bd = connect();
     $stmt = $bd->prepare("SELECT name, picture, bio, email, age, latestCommit, (SELECT COUNT(ff.followingName) FROM friend ff WHERE ff.followingName = name) AS followers
-    FROM musician JOIN friend f ON f.followerName = name
-    WHERE f.followingName = :user
+    FROM musician JOIN friend f ON f.followingName = name
+    WHERE f.followerName = :user
     LIMIT :number_to_show OFFSET :offset ");
     $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
     $stmt->bindValue(':number_to_show', $first, \PDO::PARAM_INT);

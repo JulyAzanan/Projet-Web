@@ -232,7 +232,7 @@ function setPartNumber(el: Element, n: number) {
   }
 }
 
-export function scoreDiff(score_a: Document, score_b: Document, diff: Element): void {
+export function scoreDiff(score_a: Element, score_b: Element, diff: Element): void {
   const diffPartList = diff.getElementsByTagName("part-list")[0];
 
   while (diff.getElementsByTagName("part").length > 0) {
@@ -241,9 +241,6 @@ export function scoreDiff(score_a: Document, score_b: Document, diff: Element): 
   while (diffPartList.children.length > 0) {
     diffPartList.children[0].remove();
   }
-  /* console.log(diff.getElementsByTagName("part"))
-  console.log(diff)
-  return; */
 
   const scoreParts_a = score_a.getElementsByTagName("part-list")[0].getElementsByTagName("score-part");
   const scoreParts_b = score_b.getElementsByTagName("part-list")[0].getElementsByTagName("score-part");

@@ -102,7 +102,7 @@ function remove($contributor, $authorName, $project, $loggedUser)
 
     $sql = "DELETE FROM contributor
     WHERE contributorName = :contributorname
-    AND pojectName = :projectname
+    AND projectName = :projectname
     AND authorName = :authorname";
     $bd = connect();
     $stmt = $bd->prepare($sql);
@@ -214,7 +214,7 @@ function count($authorName, $project, $loggedUser)
     return $res['count'];
 }
 
-function find($author, $project, $contributor, $loggedUser)
+function find($author, $project, $user, $loggedUser)
 {
     check_not_null($author, $project, $user, $loggedUser);
 

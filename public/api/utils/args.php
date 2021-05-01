@@ -36,7 +36,7 @@ function check_contributor($User_to_check, $Project, $Project_Author_Name)
     $stmt->execute(); //Execute the request
     //We select all contributors
     foreach ($stmt->fetchAll() as $res) {
-        if (strcmp($res['contributorName'], $User_to_check) === 0) //Check if $User_to_check is a contributor of the selected project
+        if (strcmp($res['contributorname'], $User_to_check) === 0) //Check if $User_to_check is a contributor of the selected project
         {
             return true;
         }

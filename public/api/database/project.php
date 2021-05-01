@@ -58,7 +58,13 @@ function add($author, $project, $private, $description, $loggedUser)
 function update($author, $project, $private, $description, $mainBranchName, $loggedUser)
 {
     check_not_null($author, $project, $loggedUser);
-    check_owner($author, $loggedUser);
+    if (!admin_or_contributor($author, $project, $loggedUser)) {
+        /**
+         * We are not an admin and we are not a contributor
+         * So we have to throw an error
+         */
+        forbidden_error();
+    }
     $bd = connect();
     if ($private != null) {
         $sql = "UPDATE project SET private = :private WHERE name = :project AND authorName = :author";

@@ -240,7 +240,7 @@ function find($author, $project, $branch, $commit, $loggedUser)
 function count($author, $project, $branch, $loggedUser)
 {
     // Gérer cas projets privés et publics
-    check_not_null($author, $project, $branch, $loggedUser);
+    check_not_null($author, $project, $branch);
     if (!check_project_exist($author, $project)) {
         project_error();
     }

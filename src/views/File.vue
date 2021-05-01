@@ -4,23 +4,8 @@
       <div class="uk-width-expand">
         <blockquote>{{ filePath }}</blockquote>
       </div>
-      <ul v-if="ready" class="uk-grid-small uk-flex-middle" uk-grid>
-        <li>
-          <a
-            v-if="!unkownExtension"
-            @click="playPause"
-            class="uk-icon-button"
-            uk-icon="icon: play"
-          ></a>
-        </li>
-        <li>
-          <a
-            v-if="!unkownExtension"
-            @click="refresh"
-            class="uk-icon-button"
-            uk-icon="icon: refresh"
-          ></a>
-        </li>
+      <ul v-if="ready.page" class="uk-grid-small uk-flex-middle" uk-grid>
+        <Player v-if="ready.player && !unknownExtension" :osmd="osmd " />
         <li>
           <a
             @click="download"
@@ -32,15 +17,15 @@
     </div>
 
     <div class="uk-placeholder uk-text-center">
-      <div v-show="ready" ref="osmdContainer" />
-      <div v-if="unkownExtension">
+      <div v-show="ready.page" ref="osmdContainer" />
+      <div v-if="unknownExtension">
         <span
           class="uk-margin-small-right uk-text-muted"
           uk-icon="icon: warning; ratio: 2"
         ></span>
         Extension de fichier non supportée.
       </div>
-      <div v-if="!ready">
+      <div v-if="!ready.page">
         <span uk-spinner class="uk-margin-small-right uk-text-muted"></span>
         Conversion en cours
       </div>
@@ -49,14 +34,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, reactive, ref } from "vue";
 import { onBeforeRouteUpdate } from "vue-router";
 import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import AudioPlayer from "osmd-audio-player";
-import { PlaybackEvent } from "osmd-audio-player/dist/PlaybackEngine";
 import { notFound } from "@/app/routes";
 import * as Score from "@/api/score";
 import { parseScore } from "@/utils/musicXML";
+import Player from "@/components/Pull/Player.vue";
 import "@/utils/cursor";
 
 function downloadBase64(data: string, name: string) {
@@ -84,14 +68,21 @@ export default defineComponent({
     commitID: String,
     filePath: String,
   },
+  components: {
+    Player,
+  },
   setup(props) {
     const osmdContainer = ref<HTMLElement>();
-    const ready = ref(false);
+    const ready = reactive({
+      page: false,
+      player: false,
+    });
     const score = ref<Score.DownloadResult>({
       name: "",
       content: "",
     });
-    const unkownExtension = ref(false);
+    const unknownExtension = ref(false);
+    const osmd = ref<OpenSheetMusicDisplay>();
     let xml: Document;
 
     async function init() {
@@ -109,54 +100,22 @@ export default defineComponent({
         score.value.content
       );
       if (doc !== null) xml = doc;
-      else unkownExtension.value = true;
-      ready.value = true;
+      else unknownExtension.value = true;
+      ready.page = true;
     }
 
     const initialized = init();
-    const audioPlayer = new AudioPlayer();
-    let atFileBeginning = true;
-    let osmd: OpenSheetMusicDisplay;
-
-    audioPlayer.on(PlaybackEvent.ITERATION, () => {
-      if (atFileBeginning) {
-        osmd.cursor.show();
-        atFileBeginning = false;
-      } else {
-        osmd.cursor.next();
-      }
-    });
 
     async function loadScore() {
       await initialized;
-      if (!unkownExtension.value) {
-        osmd = new OpenSheetMusicDisplay(osmdContainer.value!);
+      if (!unknownExtension.value) {
+        osmd.value = new OpenSheetMusicDisplay(osmdContainer.value!);
 
-        await osmd.load(xml);
-        osmd.render();
-        osmd.cursor.reset();
-        // @ts-ignore
-        await audioPlayer.loadScore(osmd);
+        await osmd.value.load(xml);
+        osmd.value.render();
+        osmd.value.cursor.reset();
+        ready.player = true;
       }
-    }
-
-    let play = false;
-
-    function playPause() {
-      if (play) {
-        audioPlayer.pause();
-      } else {
-        audioPlayer.play();
-      }
-      play = !play;
-    }
-
-    function refresh() {
-      atFileBeginning = true;
-      osmd.cursor.hide();
-      osmd.cursor.reset();
-      audioPlayer.stop();
-      play = false;
     }
 
     function download() {
@@ -166,7 +125,8 @@ export default defineComponent({
     onMounted(loadScore);
     onBeforeRouteUpdate(async (to) => {
       if (to.params.filePath !== props.filePath) {
-        ready.value = false;
+        ready.page = false;
+        ready.player = false;
         await init();
         await loadScore();
       }
@@ -175,11 +135,9 @@ export default defineComponent({
     return {
       osmdContainer,
       ready,
-      audioPlayer,
-      playPause,
-      refresh,
-      unkownExtension,
+      unknownExtension,
       download,
+      osmd,
     };
   },
 });

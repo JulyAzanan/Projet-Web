@@ -9,11 +9,8 @@
       <hr class="uk-tab" />
       <form class="uk-display-block uk-form-stacked">
         <div class="uk-container uk-container-xsmall">
-          <div
-            class="uk-margin-small uk-grid-small uk-child-width-1-2 uk-grid"
-            uk-grid
-          >
-            <div class="uk-first-column">
+          <div class="uk-margin-small uk-grid-small uk-grid" uk-grid>
+            <div class="uk-width-expand">
               <div class="uk-margin">
                 <label class="uk-form-label">Auteur*</label>
                 <input
@@ -25,23 +22,19 @@
                 />
               </div>
             </div>
-            <div
-              class="uk-grid-small uk-child-width-1-2 uk-grid uk-width-expand"
-            >
-              <div class="uk-first-column uk-margin-small-top uk-width-auto">
-                <p class="uk-h2 uk-margin-small-top">/</p>
-              </div>
-              <div class="uk-width-expand">
-                <label class="uk-form-label">Projet*</label>
-                <input
-                  class="uk-input"
-                  type="text"
-                  v-model="project"
-                  @input="checkProject"
-                  :class="{ 'uk-form-danger': invalidProject }"
-                  required
-                />
-              </div>
+            <div class="uk-margin-small-top uk-width-auto">
+              <p class="uk-h2 uk-margin-small-top">/</p>
+            </div>
+            <div class="uk-width-expand">
+              <label class="uk-form-label">Projet*</label>
+              <input
+                class="uk-input"
+                type="text"
+                v-model="project"
+                @input="checkProject"
+                :class="{ 'uk-form-danger': invalidProject }"
+                required
+              />
             </div>
           </div>
           <div>

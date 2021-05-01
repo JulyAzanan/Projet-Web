@@ -27,7 +27,7 @@
           <li>
             <router-link
               :to="{ name: 'Pulls', params: { userName, projectName } }"
-              >Changements
+              >Comparaison entre branches
             </router-link>
           </li>
           <li v-if="isContributor">

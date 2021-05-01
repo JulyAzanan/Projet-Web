@@ -118,3 +118,16 @@ export async function count(user: string, project: string): Promise<number> {
     project,
   });
 }
+
+export async function merge(user: string, project: string, source: string, dest: string): Promise<boolean> {
+  const response = await Request.get("api/branch.php", {
+    q: "merge",
+    user,
+    project,
+    source,
+    dest,
+  });
+  if (response.ok) return true;
+  Request.exception(response);
+  return false;
+}

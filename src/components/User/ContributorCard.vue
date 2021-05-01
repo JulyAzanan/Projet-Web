@@ -13,7 +13,7 @@
           <button
             uk-margin
             class="uk-button uk-button-default"
-            uk-tooltip="Ajouter comme contributeur"
+            @click="$emit('click')"
           >
             Ajouter {{ user.name }}
           </button>
@@ -34,7 +34,8 @@ export default defineComponent({
   },
   components: {
     UserPicture
-  }
+  },
+  emits: ['click'],
 });
 </script>
 

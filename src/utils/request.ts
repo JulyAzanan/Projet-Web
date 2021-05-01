@@ -38,8 +38,8 @@ export async function exception(response: Response): Promise<never> {
   throw new Error(`${response.statusText}: ${text}`)
 }
 
-export async function get(url: string): Promise<Response> {
-  return fetch(connection + url, {
+export async function get(url: string, params?: Record<string, any>): Promise<Response> {
+  return fetch(connection + url + (params ? `?${new URLSearchParams(params)}` : ""), {
     method: "GET",
     headers: getHeaders(url),
   });
@@ -51,7 +51,7 @@ export const patch = createRequest("PATCH");
 
 // eslint-disable-next-line
 export async function json(url: string, params?: Record<string, any>): Promise<any> {
-  const response = await get(url + (params ? `?${new URLSearchParams(params)}` : ""));
+  const response = await get(url, params);
   if (response.ok) return response.json();
   return exception(response);
 }
