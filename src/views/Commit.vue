@@ -29,7 +29,7 @@
             </select>
             <code> {{ commitID.substring(0, 6) }} </code>
           </div>
-          <a class="uk-icon" uk-icon="icon: download" @click="download"></a>
+          <a class="uk-icon uk-margin-small-left" uk-icon="icon: download" @click="download"></a>
         </div>
       </div>
     </div>

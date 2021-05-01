@@ -37,7 +37,6 @@
               type="file"
               @change="selectFiles"
               multiple
-              accept="image/x-png,image/gif,image/jpeg"
             />
             <span class="uk-link">sélectionnant des fichiers</span>
           </div>

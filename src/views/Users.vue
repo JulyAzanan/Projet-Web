@@ -29,10 +29,10 @@
                   class="uk-width-auto"
                 />
               </div>
-              <Pagination :page="parseInt(page)" :pages="pages" />
             </div>
             <div v-else uk-spinner></div>
           </div>
+          <Pagination v-if="ready" :page="parseInt(page)" :pages="pages" />
         </div>
       </div>
     </div>

@@ -48,7 +48,7 @@ function update($user, $password, $email, $age, $bio, $picture, $loggedUser)
     check_not_null($user, $loggedUser);
     check_owner($user, $loggedUser);
     $bd = connect();
-    if ($age != null) {
+    if ($age !== null) {
         $sql = "UPDATE musician SET age = :age WHERE name = :user";
         $stmt = $bd->prepare($sql);
         $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
@@ -57,7 +57,7 @@ function update($user, $password, $email, $age, $bio, $picture, $loggedUser)
             return false;
         }
     }
-    if ($password != null) {
+    if ($password !== null) {
         $passwordHash = hash("sha256", $password);
         $sql = "UPDATE musician SET passwordHash = :passwordHash WHERE name = :user";
         $stmt = $bd->prepare($sql);
@@ -67,7 +67,7 @@ function update($user, $password, $email, $age, $bio, $picture, $loggedUser)
             return false;
         }
     }
-    if ($email != null) {
+    if ($email !== null && find($user)->email !== $email) {
         if (findByEmail($email) != null) {
             return false;
         }
@@ -79,7 +79,7 @@ function update($user, $password, $email, $age, $bio, $picture, $loggedUser)
             return false;
         }
     }
-    if ($bio != null) {
+    if ($bio !== null) {
         $sql = "UPDATE musician SET bio = :bio WHERE name = :user";
         $stmt = $bd->prepare($sql);
         $stmt->bindValue(':user', $user, \PDO::PARAM_STR);
@@ -88,7 +88,7 @@ function update($user, $password, $email, $age, $bio, $picture, $loggedUser)
             return false;
         }
     }
-    if ($picture != null) {
+    if ($picture !== null) {
         $sql = "UPDATE musician SET picture = :picture WHERE name = :user";
         $stmt = $bd->prepare($sql);
         $stmt->bindValue(':user', $user, \PDO::PARAM_STR);

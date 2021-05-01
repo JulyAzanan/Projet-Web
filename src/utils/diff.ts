@@ -66,7 +66,7 @@ function longestCommonNoteSubsequence(c: Note[], d: Note[]): Note[] {
   function backtrack(c: Note[], d: Note[], x: number, y: number): Note[] {
     if (x === 0 || y === 0) return [];
     return noteEquals(c[x - 1], d[y - 1])
-      ? backtrack(c, d, x - 1, y - 1).concat(c[x - 1]) // x-1, y-1
+      ? backtrack(c, d, x - 1, y - 1).concat(c[x - 1])
       : matrix[x][y - 1] > matrix[x - 1][y]
         ? backtrack(c, d, x, y - 1)
         : backtrack(c, d, x - 1, y);
@@ -81,7 +81,7 @@ function longestCommonNoteSubsequence(c: Note[], d: Note[]): Note[] {
   for (let i = 1; i <= c.length; i++) {
     for (let j = 1; j <= d.length; j++) {
       matrix[i][j] = noteEquals(c[i - 1], d[j - 1])
-        ? matrix[i - 1][j - 1] + 1 // i-1, j-1
+        ? matrix[i - 1][j - 1] + 1
         : Math.max(matrix[i][j - 1], matrix[i - 1][j]);
     }
   }
@@ -116,7 +116,7 @@ function longestCommonSubsequence(c: string[], d: string[]): string[] {
   function backtrack(c: string[], d: string[], x: number, y: number): string[] {
     if (x === 0 || y === 0) return [];
     return c[x - 1] === d[y - 1]
-      ? backtrack(c, d, x - 1, y - 1).concat(c[x - 1]) // x-1, y-1
+      ? backtrack(c, d, x - 1, y - 1).concat(c[x - 1])
       : matrix[x][y - 1] > matrix[x - 1][y]
         ? backtrack(c, d, x, y - 1)
         : backtrack(c, d, x - 1, y);
@@ -131,7 +131,7 @@ function longestCommonSubsequence(c: string[], d: string[]): string[] {
   for (let i = 1; i <= c.length; i++) {
     for (let j = 1; j <= d.length; j++) {
       matrix[i][j] = c[i - 1] === d[j - 1]
-        ? matrix[i - 1][j - 1] + 1 // i-1, j-1
+        ? matrix[i - 1][j - 1] + 1
         : Math.max(matrix[i][j - 1], matrix[i - 1][j]);
     }
   }

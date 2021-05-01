@@ -1,8 +1,14 @@
 <template>
   <table class="uk-table uk-table-divider uk-table-hover">
+    <thead>
+      <tr>
+        <th class="uk-width-medium">Partition</th>
+        <th class="uk-table-expand">Commit</th>
+        <th class="uk-table-shrink uk-text-nowrap">Date</th>
+      </tr>
+    </thead>
     <tbody>
       <tr v-for="file in commit.files" :key="file.name">
-        <td><input class="uk-checkbox" type="checkbox" /></td>
         <td class="uk-table-link">
           <router-link
             :to="{
