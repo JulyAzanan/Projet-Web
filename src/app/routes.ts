@@ -97,10 +97,6 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
-    ...load("Settings"),
-    path: '/settings', // paramètres utilisateur // à voir
-  },
-  {
     ...load("Profile"),
     path: '/profile', // profil utilisateur
     props: route => ({ page: route.query.page ?? "1" }),

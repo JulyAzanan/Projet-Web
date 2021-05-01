@@ -131,6 +131,7 @@ export default defineComponent({
         description.value
       );
       if (success) {
+        store.commit("updateProjects")
         return router.push({
           name: "Branch-default",
           params: { userName: userName.value, projectName: project.value },
