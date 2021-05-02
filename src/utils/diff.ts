@@ -39,7 +39,7 @@ function toNote(el: Element): Note {
   const pitch = pitch_.length > 0 ? format(pitch_[0].outerHTML) : "";
   const voice = voice_.length > 0 ? format(voice_[0].outerHTML) : "";
   const type = type_.length > 0 ? format(type_[0].outerHTML) : "";
-  const tags = ["pitch", "duration", "voice", "type"]
+  const tags = ["pitch", "voice", "type"]
   const misc = [...el.children].filter((e) => !tags.includes(e.tagName));
   return {
     pitch, voice, type, misc,
