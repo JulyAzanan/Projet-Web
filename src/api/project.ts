@@ -2,7 +2,7 @@ import * as User from "./user"
 import * as Branch from "./branch"
 import * as Request from "../utils/request"
 
-export const perPage = 7;
+export const perPage = 6;
 
 export interface BaseResult {
   name: string,

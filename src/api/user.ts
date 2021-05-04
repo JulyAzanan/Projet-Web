@@ -2,8 +2,8 @@ import store from "../app/store";
 import * as Project from "./project"
 import * as Request from "../utils/request"
 
-export const perPage = 15;
-export const projectsPerPage = 15;
+export const perPage = 10;
+export const projectsPerPage = 6;
 
 export interface BaseResult {
   name: string,
